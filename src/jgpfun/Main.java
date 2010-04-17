@@ -20,7 +20,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {        
-        Dimension d = new Dimension(1024, 700);
+        Dimension d = new Dimension(1280, 1024);
         PopulationManager pm = new PopulationManager(d.width, d.height, 26, 256, 20);
         JFrame frame = new JFrame("BAH! Bonn!!1!11!!!");
         MainView mainView = new MainView();

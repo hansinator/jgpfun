@@ -31,12 +31,13 @@ public class Organism {
         this.dir = dir;
         this.food = 0;
         this.vm = new EvoVM(24, program);
+        cosdir = Math.cos(dir);
     }
 
+    double cosdir;
     void live(Food nextFood, double foodDist) throws Exception {
-        int out1, out2;
-        double left, right, speed;
-        double scale = 8192.0;
+        int left, right, scale = (int)((Integer.MAX_VALUE / (2.0*Math.PI)));
+        double speed;
 
         //write input registers
         vm.regs[0] = (int)(Math.cos(dir) * scale);
@@ -45,18 +46,18 @@ public class Organism {
 
         vm.run();
 
-        //fetch outputs
-        out1 = vm.regs[3];
-        out2 = vm.regs[4];
-
-        left = Math.max(0, Math.min(out1, 65535)) / scale;
-        right = Math.max(0, Math.min(out2, 65535)) / scale;
+        //fetch an limit outputs
+        left =  vm.regs[3] / scale;
+        right = vm.regs[4] / scale;
+        /*left =  Math.max(0, Math.min(vm.regs[3], 65535)) / scale;
+        right = Math.max(0, Math.min(vm.regs[4], 65535)) / scale;*/
 
         //compute movement here
         dir += (right - left) * (maxForce / 100);   //find the direction
         speed = (right + left) / 2;
         x += Math.sin(dir) * maxSpeed * speed / 10;       //max speed is just a twaking parameter; don't get confused by it
-        y -= Math.cos(dir) * maxSpeed * speed / 10;       //try varying it in simulation        
+        cosdir = Math.cos(dir);
+        y -= cosdir * maxSpeed * speed / 10;       //try varying it in simulation
     }
 
     static Organism randomOrganism(int xmax, int ymax, int progsize) {
