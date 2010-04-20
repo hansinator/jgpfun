@@ -21,7 +21,7 @@ public class Main {
      */
     public static void main(String[] args) {        
         Dimension d = new Dimension(1280, 1024);
-        PopulationManager pm = new PopulationManager(d.width, d.height, 26, 256, 20);
+        PoolingPopulationManager pm = new PoolingPopulationManager(d.width, d.height, 26, 256, 30);
         JFrame frame = new JFrame("BAH! Bonn!!1!11!!!");
         MainView mainView = new MainView();
 
@@ -38,6 +38,7 @@ public class Main {
 
             public void windowClosing(WindowEvent e) {
                 Main.running = false;
+                System.out.println("TADAA");
             }
 
             public void windowClosed(WindowEvent e) {

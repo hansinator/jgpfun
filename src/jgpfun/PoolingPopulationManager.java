@@ -3,6 +3,7 @@ package jgpfun;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -10,25 +11,27 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jgpfun.Organism;
 
 /**
  *
  * @author hansinator
  */
-public class PopulationManager {
+public class PoolingPopulationManager {
 
     Random rnd;
     List<Organism> ants;
+    List<Organism> organismPool;
     List<Food> food;
     final int worldWidth, worldHeight;
     public static final int foodTolerance = 10;
-    public static final int maxMutations = 4;
+    public static final int maxMutations = 2;
+    public static final int maxPoolSize = 100;
     public final int progSize;
+    private int bestInPool;
     final Object lock = new Object();
     ThreadPoolExecutor pool;
 
-    public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
+    public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
 
         for (int i = 0; i < popSize; i++) {
@@ -48,6 +51,8 @@ public class PopulationManager {
 
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        organismPool = new ArrayList<Organism>(maxPoolSize);
     }
 
     public double foodDist(Food f, int x, int y) {
@@ -85,7 +90,7 @@ public class PopulationManager {
 
         for (int i = 0; i < iterations; i++) {
             step();
-            if ((i % 1000) == 0) {
+            if ((i % 400) == 0) {
                 time = System.currentTimeMillis() - start;
                 mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
                 mainView.repaint();
@@ -100,6 +105,7 @@ public class PopulationManager {
         int foodCollected = newGeneration();
 
         System.out.println("Food collected: " + foodCollected);
+        System.out.println("Best in pool: " + bestInPool);
 
         int fs = food.size();
         food = new ArrayList<Food>(fs);
@@ -120,7 +126,7 @@ public class PopulationManager {
                     try {
                         organism.live(f, foodDist(f, organism.x, organism.y));
                     } catch (Exception ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                     //compute new movement here
@@ -153,15 +159,43 @@ public class PopulationManager {
         try {
             cb.await();
         } catch (InterruptedException ex) {
-            Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    //this funtion ensures that the populatio pool
+    //does not exceed it's maximum size by purging
+    //the least successful organisms
+    private void updatePool() {
+        if(organismPool.size() > maxPoolSize) {
+            //sort the list so that the fittest organisms are on top
+            Collections.sort(organismPool);
+            Collections.reverse(organismPool);
+
+            //drop all superfluous organisms
+            for(int i = organismPool.size()-1; i > 99 ; i--) {
+                organismPool.remove(i);
+            }
+
+            //reshuffle to make roulettewheel work better
+            Collections.shuffle(organismPool);
         }
     }
 
     private int newGeneration() {
-        int totalFit = calculateFitness();
+        int totalFit;
         OpCode[] parent1, parent2;
         double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
+
+        //enqueue all current organisms into our pool
+        organismPool.addAll(ants);
+
+        //update the pool
+        updatePool();
+
+        //get the fitness
+        totalFit = calculateFitness(organismPool);
 
         //choose crossover operator
         //CrossoverOperator crossOp = new TwoPointCrossover();
@@ -171,8 +205,8 @@ public class PopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = rouletteWheel(totalFit).clone();
-            parent2 = rouletteWheel(totalFit).clone();
+            parent1 = rouletteWheel(totalFit, organismPool).clone();
+            parent2 = rouletteWheel(totalFit, organismPool).clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.NextDouble();
@@ -199,7 +233,7 @@ public class PopulationManager {
     }
 
     //fintess proportionate selection
-    private Organism rouletteWheel(int totalFit) {
+    private Organism rouletteWheel(int totalFit, List<Organism> organisms) {
         int stopPoint = 0;
         int fitnessSoFar = 0;
 
@@ -207,15 +241,15 @@ public class PopulationManager {
             stopPoint = rnd.nextInt(totalFit);
         }
 
-        for (int i = 0; i < ants.size(); i++) {
-            fitnessSoFar += ants.get(i).food;
+        for (int i = 0; i < organisms.size(); i++) {
+            fitnessSoFar += organisms.get(i).food;
             //this way zero fitness ants are omitted
             if (fitnessSoFar > stopPoint) {
-                return ants.get(i);
+                return organisms.get(i);
             }
         }
 
-        return ants.get(rnd.nextInt(ants.size()));
+        return organisms.get(rnd.nextInt(organisms.size()));
     }
 
     //make random changes to random locations in the genome
@@ -232,13 +266,20 @@ public class PopulationManager {
     }
 
     //the team effort
-    private int calculateFitness() {
+    private int calculateFitness(List<Organism> organisms) {
         int totalFit = 0;
-        for (Organism o : ants) {
-            totalFit += o.food;
-        }
-        return totalFit;
+        bestInPool = 0;
 
+        for (Organism o : organisms) {
+            totalFit += o.food;
+
+            //remember the best
+            if(o.food > bestInPool) {
+                bestInPool = o.food;
+            }
+        }
+
+        return totalFit;
     }
     final int maxRegisterValDelta = 16;
     final int maxConstantValDelta = 16384;

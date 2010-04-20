@@ -11,7 +11,7 @@ import java.util.Random;
  *
  * @author hansinator
  */
-public class Organism {
+public class Organism implements Comparable<Organism> {
 
     static Random rnd = new SecureRandom();
     EvoVM vm;
@@ -79,5 +79,9 @@ public class Organism {
         }
 
         return p;
+    }
+
+    public int compareTo(Organism o) {
+        return new Integer(food).compareTo(o.food);
     }
 }

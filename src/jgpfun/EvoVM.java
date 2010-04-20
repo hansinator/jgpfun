@@ -50,6 +50,20 @@ public class EvoVM {
             trg = Integer.MAX_VALUE;
         }
     }
+
+    void opMov() {
+        trg = src1;
+    }
+
+    //max op
+    void opMax() {
+        trg = Math.max(src2, src1);
+    }
+
+    //min op
+    void opMin() {
+        trg = Math.min(src2, src1);
+    }
     
     OpCode[] program;
     int[] regs;
