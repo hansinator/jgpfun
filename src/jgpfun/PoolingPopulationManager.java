@@ -101,11 +101,18 @@ public class PoolingPopulationManager {
 
         System.out.println("GEN: " + gen);
         System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
+        System.out.println("Food collected: " + calculateFitness(ants));
 
-        int foodCollected = newGeneration();
+        int avgProgSize = 0;
+        for(Organism o : ants) {
+            avgProgSize += o.program.length;
+        }
+        avgProgSize /= ants.size();
+        System.out.println("Avg prog size (current generation): " + avgProgSize);        
 
-        System.out.println("Food collected: " + foodCollected);
-        System.out.println("Best in pool: " + bestInPool);
+        newGeneration();
+        
+        System.out.println("Best in pool: " + bestInPool);        
 
         int fs = food.size();
         food = new ArrayList<Food>(fs);

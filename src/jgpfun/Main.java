@@ -5,6 +5,8 @@
 package jgpfun;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.JFrame;
@@ -14,14 +16,12 @@ import javax.swing.JFrame;
  * @author hansinator
  */
 public class Main {
-    static volatile boolean running = true;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {        
+    private volatile boolean running = true;
+
+    private void run() {
         Dimension d = new Dimension(1280, 1024);
-        PoolingPopulationManager pm = new PoolingPopulationManager(d.width, d.height, 26, 256, 30);
+        final PoolingPopulationManager pm = new PoolingPopulationManager(d.width, d.height, 26, 128, 30);
         JFrame frame = new JFrame("BAH! Bonn!!1!11!!!");
         MainView mainView = new MainView();
 
@@ -29,7 +29,33 @@ public class Main {
         frame.setContentPane(mainView);
         frame.setVisible(true);
 
-        System.out.println("size: " + mainView.getWidth() + "x" + mainView.getHeight());
+        System.out.println("Main window size: " + mainView.getWidth() + "x" + mainView.getHeight());
+
+        frame.addMouseListener(new MouseListener() {
+
+            public void mouseClicked(MouseEvent e) {
+                /*if(pm.roundsMod == 400) {
+                    pm.roundsMod = 1;
+                    System.out.println("its 1 now");
+                }
+                else {
+                    System.out.println("its 400 now");
+                    pm.roundsMod = 400;
+                }*/
+            }
+
+            public void mousePressed(MouseEvent e) {
+            }
+
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            public void mouseExited(MouseEvent e) {
+            }
+        });
 
         frame.addWindowListener(new WindowListener() {
 
@@ -37,13 +63,13 @@ public class Main {
             }
 
             public void windowClosing(WindowEvent e) {
-                Main.running = false;
-                System.out.println("TADAA");
+                running = false;
+                System.out.println("Closing main window");
             }
 
             public void windowClosed(WindowEvent e) {
-                Main.running = false;
-                System.out.println("TADAA");
+                running = false;
+                System.out.println("Closed main window");
             }
 
             public void windowIconified(WindowEvent e) {
@@ -58,9 +84,17 @@ public class Main {
             public void windowDeactivated(WindowEvent e) {
             }
         });
-        
-        while (Main.running) {
+
+        while (running) {
             pm.runGeneration(4000, mainView);
         }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        new Main().run();
+        System.exit(0);
     }
 }

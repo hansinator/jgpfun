@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jgpfun.Organism;
 
 /**
  *
@@ -27,8 +26,10 @@ public class PopulationManager {
     public final int progSize;
     final Object lock = new Object();
     ThreadPoolExecutor pool;
+    public volatile int roundsMod = 400;
 
-    public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
+    public PopulationManager(int worldWidth, int worldHeight, int popSize,
+            int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
 
         for (int i = 0; i < popSize; i++) {
@@ -46,8 +47,10 @@ public class PopulationManager {
         this.worldHeight = worldHeight;
         this.progSize = progSize;
 
-        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
-        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.
+                getRuntime().availableProcessors() * 2) - 1);
+        pool.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     public double foodDist(Food f, int x, int y) {
@@ -77,32 +80,50 @@ public class PopulationManager {
             return new Food(x, y);
         }
     }
-
     static int gen = 0;
+
     public void runGeneration(int iterations, MainView mainView) {
         long start = System.currentTimeMillis();
         long time;
 
         for (int i = 0; i < iterations; i++) {
             step();
-            if ((i % 1000) == 0) {
+            if ((i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
-                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
+                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000)
+                        / time) : 1);
                 mainView.repaint();
+                if (roundsMod == 1) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(PopulationManager.class.getName()).log(
+                                Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
 
         gen++;
 
+        System.out.println("");
         System.out.println("GEN: " + gen);
-        System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
+        System.out.println("RPS: " + ((iterations * 1000) / (System.
+                currentTimeMillis() - start)));
+
+        int avgProgSize = 0;
+        for (Organism o : ants) {
+            avgProgSize += o.program.length;
+        }
+        avgProgSize /= ants.size();
+        System.out.println("Avg prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
 
         System.out.println("Food collected: " + foodCollected);
 
         int fs = food.size();
-        food = new ArrayList<Food>(fs);
+        food.clear();
         for (int i = 0; i < fs; i++) {
             food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
         }
@@ -113,39 +134,59 @@ public class PopulationManager {
 
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
+
                 public void run() {
+                    //long start = System.nanoTime();
+
                     //find closest food
                     Food f = findNearestFood(organism.x, organism.y);
+
+                    //System.out.println("Find food took: " + (System.nanoTime() - start));
+                    //start = System.nanoTime();
 
                     try {
                         organism.live(f, foodDist(f, organism.x, organism.y));
                     } catch (Exception ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PopulationManager.class.getName()).log(
+                                Level.SEVERE, null, ex);
                     }
+
+                    /*long live = (System.nanoTime() - start);
+                    System.out.println("VM Run took: " + organism.vmrun);
+                    System.out.println("Movement computation took: " + organism.comp);
+                    System.out.println("All Run took: " + organism.allrun);
+                    System.out.println("Live took: " + live);
+                    start = System.nanoTime();*/
 
                     //compute new movement here
                     //TODO: move computation from ant to here or somewhere else
 
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
-                    organism.x = Math.min(Math.max(organism.x, 0), worldWidth);
-                    organism.y = Math.min(Math.max(organism.y, 0), worldHeight);
+                    organism.x = Math.min(Math.max(organism.x, 10), worldWidth
+                            - 10);
+                    organism.y = Math.min(Math.max(organism.y, 10), worldHeight
+                            - 10);
 
                     //eat food
                     synchronized (lock) {
-                        if ((food.contains(f)) &&
-                                (f.x >= (organism.x - foodTolerance)) &&
-                                (f.x <= (organism.x + foodTolerance)) &&
-                                (f.y >= (organism.y - foodTolerance)) &&
-                                (f.y <= (organism.y + foodTolerance))) {
+                        if ((food.contains(f)) && (f.x >= (organism.x
+                                - foodTolerance)) && (f.x <= (organism.x
+                                + foodTolerance)) && (f.y >= (organism.y
+                                - foodTolerance)) && (f.y <= (organism.y
+                                + foodTolerance))) {
                             organism.food++;
                             f.x = rnd.nextInt(worldWidth);
                             f.y = rnd.nextInt(worldHeight);
                         }
                     }
+                    //System.out.println("Food computation took: " + (System.nanoTime() - start));
+                    //start = System.nanoTime();
 
                     cb.countDown();
-                }                
+
+                    //System.out.println("Latch took: " + (System.nanoTime() - start));
+                }
             };
 
             pool.execute(r);
@@ -153,7 +194,8 @@ public class PopulationManager {
         try {
             cb.await();
         } catch (InterruptedException ex) {
-            Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
     }
 
@@ -188,8 +230,10 @@ public class PopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
-            newAnts.add(new Organism(parent2, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
+            newAnts.add(new Organism(parent1, rnd.nextInt(worldWidth), rnd.
+                    nextInt(worldHeight), rnd.nextDouble()));
+            newAnts.add(new Organism(parent2, rnd.nextInt(worldWidth), rnd.
+                    nextInt(worldHeight), rnd.nextDouble()));
         }
 
         //replace and leave the other to GC
@@ -284,7 +328,8 @@ public class PopulationManager {
 
         //replacement is always possible..
         //add all up
-        chancesSum = mutateRep + mutateIns + mutateRem + mutateVal + mutateSrc2 + mutateTrg + mutateOp + mutateFlags;
+        chancesSum = mutateRep + mutateIns + mutateRem + mutateVal + mutateSrc2
+                + mutateTrg + mutateOp + mutateFlags;
 
         //choose mutation
         mutationChoice = rnd.nextInt(chancesSum);
@@ -303,7 +348,8 @@ public class PopulationManager {
             //replace a random instruction
             programSpace.set(loc, OpCode.randomOne(rnd));
         } //mutate src1 or immediate value
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal)) {
+        else if (mutationChoice
+                < (mutateIns + mutateRem + mutateRep + mutateVal)) {
             //if immediate, modify the constant value by random value
             if (instr.immediate) {
                 val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
@@ -317,7 +363,8 @@ public class PopulationManager {
             //save modified instruction
             programSpace.set(loc, instr);
         } //mutate src2
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2)) {
+        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
+                + mutateSrc2)) {
             //modify the src2 register number by a random value
             val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
             instr.src2 = (instr.src2 + val);
@@ -325,7 +372,8 @@ public class PopulationManager {
             //save modified instruction
             programSpace.set(loc, instr);
         } //mutate trg
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg)) {
+        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
+                + mutateSrc2 + mutateTrg)) {
             //modify trg field by random value
             //(the scale of the value might be ridiculous...)
             //do
@@ -340,7 +388,8 @@ public class PopulationManager {
             //save modified instruction
             programSpace.set(loc, instr);
         } //mutate op
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg + mutateOp)) {
+        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
+                + mutateSrc2 + mutateTrg + mutateOp)) {
             //replace opcode field by random value
             instr.op = rnd.nextInt();
 
