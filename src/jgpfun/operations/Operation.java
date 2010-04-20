@@ -1,0 +1,14 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package jgpfun.operations;
+
+/**
+ *
+ * @author dahmen
+ */
+public interface Operation {
+    public int execute(int src1, int src2);
+}

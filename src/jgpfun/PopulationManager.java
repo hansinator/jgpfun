@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jgpfun.Organism;
 
 /**
  *
@@ -23,10 +22,11 @@ public class PopulationManager {
     List<Food> food;
     final int worldWidth, worldHeight;
     public static final int foodTolerance = 10;
-    public static final int maxMutations = 2;
+    public static final int maxMutations = 4;
     public final int progSize;
     final Object lock = new Object();
     ThreadPoolExecutor pool;
+    public volatile int roundsMod = 400;
 
     public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
@@ -85,15 +85,23 @@ public class PopulationManager {
 
         for (int i = 0; i < iterations; i++) {
             step();
-            if ((i % 400) == 0) {
+            if ((i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
                 mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
                 mainView.repaint();
+                if(roundsMod == 1) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
 
         gen++;
 
+        System.out.println("");
         System.out.println("GEN: " + gen);
         System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
 
@@ -101,8 +109,15 @@ public class PopulationManager {
 
         System.out.println("Food collected: " + foodCollected);
 
+        int avgProgSize = 0;
+        for(Organism o : ants) {
+            avgProgSize += o.program.length;
+        }
+        avgProgSize /= ants.size();
+        System.out.println("Avg prog size: " + avgProgSize);
+
         int fs = food.size();
-        food = new ArrayList<Food>(fs);
+        food.clear();
         for (int i = 0; i < fs; i++) {
             food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
         }
@@ -114,8 +129,13 @@ public class PopulationManager {
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
                 public void run() {
+                    //long start = System.nanoTime();
+
                     //find closest food
                     Food f = findNearestFood(organism.x, organism.y);
+
+                    //System.out.println("Find food took: " + (System.nanoTime() - start));
+                    //start = System.nanoTime();
 
                     try {
                         organism.live(f, foodDist(f, organism.x, organism.y));
@@ -123,13 +143,20 @@ public class PopulationManager {
                         Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
+                    /*long live = (System.nanoTime() - start);
+                    System.out.println("VM Run took: " + organism.vmrun);
+                    System.out.println("Movement computation took: " + organism.comp);
+                    System.out.println("All Run took: " + organism.allrun);
+                    System.out.println("Live took: " + live);
+                    start = System.nanoTime();*/
+
                     //compute new movement here
                     //TODO: move computation from ant to here or somewhere else
 
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
-                    organism.x = Math.min(Math.max(organism.x, 0), worldWidth);
-                    organism.y = Math.min(Math.max(organism.y, 0), worldHeight);
+                    organism.x = Math.min(Math.max(organism.x, 10), worldWidth-10);
+                    organism.y = Math.min(Math.max(organism.y, 10), worldHeight-10);
 
                     //eat food
                     synchronized (lock) {
@@ -143,8 +170,12 @@ public class PopulationManager {
                             f.y = rnd.nextInt(worldHeight);
                         }
                     }
+                    //System.out.println("Food computation took: " + (System.nanoTime() - start));
+                    //start = System.nanoTime();
 
                     cb.countDown();
+
+                    //System.out.println("Latch took: " + (System.nanoTime() - start));
                 }                
             };
 

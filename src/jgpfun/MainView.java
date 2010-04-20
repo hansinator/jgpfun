@@ -90,20 +90,23 @@ public class MainView extends javax.swing.JPanel {
         g.setColor(Color.red);
 
         for (Organism o : organisms) {
-            Polygon p = new Polygon();
+            //Polygon p = new Polygon();
             double sindir = Math.sin(o.dir);
             double cosdir = Math.cos(o.dir);
-            int xrot = 0;//(int)Math.floor(2.0 * sindir);
-            int yrot = 0;//(int)Math.floor(2.0 * cosdir);
+            int xrot = (int)Math.floor(8.0 * sindir);
+            int yrot = (int)Math.floor(8.0 * cosdir);
 
-            p.addPoint((o.x - 4 + xrot), (o.y + 4 + yrot));
-            p.addPoint((o.x + 4 + xrot), (o.y + 4 + yrot));
-            p.addPoint(o.x + xrot, o.y - 6 + yrot);
+            /*p.addPoint((o.x - xrot), (o.y + yrot));
+            p.addPoint((o.x + xrot), (o.y + yrot));
+            p.addPoint(o.x + xrot, o.y - 6 + yrot);*/
 
-            g.drawPolygon(p);
-            g.fillPolygon(p);
+            g.drawLine(o.x, o.y, o.x+xrot, o.y-yrot);
+            g.fillOval(o.x, o.y, 4, 4);
+            /*g.drawPolygon(p);
+            g.fillPolygon(p);*/
         }
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
