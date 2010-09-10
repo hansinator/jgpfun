@@ -14,31 +14,19 @@ import java.util.Random;
 public class Organism implements Comparable<Organism> {
 
     static Random rnd = new SecureRandom();
+
     EvoVM2 vm;
-    EvoVM vm;
-    
+
     OpCode[] program;
     /*int xpos, ypos;
     int angle;*/
-    public int x, y, food;
-    double dx, dy;
-    public double dir;
-    public static final double maxForce = 10;
-    public static final double maxSpeed = 6;
-    public boolean showdebug = false;
 
-	//LAPPY
-    public Organism(OpCode[] program, int x, int y, double dir) {
-        this.x = x;
-        this.y = y;
-        dx = x;
-        dy = y;
-        this.program = program;
-        this.dir = dir;
-        this.food = 0;
-        this.vm = new EvoVM2(24, program);
-        cosdir = Math.cos(dir);
-    }
+    public int x, y;
+
+    double dx, dy;
+
+    public double dir;
+
     //public long vmrun, allrun, comp;
     double cosdir;
 
@@ -46,25 +34,41 @@ public class Organism implements Comparable<Organism> {
 
     public TankMotor[] motors;
 
+    public boolean showdebug = false;
+
     public static final double maxForce = 10.0;
 
     public static final double maxSpeed = 4.0;
 
-	//PC
+    //PC - keep this for movement reasons
+    /*
+    public Organism(OpCode[] program, int x, int y, double dir) {
+    this.x = x;
+    this.y = y;
+    dx = x;
+    dy = y;
+    this.dir = dir;
+    this.food = 0;
+    cosdir = Math.cos(dir);
+
+    this.program = program;
+    this.vm = new EvoVM2(24, program);
+    }*/
+
+    //LAPPY
     public Organism(OpCode[] program, int worldWidth, int worldHeight) {
         this.program = program;
-        this.vm = new EvoVM(24, program);
+        this.vm = new EvoVM2(24, program);
         this.food = 0;
 
         motors = new TankMotor[2];
-        for(int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             motors[i] = new TankMotor(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble());
         }
     }
-    //public long vmrun, allrun, comp;
-    double cosdir;
 
-	//LAPPY
+    //LAPPY
+
     void live(PopulationManager.FoodFinder fd) throws Exception {
         int out1, out2;
         double left, right, foodDist;
@@ -75,7 +79,7 @@ public class Organism implements Comparable<Organism> {
         for (TankMotor m : motors) {
             m.food = fd.findNearestFood(m.x, m.y);
             foodDist = fd.foodDist(m.food, m.x, m.y);
-            
+
             vm.regs[inreg++] = (int) (Math.cos(m.dir) * scale);
             vm.regs[inreg++] = (int) (((m.food.x - m.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((m.food.y - m.y) / foodDist) * scale);
@@ -98,8 +102,8 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-	//PC
-	void live(Food nextFood, double foodDist) throws Exception {
+    //PC
+    void live(Food nextFood, double foodDist) throws Exception {
         int left, right, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
         double speed;
 
@@ -192,9 +196,11 @@ public class Organism implements Comparable<Organism> {
         return p;
     }
 
+
+    @Override
     public int compareTo(Organism o) {
         return new Integer(food).compareTo(o.food);
-	}
+    }
 
     public class TankMotor {
 
