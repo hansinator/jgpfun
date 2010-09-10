@@ -24,12 +24,13 @@ public class PoolingPopulationManager {
     List<Food> food;
     final int worldWidth, worldHeight;
     public static final int foodTolerance = 10;
-    public static final int maxMutations = 2;
+    public static final int maxMutations = 4;
     public static final int maxPoolSize = 100;
     public final int progSize;
     private int bestInPool;
     final Object lock = new Object();
     ThreadPoolExecutor pool;
+    public volatile int roundsMod = 400;
 
     public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
@@ -89,12 +90,22 @@ public class PoolingPopulationManager {
         long time;
 
         for (int i = 0; i < iterations; i++) {
+            ants.get(0).showdebug = (roundsMod == 1);
             step();
-            if ((i % 400) == 0) {
+            if ((i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
                 mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
                 mainView.repaint();
             }
+            
+            if (roundsMod == 1) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(PopulationManager.class.getName()).log(
+                                Level.SEVERE, null, ex);
+                    }
+                }
         }
 
         gen++;
@@ -143,6 +154,8 @@ public class PoolingPopulationManager {
                     //TODO: take into account ant size, so it can't hide outside of the screen
                     organism.x = Math.min(Math.max(organism.x, 0), worldWidth);
                     organism.y = Math.min(Math.max(organism.y, 0), worldHeight);
+                    organism.dx = Math.min(Math.max(organism.dx, 0), worldWidth);
+                    organism.dy = Math.min(Math.max(organism.dy, 0), worldHeight);
 
                     //eat food
                     synchronized (lock) {
@@ -251,7 +264,7 @@ public class PoolingPopulationManager {
         for (int i = 0; i < organisms.size(); i++) {
             fitnessSoFar += organisms.get(i).food;
             //this way zero fitness ants are omitted
-            if (fitnessSoFar > stopPoint) {
+            if (fitnessSoFar > stopPoint) {                
                 return organisms.get(i);
             }
         }
@@ -297,7 +310,7 @@ public class PoolingPopulationManager {
         //fetch programspace and weights
 
         //define chances for what mutation could happen in some sort of percentage
-        int mutateIns = 22, mutateRem = 18, mutateRep = 20, mutateVal = 20;
+        int mutateIns = 22, mutateRem = 1, mutateRep = 20, mutateVal = 20;
         int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
         //chances sum represents 100%, i.e. the sum of all possible chances
         int chancesSum;
@@ -345,6 +358,7 @@ public class PoolingPopulationManager {
         } //mutate rem
         else if (mutationChoice < (mutateIns + mutateRem)) {
             //remove a random instruction
+            System.out.println("rem");
             programSpace.remove(loc);
         } //mutate rep
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {

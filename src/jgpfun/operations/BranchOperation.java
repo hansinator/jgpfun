@@ -5,12 +5,11 @@
 
 package jgpfun.operations;
 
-import java.io.Serializable;
-
 /**
+ * Just a tagging interface.
  *
- * @author dahmen
+ * @author Administrator
  */
-public interface Operation extends Serializable {
-    public int execute(int src1, int src2);
+public interface BranchOperation {
+
 }

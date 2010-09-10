@@ -1,10 +1,15 @@
 package jgpfun;
 
+import jgpfun.operations.BranchOperation;
+import jgpfun.operations.JumpOp;
+import jgpfun.operations.JumpTarg;
 import jgpfun.operations.OpAbs;
 import jgpfun.operations.OpAdd;
 import jgpfun.operations.OpBranchGt;
 import jgpfun.operations.OpBranchLt;
+import jgpfun.operations.OpDec;
 import jgpfun.operations.OpDiv;
+import jgpfun.operations.OpInc;
 import jgpfun.operations.OpMax;
 import jgpfun.operations.OpMin;
 import jgpfun.operations.OpMod;
@@ -40,10 +45,14 @@ public class EvoVM2 {
                     new OpMin(),
                     new OpMax(),
                     new OpAbs(),
-                    new OpSin(),
-                    new OpMov()
-                    //new OpBranchLt(),
-                    //new OpBranchGt()
+                    //new OpSin(),
+                    new OpMov(),
+                    new OpInc(),
+                    new OpDec(),
+                    new OpBranchLt(),
+                    new OpBranchGt()
+                    //new JumpOp(),
+                    //new JumpTarg()
                 };
     }
     OpCode[] program;
@@ -59,27 +68,40 @@ public class EvoVM2 {
             curop.src1 = Math.abs(curop.src1) % numregs;
             if (!curop.immediate) {
                 curop.src2 = Math.abs(curop.src2) % numregs;
+            } else {
+                curop.src2 /= 65535;
             }
             curop.trg = Math.abs(curop.trg) % numregs;
             curop.op = Math.abs(curop.op) % ops.length;
         }
     }
+    int pc;
 
     public void run() throws Exception {
-        for (int pc = 0; pc < program.length; pc++) {
-            try {
-                execute(pc);
-            } catch (NoOp ex) {
-            } catch (Branch ex) {
-                pc++;
-            }
+        pc = 0;
+        while (pc < program.length) {
+            execute(pc++);
         }
     }
 
     public void execute(int pc) throws Exception {
         OpCode curop = program[pc];
+        Operation op = ops[curop.op];
 
-        //execute the operation
-        regs[curop.trg] = ops[curop.op].execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
+        if (op instanceof BranchOperation) {
+            if(op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2])) != 1) {
+                pc++;
+            }
+        /*} else if(op instanceof JumpOp) {
+            //fast forward until the next jumptarg is found or program end is reached
+            do {
+                pc++;
+            } while ((pc < program.length) && !(ops[program[pc].op] instanceof JumpTarg));
+        } else if(op instanceof JumpTarg) {
+            //do nothing*/
+        } else {
+            //execute the operation
+            regs[curop.trg] = op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
+        }
     }
 }

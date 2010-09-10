@@ -7,12 +7,12 @@ package jgpfun.operations;
 
 /**
  *
- * @author dahmen
+ * @author Administrator
  */
-public class OpSqrt implements Operation, UnaryOperation {
+public class OpInc implements Operation, UnaryOperation {
 
     public int execute(int src1, int src2) {
-        return (int)Math.sqrt(src1);
+        return src1++;
     }
 
 }

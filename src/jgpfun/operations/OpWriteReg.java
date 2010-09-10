@@ -7,12 +7,12 @@ package jgpfun.operations;
 
 /**
  *
- * @author dahmen
+ * @author Administrator
  */
-public class OpSqrt implements Operation, UnaryOperation {
+public class OpWriteReg implements Operation {
 
     public int execute(int src1, int src2) {
-        return (int)Math.sqrt(src1);
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

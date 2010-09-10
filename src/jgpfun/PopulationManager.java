@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jgpfun.operations.UnaryOperation;
 
 /**
  *
@@ -93,6 +94,7 @@ public class PopulationManager {
                 mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000)
                         / time) : 1);
                 mainView.repaint();
+
                 if (roundsMod == 1) {
                     try {
                         Thread.sleep(5);
@@ -129,6 +131,14 @@ public class PopulationManager {
         }
     }
 
+    private boolean checkBarrier(int inx, int iny, int x1, int y1, int x2,
+            int y2) {
+        if (((inx >= x1) && (inx <= x2)) && ((iny >= y1) && (iny <= y2))) {
+            return false;
+        }
+        return true;
+    }
+
     void step() {
         final CountDownLatch cb = new CountDownLatch(ants.size());
 
@@ -137,6 +147,7 @@ public class PopulationManager {
 
                 public void run() {
                     //long start = System.nanoTime();
+                    int oldx, oldy;
 
                     //find closest food
                     Food f = findNearestFood(organism.x, organism.y);
@@ -145,6 +156,8 @@ public class PopulationManager {
                     //start = System.nanoTime();
 
                     try {
+                        oldx = organism.x;
+                        oldy = organism.y;
                         organism.live(f, foodDist(f, organism.x, organism.y));
                     } catch (Exception ex) {
                         Logger.getLogger(PopulationManager.class.getName()).log(
@@ -167,6 +180,9 @@ public class PopulationManager {
                             - 10);
                     organism.y = Math.min(Math.max(organism.y, 10), worldHeight
                             - 10);
+
+                    //have a more compex world, add a barrier in the middle of the screen
+
 
                     //eat food
                     synchronized (lock) {
@@ -286,6 +302,7 @@ public class PopulationManager {
     }
     final int maxRegisterValDelta = 16;
     final int maxConstantValDelta = 16384;
+    //final int maxConstantValDelta = Integer.maxValue / 2;
 
     public OpCode[] mutateProgramSpace(OpCode[] program) {
         List<OpCode> programSpace = new ArrayList(program.length);
@@ -324,6 +341,12 @@ public class PopulationManager {
         //if we have only 4 opcodes left, don't delete more
         if (programSpace.size() < 5) {
             mutateRem = 0;
+            mutateIns = 100; //TEST: when prog is too small, mutation tends to vary the same loc multiple times... 
+        }
+
+        //if this is a unary op, don't touch src2 - it'll be noneffective
+        if(instr instanceof UnaryOperation) {
+            mutateSrc2 = 0;
         }
 
         //replacement is always possible..
@@ -350,24 +373,24 @@ public class PopulationManager {
         } //mutate src1 or immediate value
         else if (mutationChoice
                 < (mutateIns + mutateRem + mutateRep + mutateVal)) {
-            //if immediate, modify the constant value by random value
-            if (instr.immediate) {
-                val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
-                instr.src1 += val;
-            } //else modify the src1 register number by a random value
-            else {
-                val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-                instr.src1 += val;
-            }
+            //modify the src1 register number by a random value
+            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+            instr.src1 = (instr.src1 + val);
 
             //save modified instruction
             programSpace.set(loc, instr);
         } //mutate src2
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
                 + mutateSrc2)) {
-            //modify the src2 register number by a random value
-            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-            instr.src2 = (instr.src2 + val);
+            //if immediate, modify the constant value by random value
+            if (instr.immediate) {
+                val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
+                instr.src2 += val;
+            } //else modify the src2 register number by a random value
+            else {
+                val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+                instr.src2 += val;
+            }
 
             //save modified instruction
             programSpace.set(loc, instr);

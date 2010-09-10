@@ -21,7 +21,7 @@ public class Main {
 
     private void run() {
         Dimension d = new Dimension(1280, 1024);
-        final PoolingPopulationManager pm = new PoolingPopulationManager(d.width, d.height, 26, 128, 30);
+        final PopulationManager pm = new PopulationManager(d.width, d.height, 26, 192, 30);
         JFrame frame = new JFrame("BAH! Bonn!!1!11!!!");
         MainView mainView = new MainView();
 
@@ -34,14 +34,14 @@ public class Main {
         frame.addMouseListener(new MouseListener() {
 
             public void mouseClicked(MouseEvent e) {
-                /*if(pm.roundsMod == 400) {
+                if(pm.roundsMod == 400) {
                     pm.roundsMod = 1;
                     System.out.println("its 1 now");
                 }
                 else {
                     System.out.println("its 400 now");
                     pm.roundsMod = 400;
-                }*/
+                }
             }
 
             public void mousePressed(MouseEvent e) {

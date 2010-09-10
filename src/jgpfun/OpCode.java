@@ -22,6 +22,7 @@ public class OpCode {
         return oc;
     }
 
+    @Override
     public OpCode clone() {
         OpCode oc = new OpCode();
 

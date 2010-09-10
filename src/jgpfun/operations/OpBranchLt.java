@@ -5,22 +5,19 @@
 
 package jgpfun.operations;
 
-import jgpfun.Branch;
-import jgpfun.NoOp;
-
 
 /**
  *
  * @author dahmen
  */
-public class OpBranchLt implements Operation {
+public class OpBranchLt implements Operation, BranchOperation {
 
     public int execute(int src1, int src2) {
         if(src1 < src2) {
-            throw new NoOp();
+            return 1;
         }
 
-        throw new Branch();
+        return 0;
     }
 
 }

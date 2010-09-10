@@ -9,7 +9,7 @@ package jgpfun.operations;
  *
  * @author dahmen
  */
-public class OpAbs implements Operation {
+public class OpAbs implements Operation, UnaryOperation {
 
     public int execute(int src1, int src2) {
         return Math.abs(src1);
