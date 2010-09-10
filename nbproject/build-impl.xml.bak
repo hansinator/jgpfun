@@ -55,7 +55,10 @@ is divided into following sections:
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project,-init-macrodef-property" name="-do-init">
         <available file="${manifest.file}" property="manifest.available"/>
+<<<<<<< HEAD:nbproject/build-impl.xml
         <available file="${application.splash}" property="splashscreen.available"/>
+=======
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
         <condition property="main.class.available">
             <and>
                 <isset property="main.class"/>
@@ -82,6 +85,7 @@ is divided into following sections:
             <and>
                 <istrue value="${manifest.available+main.class}"/>
                 <isset property="do.mkdist"/>
+<<<<<<< HEAD:nbproject/build-impl.xml
             </and>
         </condition>
         <condition property="manifest.available+main.class+mkdist.available+splashscreen.available">
@@ -117,6 +121,8 @@ is divided into following sections:
             <and>
                 <istrue value="${manifest.available+main.class+mkdist.available+splashscreen.available}"/>
                 <istrue value="${do.archive}"/>
+=======
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
             </and>
         </condition>
         <condition property="manifest.available+mkdist.available">
@@ -192,8 +198,11 @@ is divided into following sections:
             <length length="0" string="${endorsed.classpath}" when="greater"/>
         </condition>
         <property name="javac.fork" value="false"/>
+<<<<<<< HEAD:nbproject/build-impl.xml
         <property name="jar.index" value="false"/>
         <available file="${meta.inf.dir}/persistence.xml" property="has.persistence.xml"/>
+=======
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization. -->
@@ -586,10 +595,17 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
+<<<<<<< HEAD:nbproject/build-impl.xml
     <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive" name="-do-jar-without-manifest" unless="manifest.available">
         <j2seproject1:jar/>
     </target>
     <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive+manifest.available" name="-do-jar-with-manifest" unless="manifest.available+main.class">
+=======
+    <target depends="init,compile,-pre-pre-jar,-pre-jar" name="-do-jar-without-manifest" unless="manifest.available-mkdist.available">
+        <j2seproject1:jar/>
+    </target>
+    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="manifest.available" name="-do-jar-with-manifest" unless="manifest.available+main.class-mkdist.available">
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
         <j2seproject1:jar manifest="${manifest.file}"/>
     </target>
     <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.archive+manifest.available+main.class" name="-do-jar-with-mainclass" unless="manifest.available+main.class+mkdist.available">
@@ -621,6 +637,7 @@ is divided into following sections:
         <property location="${dist.jar}" name="dist.jar.resolved"/>
         <echo>java -jar "${dist.jar.resolved}"</echo>
     </target>
+<<<<<<< HEAD:nbproject/build-impl.xml
     <target depends="init,compile,-pre-pre-jar,-pre-jar,-init-macrodef-copylibs" if="do.archive+manifest.available+main.class+mkdist.available" name="-do-jar-with-libraries" unless="splashscreen.available">
         <j2seproject3:copylibs>
             <customize>
@@ -630,12 +647,59 @@ is divided into following sections:
         <echo>To run this application from the command line without Ant, try:</echo>
         <property location="${dist.jar}" name="dist.jar.resolved"/>
         <echo>java -jar "${dist.jar.resolved}"</echo>
+=======
+    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="manifest.available+mkdist.available" name="-do-jar-with-libraries-without-mainclass" unless="main.class.available">
+        <property location="${build.classes.dir}" name="build.classes.dir.resolved"/>
+        <pathconvert property="run.classpath.without.build.classes.dir">
+            <path path="${run.classpath}"/>
+            <map from="${build.classes.dir.resolved}" to=""/>
+        </pathconvert>
+        <pathconvert pathsep=" " property="jar.classpath">
+            <path path="${run.classpath.without.build.classes.dir}"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="lib/*"/>
+            </chainedmapper>
+        </pathconvert>
+        <taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/>
+        <copylibs compress="${jar.compress}" jarfile="${dist.jar}" manifest="${manifest.file}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
+            <fileset dir="${build.classes.dir}"/>
+            <manifest>
+                <attribute name="Class-Path" value="${jar.classpath}"/>
+            </manifest>
+        </copylibs>
+    </target>
+    <target depends="init,compile,-pre-pre-jar,-pre-jar" if="do.mkdist" name="-do-jar-with-libraries-without-manifest" unless="manifest.available">
+        <property location="${build.classes.dir}" name="build.classes.dir.resolved"/>
+        <pathconvert property="run.classpath.without.build.classes.dir">
+            <path path="${run.classpath}"/>
+            <map from="${build.classes.dir.resolved}" to=""/>
+        </pathconvert>
+        <pathconvert pathsep=" " property="jar.classpath">
+            <path path="${run.classpath.without.build.classes.dir}"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="lib/*"/>
+            </chainedmapper>
+        </pathconvert>
+        <taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/>
+        <copylibs compress="${jar.compress}" jarfile="${dist.jar}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
+            <fileset dir="${build.classes.dir}"/>
+            <manifest>
+                <attribute name="Class-Path" value="${jar.classpath}"/>
+            </manifest>
+        </copylibs>
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
     </target>
     <target name="-post-jar">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
+<<<<<<< HEAD:nbproject/build-impl.xml
     <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries-and-splashscreen,-do-jar-with-libraries,-post-jar" description="Build JAR." name="jar"/>
+=======
+    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-do-jar-with-libraries-without-mainclass,-do-jar-with-libraries-without-manifest,-post-jar" description="Build JAR." name="jar"/>
+>>>>>>> 9cea11aad0c8ab52fe0e598764d252b4d0b3b2dc:nbproject/build-impl.xml
     <!--
                 =================
                 EXECUTION SECTION
