@@ -24,6 +24,7 @@ public class MainView extends javax.swing.JPanel {
     List<Food> curFood;
     List<Organism> curOrganisms;
     private int rps;
+    private int progress;
 
     /** Creates new form MainView */
     public MainView() {
@@ -70,12 +71,18 @@ public class MainView extends javax.swing.JPanel {
             g.setColor(Color.yellow);
             g.drawString("RPS: " + rps, 10, 15);
         }
+
+        if(progress != 0) {
+            g.setColor(Color.yellow);
+            g.drawString("" + progress + "%", 10, 30);
+        }
     }
 
-    public void drawStuff(List<Food> food, List<Organism> organisms, int rps) {
+    public void drawStuff(List<Food> food, List<Organism> organisms, int rps, int progress) {
         this.curFood = food;
         this.curOrganisms = organisms;
         this.rps = rps;
+        this.progress = progress;
     }
 
     private void drawFood(List<Food> food, Graphics g) {
@@ -90,18 +97,23 @@ public class MainView extends javax.swing.JPanel {
         g.setColor(Color.red);
 
         for (Organism o : organisms) {
-            Polygon p = new Polygon();
-            double sindir = Math.sin(o.dir);
-            double cosdir = Math.cos(o.dir);
+            //double sindir;
+            //double cosdir;
             int xrot = 0;//(int)Math.floor(2.0 * sindir);
             int yrot = 0;//(int)Math.floor(2.0 * cosdir);
 
-            p.addPoint((o.x - 4 + xrot), (o.y + 4 + yrot));
-            p.addPoint((o.x + 4 + xrot), (o.y + 4 + yrot));
-            p.addPoint(o.x + xrot, o.y - 6 + yrot);
+            for(Organism.TankMotor m : o.motors) {
+                Polygon p = new Polygon();
+                //sindir = Math.sin(m.dir);
+                //cosdir = Math.cos(m.dir);
 
-            g.drawPolygon(p);
-            g.fillPolygon(p);
+                p.addPoint((m.x - 4 + xrot), (m.y + 4 + yrot));
+                p.addPoint((m.x + 4 + xrot), (m.y + 4 + yrot));
+                p.addPoint(m.x + xrot, m.y - 6 + yrot);
+
+                g.drawPolygon(p);
+                g.fillPolygon(p);
+            }
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

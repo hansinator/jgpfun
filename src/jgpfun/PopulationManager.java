@@ -3,6 +3,7 @@ package jgpfun;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -11,6 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.Organism;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  *
@@ -19,14 +21,27 @@ import jgpfun.Organism;
 public class PopulationManager {
 
     Random rnd;
+
     List<Organism> ants;
+
     List<Food> food;
+
     final int worldWidth, worldHeight;
+
     public static final int foodTolerance = 10;
+
     public static final int maxMutations = 2;
+
     public final int progSize;
+
+    private boolean slowMode;
+
     final Object lock = new Object();
+
+    FoodFinder foodFinder;
+
     ThreadPoolExecutor pool;
+
 
     public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
@@ -48,47 +63,70 @@ public class PopulationManager {
 
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        foodFinder = new FoodFinder(Collections.unmodifiableList(food));
     }
 
-    public double foodDist(Food f, int x, int y) {
-        return Math.sqrt(((x - f.x) * (x - f.x)) + ((y - f.y) * (y - f.y)));
-    }
+    public class FoodFinder {
 
-    public Food findNearestFood(int x, int y) {
-        double minDist = 1000000, curDist;
-        int indexMinDist = -1;
+        List<Food> food;
 
-        for (int i = 0; i < food.size(); i++) {
-            curDist = foodDist(food.get(i), x, y);
 
-            //limit visible range to 200
-            //if (curDist > 200)
-            //    continue;
+        public FoodFinder(List<Food> food) {
+            this.food = food;
+        }
 
-            if (curDist < minDist) {
-                minDist = curDist;
-                indexMinDist = i;
+
+        public double foodDist(Food f, int x, int y) {
+            return Math.sqrt(((x - f.x) * (x - f.x)) + ((y - f.y) * (y - f.y)));
+        }
+
+
+        public Food findNearestFood(int x, int y) {
+            double minDist = 1000000, curDist;
+            int indexMinDist = -1;
+
+            for (int i = 0; i < food.size(); i++) {
+                curDist = foodDist(food.get(i), x, y);
+
+                //limit visible range to 200
+                //if (curDist > 200)
+                //    continue;
+
+                if (curDist < minDist) {
+                    minDist = curDist;
+                    indexMinDist = i;
+                }
+            }
+
+            if (indexMinDist > -1) {
+                return food.get(indexMinDist);
+            } else {
+                return new Food(x, y);
             }
         }
 
-        if (indexMinDist > -1) {
-            return food.get(indexMinDist);
-        } else {
-            return new Food(x, y);
-        }
     }
-
     static int gen = 0;
-    public void runGeneration(int iterations, MainView mainView) {
+
+
+    public void runGeneration(int iterations, MainView mainView, List<Integer> foodList) {
         long start = System.currentTimeMillis();
         long time;
 
         for (int i = 0; i < iterations; i++) {
             step();
-            if ((i % 400) == 0) {
+            if (slowMode || (i % 800) == 0) {
                 time = System.currentTimeMillis() - start;
-                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
+                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 mainView.repaint();
+                if (slowMode) {
+                    try {
+                        Thread.sleep(15);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
 
@@ -99,53 +137,72 @@ public class PopulationManager {
 
         int foodCollected = newGeneration();
 
-        System.out.println("Food collected: " + foodCollected);
+        //System.out.println("Food collected: " + foodCollected);
+        foodList.add(0, foodCollected);
 
         int fs = food.size();
         food = new ArrayList<Food>(fs);
         for (int i = 0; i < fs; i++) {
             food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
         }
+        foodFinder = new FoodFinder(Collections.unmodifiableList(food));
     }
+
 
     void step() {
         final CountDownLatch cb = new CountDownLatch(ants.size());
 
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
+
                 public void run() {
                     //find closest food
-                    Food f = findNearestFood(organism.x, organism.y);
+
+                    /*int x = 0, y = 0;
+                    if(slowMode) {
+                    x = organism.x;
+                    y = organism.y;
+                    }*/
 
                     try {
-                        organism.live(f, foodDist(f, organism.x, organism.y));
+                        organism.live(foodFinder);
                     } catch (Exception ex) {
                         Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
+
+                    /*if(slowMode) {
+                    x = Math.abs(organism.x - x);
+                    y = Math.abs(organism.y - y);
+
+                    System.out.println("x " + x + "y " + y);
+                    }*/
 
                     //compute new movement here
                     //TODO: move computation from ant to here or somewhere else
 
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
-                    organism.x = Math.min(Math.max(organism.x, 0), worldWidth);
-                    organism.y = Math.min(Math.max(organism.y, 0), worldHeight);
+                    for (Organism.TankMotor m : organism.motors) {
+                        m.x = Math.min(Math.max(m.x, 0), worldWidth);
+                        m.y = Math.min(Math.max(m.y, 0), worldHeight);
 
-                    //eat food
-                    synchronized (lock) {
-                        if ((food.contains(f)) &&
-                                (f.x >= (organism.x - foodTolerance)) &&
-                                (f.x <= (organism.x + foodTolerance)) &&
-                                (f.y >= (organism.y - foodTolerance)) &&
-                                (f.y <= (organism.y + foodTolerance))) {
-                            organism.food++;
-                            f.x = rnd.nextInt(worldWidth);
-                            f.y = rnd.nextInt(worldHeight);
+                        //eat food
+                        synchronized (lock) {
+                            if ((food.contains(m.food))
+                                    && (m.food.x >= (m.x - foodTolerance))
+                                    && (m.food.x <= (m.x + foodTolerance))
+                                    && (m.food.y >= (m.y - foodTolerance))
+                                    && (m.food.y <= (m.y + foodTolerance))) {
+                                organism.food++;
+                                m.food.x = rnd.nextInt(worldWidth);
+                                m.food.y = rnd.nextInt(worldHeight);
+                            }
                         }
                     }
 
                     cb.countDown();
-                }                
+                }
+
             };
 
             pool.execute(r);
@@ -156,6 +213,7 @@ public class PopulationManager {
             Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
 
     private int newGeneration() {
         int totalFit = calculateFitness();
@@ -188,8 +246,8 @@ public class PopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
-            newAnts.add(new Organism(parent2, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
+            newAnts.add(new Organism(parent1, worldWidth, worldHeight));
+            newAnts.add(new Organism(parent2, worldWidth, worldHeight));
         }
 
         //replace and leave the other to GC
@@ -199,6 +257,7 @@ public class PopulationManager {
     }
 
     //fintess proportionate selection
+
     private Organism rouletteWheel(int totalFit) {
         int stopPoint = 0;
         int fitnessSoFar = 0;
@@ -219,6 +278,7 @@ public class PopulationManager {
     }
 
     //make random changes to random locations in the genome
+
     private OpCode[] mutate(OpCode[] genome, int mutCount) {
         //determine amount of mutations, minimum 1
         //int mutCount = maxMutations;
@@ -232,6 +292,7 @@ public class PopulationManager {
     }
 
     //the team effort
+
     private int calculateFitness() {
         int totalFit = 0;
         for (Organism o : ants) {
@@ -240,8 +301,11 @@ public class PopulationManager {
         return totalFit;
 
     }
+
     final int maxRegisterValDelta = 16;
+
     final int maxConstantValDelta = 16384;
+
 
     public OpCode[] mutateProgramSpace(OpCode[] program) {
         List<OpCode> programSpace = new ArrayList(program.length);
@@ -358,4 +422,15 @@ public class PopulationManager {
         program = new OpCode[programSpace.size()];
         return programSpace.toArray(program);
     }
+
+
+    public boolean isSlowMode() {
+        return slowMode;
+    }
+
+
+    public void setSlowMode(boolean slowMode) {
+        this.slowMode = slowMode;
+    }
+
 }
