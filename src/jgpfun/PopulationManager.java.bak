@@ -283,8 +283,10 @@ public class PopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, worldWidth, worldHeight));
-            newAnts.add(new Organism(parent2, worldWidth, worldHeight));
+            newAnts.add(new Organism(parent1, rnd.nextInt(worldWidth), rnd.
+                    nextInt(worldHeight), rnd.nextDouble()));
+            newAnts.add(new Organism(parent2, rnd.nextInt(worldWidth), rnd.
+                    nextInt(worldHeight), rnd.nextDouble()));
         }
 
         //replace and leave the other to GC
