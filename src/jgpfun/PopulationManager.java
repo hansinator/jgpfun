@@ -177,17 +177,16 @@ public class PopulationManager {
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
                     for (Body2d b : organism.bodies) {
-                        TankMotor m = b.motor;
-                        m.x = Math.min(Math.max(m.x, 0), worldWidth);
-                        m.y = Math.min(Math.max(m.y, 0), worldHeight);
+                        b.x = Math.min(Math.max(b.x, 0), worldWidth);
+                        b.y = Math.min(Math.max(b.y, 0), worldHeight);
 
                         //eat food
                         synchronized (lock) {
                             if ((food.contains(b.food))
-                                    && (b.food.x >= (m.x - foodTolerance))
-                                    && (b.food.x <= (m.x + foodTolerance))
-                                    && (b.food.y >= (m.y - foodTolerance))
-                                    && (b.food.y <= (m.y + foodTolerance))) {
+                                    && (b.food.x >= (b.x - foodTolerance))
+                                    && (b.food.x <= (b.x + foodTolerance))
+                                    && (b.food.y >= (b.y - foodTolerance))
+                                    && (b.food.y <= (b.y + foodTolerance))) {
                                 organism.food++;
                                 b.food.x = rnd.nextInt(worldWidth);
                                 b.food.y = rnd.nextInt(worldHeight);

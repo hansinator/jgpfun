@@ -2,31 +2,28 @@ package jgpfun.world2d;
 
 import jgpfun.Organism;
 
-public class TankMotor {
+public class TankMotor implements Motor2d {
 
-    public double dir;
-
-    public int x;
-
-    public int y;
+    private final Body2d body;
 
 
-    public TankMotor(int x, int y, double dir) {
-        this.x = x;
-        this.y = y;
-        this.dir = dir;
+    public TankMotor(Body2d body) {
+        this.body = body;
     }
 
 
     //compute movement here
+    @Override
     public void move(double left, double right) {
         double speed;
+        
         //find the direction
-        dir += (right - left) * (Organism.maxForce / 100);
+        body.dir += (right - left) * (Organism.maxForce / 100);
         //max speed is just a twaking parameter; don't get confused by it
         //try varying it in simulation
         speed = (right + left) / 2;
-        x += Math.sin(dir) * Organism.maxSpeed * speed / 10;
-        y -= Math.cos(dir) * Organism.maxSpeed * speed / 10;
+        body.x += Math.sin(body.dir) * Organism.maxSpeed * speed / 10;
+        body.y -= Math.cos(body.dir) * Organism.maxSpeed * speed / 10;
     }
+
 }

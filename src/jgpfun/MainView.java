@@ -109,26 +109,25 @@ public class MainView extends javax.swing.JPanel {
 
         for (Organism o : organisms) {
             for (Body2d b : o.bodies) {
-                TankMotor m = b.motor;
-                double sindir = Math.sin(m.dir);
-                double cosdir = Math.cos(m.dir);
+                double sindir = Math.sin(b.dir);
+                double cosdir = Math.cos(b.dir);
                 int xrot = (int) Math.floor(8.0 * sindir);
                 int yrot = (int) Math.floor(8.0 * cosdir);
 
-                g.drawLine(m.x, m.y, m.x + xrot, m.y - yrot);
-                g.fillOval(m.x, m.y, 4, 4);
+                g.drawLine(b.x, b.y, b.x + xrot, b.y - yrot);
+                g.fillOval(b.x, b.y, 4, 4);
 
                 //Polygon p = new Polygon();
                 /*
                 //1st try
-                p.addPoint((o.x - xrot), (o.y + yrot));
-                p.addPoint((o.x + xrot), (o.y + yrot));
-                p.addPoint(o.x + xrot, o.y - 6 + yrot);
+                p.addPoint((b.x - xrot), (b.y + yrot));
+                p.addPoint((b.x + xrot), (b.y + yrot));
+                p.addPoint(b.x + xrot, b.y - 6 + yrot);
 
                 //2nd try - looks like a triangle
-                p.addPoint((m.x - 4 + xrot), (m.y + 4 + yrot));
-                p.addPoint((m.x + 4 + xrot), (m.y + 4 + yrot));
-                p.addPoint(m.x + xrot, m.y - 6 + yrot);
+                p.addPoint((b.x - 4 + xrot), (b.y + 4 + yrot));
+                p.addPoint((b.x + 4 + xrot), (b.y + 4 + yrot));
+                p.addPoint(b.x + xrot, b.y - 6 + yrot);
                 
                 g.drawPolygon(p);
                 g.fillPolygon(p);*/

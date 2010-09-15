@@ -66,9 +66,9 @@ public class Organism implements Comparable<Organism> {
         this.vm = new EvoVM2(24, program);
         this.food = 0;
 
-        bodies = new Body2d[2];
+        bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(new TankMotor(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()), foodFinder);
+            bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
         }
     }
 
@@ -82,13 +82,12 @@ public class Organism implements Comparable<Organism> {
         //write input registers
         int inreg = 0;
         for (Body2d b : bodies) {
-            TankMotor m = b.motor;
-            b.food = fd.findNearestFood(m.x, m.y);
-            foodDist = fd.foodDist(b.food, m.x, m.y);
+            b.food = fd.findNearestFood(b.x, b.y);
+            foodDist = fd.foodDist(b.food, b.x, b.y);
 
-            vm.regs[inreg++] = (int) (Math.cos(m.dir) * scale);
-            vm.regs[inreg++] = (int) (((b.food.x - m.x) / foodDist) * scale);
-            vm.regs[inreg++] = (int) (((b.food.y - m.y) / foodDist) * scale);
+            vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
+            vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
+            vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
         }
 
         vm.run();
