@@ -1,16 +1,16 @@
-package jgpfun;
+package jgpfun.jgp;
 
 import java.util.Random;
 
 public class OpCode {
 
-    int op;
-    int src1;
-    int src2;
-    int trg;
-    boolean immediate;
+    public int op;
+    public int src1;
+    public int src2;
+    public int trg;
+    public boolean immediate;
 
-    static OpCode randomOne(Random rnd) {
+    public static OpCode randomOpCode(Random rnd) {
         OpCode oc = new OpCode();
         
         oc.op = rnd.nextInt();

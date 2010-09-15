@@ -3,16 +3,16 @@
  * and open the template in the editor.
  */
 
-package jgpfun.operations;
+package jgpfun.jgp.operations;
 
 /**
  *
  * @author Administrator
  */
-public class OpInc implements Operation, UnaryOperation {
+public class JumpTarg implements Operation {
 
     public int execute(int src1, int src2) {
-        return src1++;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

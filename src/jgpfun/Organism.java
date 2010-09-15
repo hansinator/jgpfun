@@ -4,6 +4,8 @@
  */
 package jgpfun;
 
+import jgpfun.jgp.OpCode;
+import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -178,7 +180,7 @@ public class Organism implements Comparable<Organism> {
         OpCode[] program = new OpCode[rnd.nextInt(progsize)];
 
         for (int i = 0; i < program.length; i++) {
-            program[i] = OpCode.randomOne(rnd);
+            program[i] = OpCode.randomOpCode(rnd);
         }
 
         return new Organism(program, xmax, ymax);

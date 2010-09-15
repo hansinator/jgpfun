@@ -3,16 +3,16 @@
  * and open the template in the editor.
  */
 
-package jgpfun.operations;
+package jgpfun.jgp.operations;
 
 /**
  *
- * @author dahmen
+ * @author Administrator
  */
-public class OpSin implements Operation, UnaryOperation {
+public class OpInc implements Operation, UnaryOperation {
 
     public int execute(int src1, int src2) {
-        return (int)(Math.sin(src1 / 65535.0) * 65535);
+        return src1++;
     }
-    
+
 }

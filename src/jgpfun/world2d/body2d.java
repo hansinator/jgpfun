@@ -3,13 +3,12 @@
  * and open the template in the editor.
  */
 
-package jgpfun.operations;
+package jgpfun.world2d;
 
 /**
- * Just a tagging interface.
  *
  * @author Administrator
  */
-public interface BranchOperation {
+public class body2d {
 
 }

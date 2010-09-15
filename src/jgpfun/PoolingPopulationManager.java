@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.jgp.OpCode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +95,7 @@ public class PoolingPopulationManager {
             step();
             if ((i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
-                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1);
+                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 mainView.repaint();
             }
             
@@ -242,8 +243,8 @@ public class PoolingPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
-            newAnts.add(new Organism(parent2, rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()));
+            newAnts.add(new Organism(parent1, worldWidth, worldHeight));
+            newAnts.add(new Organism(parent2, worldWidth, worldHeight));
         }
 
         //replace and leave the other to GC
@@ -354,7 +355,7 @@ public class PoolingPopulationManager {
         //mutate ins
         if (mutationChoice < mutateIns) {
             //insert a random instruction at a random location
-            programSpace.add(loc, OpCode.randomOne(rnd));
+            programSpace.add(loc, OpCode.randomOpCode(rnd));
         } //mutate rem
         else if (mutationChoice < (mutateIns + mutateRem)) {
             //remove a random instruction
@@ -363,7 +364,7 @@ public class PoolingPopulationManager {
         } //mutate rep
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {
             //replace a random instruction
-            programSpace.set(loc, OpCode.randomOne(rnd));
+            programSpace.set(loc, OpCode.randomOpCode(rnd));
         } //mutate src1 or immediate value
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal)) {
             //if immediate, modify the constant value by random value

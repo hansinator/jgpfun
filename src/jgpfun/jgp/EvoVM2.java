@@ -1,25 +1,25 @@
-package jgpfun;
+package jgpfun.jgp;
 
-import jgpfun.operations.BranchOperation;
-import jgpfun.operations.JumpOp;
-import jgpfun.operations.JumpTarg;
-import jgpfun.operations.OpAbs;
-import jgpfun.operations.OpAdd;
-import jgpfun.operations.OpBranchGt;
-import jgpfun.operations.OpBranchLt;
-import jgpfun.operations.OpDec;
-import jgpfun.operations.OpDiv;
-import jgpfun.operations.OpInc;
-import jgpfun.operations.OpMax;
-import jgpfun.operations.OpMin;
-import jgpfun.operations.OpMod;
-import jgpfun.operations.OpMov;
-import jgpfun.operations.OpMul;
-import jgpfun.operations.OpNeg;
-import jgpfun.operations.OpSin;
-import jgpfun.operations.OpSqrt;
-import jgpfun.operations.OpSub;
-import jgpfun.operations.Operation;
+import jgpfun.jgp.operations.BranchOperation;
+import jgpfun.jgp.operations.JumpOp;
+import jgpfun.jgp.operations.JumpTarg;
+import jgpfun.jgp.operations.OpAbs;
+import jgpfun.jgp.operations.OpAdd;
+import jgpfun.jgp.operations.OpBranchGt;
+import jgpfun.jgp.operations.OpBranchLt;
+import jgpfun.jgp.operations.OpDec;
+import jgpfun.jgp.operations.OpDiv;
+import jgpfun.jgp.operations.OpInc;
+import jgpfun.jgp.operations.OpMax;
+import jgpfun.jgp.operations.OpMin;
+import jgpfun.jgp.operations.OpMod;
+import jgpfun.jgp.operations.OpMov;
+import jgpfun.jgp.operations.OpMul;
+import jgpfun.jgp.operations.OpNeg;
+import jgpfun.jgp.operations.OpSin;
+import jgpfun.jgp.operations.OpSqrt;
+import jgpfun.jgp.operations.OpSub;
+import jgpfun.jgp.operations.Operation;
 
 /**
  *
@@ -56,7 +56,7 @@ public class EvoVM2 {
                 };
     }
     OpCode[] program;
-    int[] regs;
+    public int[] regs;
 
     public EvoVM2(int numregs, OpCode[] program) {
         this.program = program;

@@ -1,4 +1,4 @@
-package jgpfun;
+package jgpfun.jgp;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

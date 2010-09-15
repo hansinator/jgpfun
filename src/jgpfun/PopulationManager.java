@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.jgp.OpCode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jgpfun.operations.UnaryOperation;
+import jgpfun.jgp.operations.UnaryOperation;
 
 /**
  *
@@ -402,7 +403,7 @@ public class PopulationManager {
         //mutate ins
         if (mutationChoice < mutateIns) {
             //insert a random instruction at a random location
-            programSpace.add(loc, OpCode.randomOne(rnd));
+            programSpace.add(loc, OpCode.randomOpCode(rnd));
         } //mutate rem
         else if (mutationChoice < (mutateIns + mutateRem)) {
             //remove a random instruction
@@ -410,7 +411,7 @@ public class PopulationManager {
         } //mutate rep
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {
             //replace a random instruction
-            programSpace.set(loc, OpCode.randomOne(rnd));
+            programSpace.set(loc, OpCode.randomOpCode(rnd));
         } //mutate src1 or immediate value
         else if (mutationChoice
                 < (mutateIns + mutateRem + mutateRep + mutateVal)) {
