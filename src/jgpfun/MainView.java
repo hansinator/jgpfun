@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.List;
+import jgpfun.world2d.Body2d;
 
 /**
  *
@@ -23,14 +24,19 @@ import java.util.List;
 public class MainView extends javax.swing.JPanel {
 
     List<Food> curFood;
+
     List<Organism> curOrganisms;
+
     private int rps;
+
     private int progress;
+
 
     /** Creates new form MainView */
     public MainView() {
         initComponents();
     }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -53,6 +59,7 @@ public class MainView extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -68,16 +75,17 @@ public class MainView extends javax.swing.JPanel {
             drawOrganisms(curOrganisms, g);
         }
 
-        if(rps != 0) {
+        if (rps != 0) {
             g.setColor(Color.yellow);
             g.drawString("RPS: " + rps, 10, 15);
         }
 
-        if(progress != 0) {
+        if (progress != 0) {
             g.setColor(Color.yellow);
             g.drawString("" + progress + "%", 10, 30);
         }
     }
+
 
     public void drawStuff(List<Food> food, List<Organism> organisms, int rps, int progress) {
         this.curFood = food;
@@ -85,6 +93,7 @@ public class MainView extends javax.swing.JPanel {
         this.rps = rps;
         this.progress = progress;
     }
+
 
     private void drawFood(List<Food> food, Graphics g) {
         g.setColor(Color.green);
@@ -94,17 +103,19 @@ public class MainView extends javax.swing.JPanel {
         }
     }
 
+
     private void drawOrganisms(List<Organism> organisms, Graphics g) {
         g.setColor(Color.red);
 
         for (Organism o : organisms) {
-            for(TankMotor m : o.motors) {
+            for (Body2d b : o.bodies) {
+                TankMotor m = b.motor;
                 double sindir = Math.sin(m.dir);
                 double cosdir = Math.cos(m.dir);
-                int xrot = (int)Math.floor(8.0 * sindir);
-                int yrot = (int)Math.floor(8.0 * cosdir);
+                int xrot = (int) Math.floor(8.0 * sindir);
+                int yrot = (int) Math.floor(8.0 * cosdir);
 
-                g.drawLine(m.x, m.y, m.x+xrot, m.y-yrot);
+                g.drawLine(m.x, m.y, m.x + xrot, m.y - yrot);
                 g.fillOval(m.x, m.y, 4, 4);
 
                 //Polygon p = new Polygon();
@@ -125,7 +136,7 @@ public class MainView extends javax.swing.JPanel {
 
         }
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

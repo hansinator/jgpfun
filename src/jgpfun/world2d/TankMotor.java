@@ -1,6 +1,5 @@
 package jgpfun.world2d;
 
-import jgpfun.Food;
 import jgpfun.Organism;
 
 public class TankMotor {
@@ -10,8 +9,6 @@ public class TankMotor {
     public int x;
 
     public int y;
-
-    public Food food;
 
 
     public TankMotor(int x, int y, double dir) {

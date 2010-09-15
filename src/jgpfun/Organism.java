@@ -37,8 +37,6 @@ public class Organism implements Comparable<Organism> {
 
     public int food;
 
-    public TankMotor[] motors;
-
     public Body2d[] bodies;
 
     public boolean showdebug = false;
@@ -83,19 +81,20 @@ public class Organism implements Comparable<Organism> {
 
         //write input registers
         int inreg = 0;
-        for (TankMotor m : motors) {
-            m.food = fd.findNearestFood(m.x, m.y);
-            foodDist = fd.foodDist(m.food, m.x, m.y);
+        for (Body2d b : bodies) {
+            TankMotor m = b.motor;
+            b.food = fd.findNearestFood(m.x, m.y);
+            foodDist = fd.foodDist(b.food, m.x, m.y);
 
             vm.regs[inreg++] = (int) (Math.cos(m.dir) * scale);
-            vm.regs[inreg++] = (int) (((m.food.x - m.x) / foodDist) * scale);
-            vm.regs[inreg++] = (int) (((m.food.y - m.y) / foodDist) * scale);
+            vm.regs[inreg++] = (int) (((b.food.x - m.x) / foodDist) * scale);
+            vm.regs[inreg++] = (int) (((b.food.y - m.y) / foodDist) * scale);
         }
 
         vm.run();
 
         //fetch outputs
-        for (TankMotor m : motors) {
+        for (Body2d b : bodies) {
             out1 = vm.regs[inreg++];
             out2 = vm.regs[inreg++];
 
@@ -104,7 +103,7 @@ public class Organism implements Comparable<Organism> {
             right = Math.max(0, Math.min(out2, 65535)) / scale;
 
             //move
-            m.move(left, right);
+            b.motor.move(left, right);
         }
     }
 

@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.jgp.operations.UnaryOperation;
+import jgpfun.world2d.Body2d;
 
 /**
  *
@@ -175,20 +176,21 @@ public class PopulationManager {
 
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
-                    for (TankMotor m : organism.motors) {
+                    for (Body2d b : organism.bodies) {
+                        TankMotor m = b.motor;
                         m.x = Math.min(Math.max(m.x, 0), worldWidth);
                         m.y = Math.min(Math.max(m.y, 0), worldHeight);
 
                         //eat food
                         synchronized (lock) {
-                            if ((food.contains(m.food))
-                                    && (m.food.x >= (m.x - foodTolerance))
-                                    && (m.food.x <= (m.x + foodTolerance))
-                                    && (m.food.y >= (m.y - foodTolerance))
-                                    && (m.food.y <= (m.y + foodTolerance))) {
+                            if ((food.contains(b.food))
+                                    && (b.food.x >= (m.x - foodTolerance))
+                                    && (b.food.x <= (m.x + foodTolerance))
+                                    && (b.food.y >= (m.y - foodTolerance))
+                                    && (b.food.y <= (m.y + foodTolerance))) {
                                 organism.food++;
-                                m.food.x = rnd.nextInt(worldWidth);
-                                m.food.y = rnd.nextInt(worldHeight);
+                                b.food.x = rnd.nextInt(worldWidth);
+                                b.food.y = rnd.nextInt(worldHeight);
                             }
                         }
                     }
