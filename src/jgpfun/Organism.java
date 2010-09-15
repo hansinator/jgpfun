@@ -4,10 +4,13 @@
  */
 package jgpfun;
 
+import jgpfun.world2d.FoodFinder;
+import jgpfun.world2d.TankMotor;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
 import java.util.Random;
+import jgpfun.world2d.Body2d;
 
 /**
  *
@@ -36,6 +39,8 @@ public class Organism implements Comparable<Organism> {
 
     public TankMotor[] motors;
 
+    public Body2d[] bodies;
+
     public boolean showdebug = false;
 
     public static final double maxForce = 10.0;
@@ -58,20 +63,20 @@ public class Organism implements Comparable<Organism> {
     }*/
 
     //LAPPY
-    public Organism(OpCode[] program, int worldWidth, int worldHeight) {
+    public Organism(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         this.program = program;
         this.vm = new EvoVM2(24, program);
         this.food = 0;
 
-        motors = new TankMotor[2];
-        for (int i = 0; i < 2; i++) {
-            motors[i] = new TankMotor(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble());
+        bodies = new Body2d[2];
+        for (int i = 0; i < bodies.length; i++) {
+            bodies[i] = new Body2d(new TankMotor(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble()), foodFinder);
         }
     }
 
     //LAPPY
 
-    void live(PopulationManager.FoodFinder fd) throws Exception {
+    void live(FoodFinder fd) throws Exception {
         int out1, out2;
         double left, right, foodDist;
         double scale = 8192.0;
@@ -176,14 +181,14 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    static Organism randomOrganism(int xmax, int ymax, int progsize) {
+    static Organism randomOrganism(int xmax, int ymax, int progsize, FoodFinder foodFinder) {
         OpCode[] program = new OpCode[rnd.nextInt(progsize)];
 
         for (int i = 0; i < program.length; i++) {
             program[i] = OpCode.randomOpCode(rnd);
         }
 
-        return new Organism(program, xmax, ymax);
+        return new Organism(program, xmax, ymax, foodFinder);
     }
 
 
@@ -202,37 +207,5 @@ public class Organism implements Comparable<Organism> {
     @Override
     public int compareTo(Organism o) {
         return new Integer(food).compareTo(o.food);
-    }
-
-    public class TankMotor {
-
-        public double dir;
-
-        public int x, y;
-
-        public Food food;
-
-
-        public TankMotor(int x, int y, double dir) {
-            this.x = x;
-            this.y = y;
-            this.dir = dir;
-        }
-
-        //compute movement here
-
-        private void move(double left, double right) {
-            double speed;
-
-            //find the direction
-            dir += (right - left) * (maxForce / 100);
-
-            //max speed is just a twaking parameter; don't get confused by it
-            //try varying it in simulation
-            speed = (right + left) / 2;
-            x += Math.sin(dir) * maxSpeed * speed / 10;
-            y -= Math.cos(dir) * maxSpeed * speed / 10;
-        }
-
     }
 }

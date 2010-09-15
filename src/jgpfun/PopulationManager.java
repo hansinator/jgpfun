@@ -1,5 +1,7 @@
 package jgpfun;
 
+import jgpfun.world2d.FoodFinder;
+import jgpfun.world2d.TankMotor;
 import jgpfun.jgp.OpCode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ public class PopulationManager {
 
     public final int progSize;
 
+    public final int foodCount;
+
     private boolean slowMode;
 
     final Object lock = new Object();
@@ -46,67 +50,22 @@ public class PopulationManager {
 
     public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
+        rnd = new SecureRandom();
+        food = new ArrayList<Food>(foodCount);
+        foodFinder = new FoodFinder(Collections.unmodifiableList(food));
+        randomFood();
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize));
-        }
-
-        rnd = new SecureRandom();
-
-        food = new ArrayList<Food>(foodCount);
-        for (int i = 0; i < foodCount; i++) {
-            food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
+            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, foodFinder));
         }
 
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
         this.progSize = progSize;
+        this.foodCount = foodCount;
 
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-
-        foodFinder = new FoodFinder(Collections.unmodifiableList(food));
-    }
-
-    public class FoodFinder {
-
-        List<Food> food;
-
-
-        public FoodFinder(List<Food> food) {
-            this.food = food;
-        }
-
-
-        public double foodDist(Food f, int x, int y) {
-            return Math.sqrt(((x - f.x) * (x - f.x)) + ((y - f.y) * (y - f.y)));
-        }
-
-
-        public Food findNearestFood(int x, int y) {
-            double minDist = 1000000, curDist;
-            int indexMinDist = -1;
-
-            for (int i = 0; i < food.size(); i++) {
-                curDist = foodDist(food.get(i), x, y);
-
-                //limit visible range to 200
-                //if (curDist > 200)
-                //    continue;
-
-                if (curDist < minDist) {
-                    minDist = curDist;
-                    indexMinDist = i;
-                }
-            }
-
-            if (indexMinDist > -1) {
-                return food.get(indexMinDist);
-            } else {
-                return new Food(x, y);
-            }
-        }
-
     }
     static int gen = 0;
 
@@ -147,16 +106,16 @@ public class PopulationManager {
         System.out.println("Avg prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
-
-        //System.out.println("Food collected: " + foodCollected);
         foodList.add(0, foodCollected);
+        
+        randomFood();
+    }
 
-        int fs = food.size();
+    private void randomFood() {
         food.clear();
-        for (int i = 0; i < fs; i++) {
+        for (int i = 0; i < foodCount; i++) {
             food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
         }
-        foodFinder = new FoodFinder(Collections.unmodifiableList(food));
     }
 
     private boolean checkBarrier(int inx, int iny, int x1, int y1, int x2,
@@ -212,11 +171,11 @@ public class PopulationManager {
                     //compute new movement here
                     //TODO: move computation from ant to here or somewhere else
 
-					//have a more compex world, add a barrier in the middle of the screen
+                    //have a more compex world, add a barrier in the middle of the screen
 
                     //prevent world wrapping
                     //TODO: take into account ant size, so it can't hide outside of the screen
-                    for (Organism.TankMotor m : organism.motors) {
+                    for (TankMotor m : organism.motors) {
                         m.x = Math.min(Math.max(m.x, 0), worldWidth);
                         m.y = Math.min(Math.max(m.y, 0), worldHeight);
 
@@ -284,8 +243,8 @@ public class PopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, worldWidth, worldHeight));
-            newAnts.add(new Organism(parent2, worldWidth, worldHeight));
+            newAnts.add(new Organism(parent1, worldWidth, worldHeight, foodFinder));
+            newAnts.add(new Organism(parent2, worldWidth, worldHeight, foodFinder));
         }
 
         //replace and leave the other to GC

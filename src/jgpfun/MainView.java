@@ -10,6 +10,7 @@
  */
 package jgpfun;
 
+import jgpfun.world2d.TankMotor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -97,7 +98,7 @@ public class MainView extends javax.swing.JPanel {
         g.setColor(Color.red);
 
         for (Organism o : organisms) {
-            for(Organism.TankMotor m : o.motors) {
+            for(TankMotor m : o.motors) {
                 double sindir = Math.sin(m.dir);
                 double cosdir = Math.cos(m.dir);
                 int xrot = (int)Math.floor(8.0 * sindir);
