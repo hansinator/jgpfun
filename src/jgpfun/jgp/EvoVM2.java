@@ -47,10 +47,10 @@ public class EvoVM2 {
                     new OpAbs(),
                     //new OpSin(),
                     new OpMov(),
-                    new OpInc(),
-                    new OpDec(),
-                    new OpBranchLt(),
-                    new OpBranchGt()
+                    //new OpInc(),
+                    //new OpDec(),
+                    // OpBranchLt(),
+                    //new OpBranchGt()
                     //new JumpOp(),
                     //new JumpTarg()
                 };
@@ -88,10 +88,10 @@ public class EvoVM2 {
         OpCode curop = program[pc];
         Operation op = ops[curop.op];
 
-        if (op instanceof BranchOperation) {
+        /*if (op instanceof BranchOperation) {
             if(op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2])) != 1) {
                 pc++;
-            }
+            }*/
         /*} else if(op instanceof JumpOp) {
             //fast forward until the next jumptarg is found or program end is reached
             do {
@@ -99,9 +99,9 @@ public class EvoVM2 {
             } while ((pc < program.length) && !(ops[program[pc].op] instanceof JumpTarg));
         } else if(op instanceof JumpTarg) {
             //do nothing*/
-        } else {
+        //} else {
             //execute the operation
             regs[curop.trg] = op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
-        }
+        //}
     }
 }
