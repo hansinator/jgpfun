@@ -3,6 +3,7 @@ package jgpfun;
 import jgpfun.jgp.OpCode;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.FoodFinder;
+import jgpfun.world2d.PrecisionBody2d;
 
 /**
  *
@@ -14,17 +15,7 @@ public class OrganismDebug extends Organism {
 
     //speed profiling helper vars
     //public long vmrun, allrun, comp;
-    //precision movement, should be recatored into some kind of body
-    double dx, dy, cosdir;
 
-    //PC - keep this for movement reasons
-    /* only the important parts remain, vm stuff stripped
-    public Organism(int x, int y, double dir) {
-    dx = x;
-    dy = y;
-    this.dir = dir;
-    cosdir = Math.cos(dir);
-    }*/
 
     public OrganismDebug(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         super(program, worldWidth, worldHeight, foodFinder);
@@ -42,7 +33,7 @@ public class OrganismDebug extends Organism {
 
         //write input registers
         int inreg = 0;
-        for (Body2d b : bodies) {
+        for (PrecisionBody2d b : (PrecisionBody2d[])bodies) {
             b.food = b.foodFinder.findNearestFood(b.x, b.y);
             foodDist = b.foodFinder.foodDist(b.food, b.x, b.y);
 
@@ -55,14 +46,11 @@ public class OrganismDebug extends Organism {
                 System.out.println("foody " + (((b.food.y - b.y) / foodDist) * scale));
             }
 
-            vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
+            //cached cosdir and scale as int are meant to speed this up
+            vm.regs[inreg++] = (int) (b.cosdir * scale);
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
         }
-
-        //global cosdir and scale as int are meant to speed this up
-        vm.regs[0] = (int) (cosdir * scale);
-        vm.regs[1] = (int) (cosdir * scale);
 
         //long start = System.nanoTime();
 
@@ -72,7 +60,7 @@ public class OrganismDebug extends Organism {
         //start = System.nanoTime();
 
         //use output values
-        for (Body2d b : bodies) {
+        for (PrecisionBody2d b : (PrecisionBody2d[])bodies) {
             //fetch and scale outputs
             left = vm.regs[6] / scale;
             right = vm.regs[7] / scale;
@@ -85,13 +73,13 @@ public class OrganismDebug extends Organism {
             //dir += (right - left) * (maxForce / 50000);   //find the direction
             b.dir += ((right - left) / 160000.0);   //find the direction
             speed = (right + left) / 2;
-            cosdir = Math.cos(b.dir);
+            b.cosdir = Math.cos(b.dir);
 
             if (showdebug) {
                 System.out.println("");
                 System.out.println("dirdelta: " + ((right - left) / 160000.0));
                 System.out.println("xdelta: " + ((Math.sin(b.dir) * speed) / 30000.0));
-                System.out.println("ydelta: " + ((cosdir * speed) / 30000.0));
+                System.out.println("ydelta: " + ((b.cosdir * speed) / 30000.0));
                 System.out.println("cur x: " + b.x);
                 System.out.println("cur y: " + b.y);
             }
@@ -101,10 +89,10 @@ public class OrganismDebug extends Organism {
             y -= cosdir * maxSpeed * speed / 20000;       //try varying it in simulation*/
 
             //TODO: dx and dy are not body specific yet
-            dx += ((Math.sin(b.dir) * speed) / 30000.0);
-            dy -= ((cosdir * speed) / 30000.0);
-            b.x = (int) dx;
-            b.y = (int) dy;
+            b.dx += ((Math.sin(b.dir) * speed) / 30000.0);
+            b.dy -= ((b.cosdir * speed) / 30000.0);
+            b.x = (int) b.dx;
+            b.y = (int) b.dy;
 
             if (showdebug) {
                 System.out.println("cur2 x: " + b.x);
