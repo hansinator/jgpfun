@@ -16,6 +16,7 @@ public class OrganismDebug extends Organism {
     //speed profiling helper vars
     //public long vmrun, allrun, comp;
 
+    
     public OrganismDebug(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         super(program, worldWidth, worldHeight, foodFinder);
     }
@@ -46,7 +47,7 @@ public class OrganismDebug extends Organism {
             }
 
             //cached cosdir and scale as int are meant to speed this up
-            vm.regs[inreg++] = (int) (((PrecisionBody2d) b.motor).cosdir * scale);
+            vm.regs[inreg++] = (int) (((PrecisionBody2d)b).cosdir * scale);
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
         }
