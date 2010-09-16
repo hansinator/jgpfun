@@ -3,7 +3,6 @@ package jgpfun;
 import jgpfun.jgp.OpCode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +11,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jgpfun.util.EvoUtils;
+import jgpfun.util.MutationUtils;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -19,32 +21,43 @@ import java.util.logging.Logger;
  */
 public class PoolingPopulationManager {
 
-    Random rnd;
-    List<Organism> ants;
-    List<Organism> organismPool;
-    List<Food> food;
-    final int worldWidth, worldHeight;
+    private final Random rnd;
+
+    private List<Organism> ants;
+
+    private List<Organism> organismPool;
+
+    private final int worldWidth, worldHeight;
+
+    private World2d world;
+
     public static final int foodTolerance = 10;
+
     public static final int maxMutations = 4;
+
     public static final int maxPoolSize = 100;
-    public final int progSize;
+
+    private final int progSize;
+
+    private boolean slowMode;
+
     private int bestInPool;
-    final Object lock = new Object();
-    ThreadPoolExecutor pool;
-    public volatile int roundsMod = 400;
+
+    private final Object lock = new Object();
+
+    private final ThreadPoolExecutor pool;
+
+    public volatile int roundsMod = 800;
+
 
     public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         ants = new ArrayList<Organism>(popSize);
+        rnd = new SecureRandom();
+        world = new World2d(worldWidth, worldHeight, foodCount);
+        organismPool = new ArrayList<Organism>(maxPoolSize);
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize));
-        }
-
-        rnd = new SecureRandom();
-
-        food = new ArrayList<Food>(foodCount);
-        for (int i = 0; i < foodCount; i++) {
-            food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
+            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
         }
 
         this.worldWidth = worldWidth;
@@ -53,126 +66,74 @@ public class PoolingPopulationManager {
 
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-
-        organismPool = new ArrayList<Organism>(maxPoolSize);
-    }
-
-    public double foodDist(Food f, int x, int y) {
-        return Math.sqrt(((x - f.x) * (x - f.x)) + ((y - f.y) * (y - f.y)));
-    }
-
-    public Food findNearestFood(int x, int y) {
-        double minDist = 1000000, curDist;
-        int indexMinDist = -1;
-
-        for (int i = 0; i < food.size(); i++) {
-            curDist = foodDist(food.get(i), x, y);
-
-            //limit visible range to 200
-            //if (curDist > 200)
-            //    continue;
-
-            if (curDist < minDist) {
-                minDist = curDist;
-                indexMinDist = i;
-            }
-        }
-
-        if (indexMinDist > -1) {
-            return food.get(indexMinDist);
-        } else {
-            return new Food(x, y);
-        }
     }
 
     static int gen = 0;
-    public void runGeneration(int iterations, MainView mainView) {
+
+
+    public void runGeneration(int iterations, MainView mainView, List<Integer> foodList) {
         long start = System.currentTimeMillis();
         long time;
 
         for (int i = 0; i < iterations; i++) {
-            ants.get(0).showdebug = (roundsMod == 1);
+            //ants.get(0).showdebug = (roundsMod == 1);
             step();
-            if ((i % roundsMod) == 0) {
+            if (slowMode || (i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
-                mainView.drawStuff(food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                mainView.drawStuff(world.food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 mainView.repaint();
-            }
-            
-            if (roundsMod == 1) {
+
+                if (slowMode) {
                     try {
-                        Thread.sleep(5);
+                        Thread.sleep(15);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(
-                                Level.SEVERE, null, ex);
+                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+            }
         }
 
         gen++;
 
+        System.out.println("");
         System.out.println("GEN: " + gen);
         System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
-        System.out.println("Food collected: " + calculateFitness(ants));
 
         int avgProgSize = 0;
-        for(Organism o : ants) {
+        for (Organism o : ants) {
             avgProgSize += o.program.length;
         }
         avgProgSize /= ants.size();
-        System.out.println("Avg prog size (current generation): " + avgProgSize);        
+        System.out.println("Avg prog size (current generation): " + avgProgSize);
 
-        newGeneration();
-        
-        System.out.println("Best in pool: " + bestInPool);        
+        int foodCollected = newGeneration();
+        foodList.add(0, foodCollected);
 
-        int fs = food.size();
-        food = new ArrayList<Food>(fs);
-        for (int i = 0; i < fs; i++) {
-            food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
-        }
+        System.out.println("Best in pool: " + bestInPool);
+
+        world.randomFood();
     }
+
 
     void step() {
         final CountDownLatch cb = new CountDownLatch(ants.size());
 
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
-                public void run() {
-                    //find closest food
-                    Food f = findNearestFood(organism.x, organism.y);
 
+                public void run() {
                     try {
-                        organism.live(f, foodDist(f, organism.x, organism.y));
+                        organism.live();
                     } catch (Exception ex) {
                         Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-                    //compute new movement here
-                    //TODO: move computation from ant to here or somewhere else
-
-                    //prevent world wrapping
-                    //TODO: take into account ant size, so it can't hide outside of the screen
-                    organism.x = Math.min(Math.max(organism.x, 0), worldWidth);
-                    organism.y = Math.min(Math.max(organism.y, 0), worldHeight);
-                    organism.dx = Math.min(Math.max(organism.dx, 0), worldWidth);
-                    organism.dy = Math.min(Math.max(organism.dy, 0), worldHeight);
-
-                    //eat food
-                    synchronized (lock) {
-                        if ((food.contains(f)) &&
-                                (f.x >= (organism.x - foodTolerance)) &&
-                                (f.x <= (organism.x + foodTolerance)) &&
-                                (f.y >= (organism.y - foodTolerance)) &&
-                                (f.y <= (organism.y + foodTolerance))) {
-                            organism.food++;
-                            f.x = rnd.nextInt(worldWidth);
-                            f.y = rnd.nextInt(worldHeight);
-                        }
-                    }
+                    //move organism in world to see if it had hit some food or something like that
+                    world.moveOrganismInWorld(organism, lock);
 
                     cb.countDown();
-                }                
+                }
+
             };
 
             pool.execute(r);
@@ -187,14 +148,15 @@ public class PoolingPopulationManager {
     //this funtion ensures that the populatio pool
     //does not exceed it's maximum size by purging
     //the least successful organisms
+
     private void updatePool() {
-        if(organismPool.size() > maxPoolSize) {
+        if (organismPool.size() > maxPoolSize) {
             //sort the list so that the fittest organisms are on top
             Collections.sort(organismPool);
             Collections.reverse(organismPool);
 
             //drop all superfluous organisms
-            for(int i = organismPool.size()-1; i > 99 ; i--) {
+            for (int i = organismPool.size() - 1; i > 99; i--) {
                 organismPool.remove(i);
             }
 
@@ -202,6 +164,7 @@ public class PoolingPopulationManager {
             Collections.shuffle(organismPool);
         }
     }
+
 
     private int newGeneration() {
         int totalFit;
@@ -226,15 +189,15 @@ public class PoolingPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = rouletteWheel(totalFit, organismPool).clone();
-            parent2 = rouletteWheel(totalFit, organismPool).clone();
+            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).clone();
+            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.NextDouble();
             //if (mutador > crossoverRate) {
             //mutate genomes
-            parent1 = mutate(parent1, rnd.nextInt(maxMutations) + 1);
-            parent2 = mutate(parent2, rnd.nextInt(maxMutations) + 1);
+            parent1 = MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            parent2 = MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
             /*} //crossover
             else {
             //perform crossover
@@ -243,8 +206,8 @@ public class PoolingPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, worldWidth, worldHeight));
-            newAnts.add(new Organism(parent2, worldWidth, worldHeight));
+            newAnts.add(new Organism(parent1, worldWidth, worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent2, worldWidth, worldHeight, world.foodFinder));
         }
 
         //replace and leave the other to GC
@@ -253,38 +216,6 @@ public class PoolingPopulationManager {
         return totalFit;
     }
 
-    //fintess proportionate selection
-    private Organism rouletteWheel(int totalFit, List<Organism> organisms) {
-        int stopPoint = 0;
-        int fitnessSoFar = 0;
-
-        if (totalFit > 0) {
-            stopPoint = rnd.nextInt(totalFit);
-        }
-
-        for (int i = 0; i < organisms.size(); i++) {
-            fitnessSoFar += organisms.get(i).food;
-            //this way zero fitness ants are omitted
-            if (fitnessSoFar > stopPoint) {                
-                return organisms.get(i);
-            }
-        }
-
-        return organisms.get(rnd.nextInt(organisms.size()));
-    }
-
-    //make random changes to random locations in the genome
-    private OpCode[] mutate(OpCode[] genome, int mutCount) {
-        //determine amount of mutations, minimum 1
-        //int mutCount = maxMutations;
-        //int mutCount = randomR.Next(maxMutations) + 1;
-
-        for (int i = 0; i < mutCount; i++) {
-            genome = mutateProgramSpace(genome);
-        }
-
-        return genome;
-    }
 
     //the team effort
     private int calculateFitness(List<Organism> organisms) {
@@ -295,130 +226,11 @@ public class PoolingPopulationManager {
             totalFit += o.food;
 
             //remember the best
-            if(o.food > bestInPool) {
+            if (o.food > bestInPool) {
                 bestInPool = o.food;
             }
         }
 
         return totalFit;
-    }
-    final int maxRegisterValDelta = 16;
-    final int maxConstantValDelta = 16384;
-
-    public OpCode[] mutateProgramSpace(OpCode[] program) {
-        List<OpCode> programSpace = new ArrayList(program.length);
-        programSpace.addAll(Arrays.asList(program));
-        //fetch programspace and weights
-
-        //define chances for what mutation could happen in some sort of percentage
-        int mutateIns = 22, mutateRem = 1, mutateRep = 20, mutateVal = 20;
-        int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
-        //chances sum represents 100%, i.e. the sum of all possible chances
-        int chancesSum;
-        //the choice of mutation
-        int mutationChoice;
-        //choose random location
-        int loc = rnd.nextInt(program.length);
-        //precalculate a random value, but exclude zero
-        //zero is no valid constant, as it tends to create semantic introns
-        //(like a = a + 0 or b = n * 0 and so on)
-        int val = rnd.nextInt();
-        //while (val == 0)
-        //{
-        //    val = rnd.Next(Int32.MinValue, Int32.MaxValue);
-        //}
-
-        OpCode instr = programSpace.get(loc);
-
-        //now see what to do
-        //either delete an opcode, add a new or mutate an existing one
-
-        //first determine which mutations are possible and add up all the chances
-        //if we have the max possible opcodes, we can't add a new one
-        if (programSpace.size() >= progSize) {
-            mutateIns = 0;
-        }
-
-        //if we have only 4 opcodes left, don't delete more
-        if (programSpace.size() < 5) {
-            mutateRem = 0;
-        }
-
-        //replacement is always possible..
-        //add all up
-        chancesSum = mutateRep + mutateIns + mutateRem + mutateVal + mutateSrc2 + mutateTrg + mutateOp + mutateFlags;
-
-        //choose mutation
-        mutationChoice = rnd.nextInt(chancesSum);
-
-        //see which one has been chosen
-        //mutate ins
-        if (mutationChoice < mutateIns) {
-            //insert a random instruction at a random location
-            programSpace.add(loc, OpCode.randomOpCode(rnd));
-        } //mutate rem
-        else if (mutationChoice < (mutateIns + mutateRem)) {
-            //remove a random instruction
-            System.out.println("rem");
-            programSpace.remove(loc);
-        } //mutate rep
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {
-            //replace a random instruction
-            programSpace.set(loc, OpCode.randomOpCode(rnd));
-        } //mutate src1 or immediate value
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal)) {
-            //if immediate, modify the constant value by random value
-            if (instr.immediate) {
-                val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
-                instr.src1 += val;
-            } //else modify the src1 register number by a random value
-            else {
-                val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-                instr.src1 += val;
-            }
-
-            //save modified instruction
-            programSpace.set(loc, instr);
-        } //mutate src2
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2)) {
-            //modify the src2 register number by a random value
-            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-            instr.src2 = (instr.src2 + val);
-
-            //save modified instruction
-            programSpace.set(loc, instr);
-        } //mutate trg
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg)) {
-            //modify trg field by random value
-            //(the scale of the value might be ridiculous...)
-            //do
-            //{
-            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-            //modify and normalize
-            instr.trg = (instr.trg + val);
-            //}
-            //don't write input registers
-            //while (!((instr.trg == 4) || (instr.trg == 5)));
-
-            //save modified instruction
-            programSpace.set(loc, instr);
-        } //mutate op
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg + mutateOp)) {
-            //replace opcode field by random value
-            instr.op = rnd.nextInt();
-
-            //save modified instruction
-            programSpace.set(loc, instr);
-        } //mutate opflags
-        else {
-            //set new random opflags
-            instr.immediate = rnd.nextBoolean();
-
-            //save modified instruction
-            programSpace.set(loc, instr);
-        }
-
-        program = new OpCode[programSpace.size()];
-        return programSpace.toArray(program);
     }
 }

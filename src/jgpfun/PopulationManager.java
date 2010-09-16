@@ -112,7 +112,7 @@ public class PopulationManager {
 
                 public void run() {
                     //long start = System.nanoTime();
-                    int oldx, oldy;
+                    //int oldx, oldy;
 
                     //find closest food
 

@@ -42,9 +42,13 @@ public class World2d {
     public void moveOrganismInWorld(Organism organism, Object worldLock) {
         //TODO: have a more compex world, add a barrier in the middle of the screen
         //TODO: take into account ant size, so it can't hide outside of the screen
-        //prevent world wrapping
         //start = System.nanoTime();
         for (Body2d b : organism.bodies) {
+            //prevent world wrapping
+            //organism.dx = Math.min(Math.max(organism.dx, 0), worldWidth);
+            //organism.dy = Math.min(Math.max(organism.dy, 0), worldHeight);
+
+            //prevent world wrapping
             b.x = Math.min(Math.max(b.x, 0), worldWidth);
             b.y = Math.min(Math.max(b.y, 0), worldHeight);
 
