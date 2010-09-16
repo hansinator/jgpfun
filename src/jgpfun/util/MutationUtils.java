@@ -13,27 +13,28 @@ import jgpfun.jgp.operations.UnaryOperation;
  * @author hansinator
  */
 public class MutationUtils {
+
     final static int maxRegisterValDelta = 16;
 
     final static int maxConstantValDelta = 16384;
     //final int maxConstantValDelta = Integer.maxValue / 2;
 
-    final static Random rnd = new SecureRandom();
-    
+
     //make random changes to random locations in the genome
-    public static  OpCode[] mutate(OpCode[] genome, int mutCount, int progSize) {
+    public static OpCode[] mutate(OpCode[] genome, int mutCount, int progSize, Random rnd) {
         //determine amount of mutations, minimum 1
         //int mutCount = maxMutations;
         //int mutCount = randomR.Next(maxMutations) + 1;
 
         for (int i = 0; i < mutCount; i++) {
-            genome = mutateProgramSpace(genome, progSize);
+            genome = mutateProgramSpace(genome, progSize, rnd);
         }
 
         return genome;
     }
 
-    public static OpCode[] mutateProgramSpace(OpCode[] program, int progSize) {
+
+    public static OpCode[] mutateProgramSpace(OpCode[] program, int progSize, Random rnd) {
         List<OpCode> programSpace = new ArrayList(program.length);
         programSpace.addAll(Arrays.asList(program));
         //fetch programspace and weights
@@ -74,7 +75,7 @@ public class MutationUtils {
         }
 
         //if this is a unary op, don't touch src2 - it'll be noneffective
-        if(instr instanceof UnaryOperation) {
+        if (instr instanceof UnaryOperation) {
             mutateSrc2 = 0;
         }
 
@@ -159,4 +160,5 @@ public class MutationUtils {
         program = new OpCode[programSpace.size()];
         return programSpace.toArray(program);
     }
+
 }

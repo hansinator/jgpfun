@@ -66,7 +66,7 @@ public class Organism implements Comparable<Organism> {
         this.vm = new EvoVM2(24, program);
         this.food = 0;
 
-        bodies = new Body2d[2];
+        bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
             bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
         }

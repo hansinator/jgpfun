@@ -1,12 +1,8 @@
 package jgpfun;
 
-import jgpfun.world2d.FoodFinder;
-import jgpfun.world2d.TankMotor;
 import jgpfun.jgp.OpCode;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -14,9 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jgpfun.jgp.operations.UnaryOperation;
+import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
-import jgpfun.world2d.Body2d;
 import jgpfun.world2d.World2d;
 
 /**
@@ -52,7 +47,7 @@ public class PopulationManager {
         ants = new ArrayList<Organism>(popSize);
         rnd = new SecureRandom();
         world = new World2d(worldWidth, worldHeight, foodCount);
-        
+
         for (int i = 0; i < popSize; i++) {
             ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
         }
@@ -137,6 +132,13 @@ public class PopulationManager {
                                 Level.SEVERE, null, ex);
                     }
 
+                    /*long live = (System.nanoTime() - start);
+                    System.out.println("VM Run took: " + organism.vmrun);
+                    System.out.println("Movement computation took: " + organism.comp);
+                    System.out.println("All Run took: " + organism.allrun);
+                    System.out.println("Live took: " + live);
+                     */
+
                     /*if(slowMode) {
                     x = Math.abs(organism.x - x);
                     y = Math.abs(organism.y - y);
@@ -144,12 +146,8 @@ public class PopulationManager {
                     System.out.println("x " + x + "y " + y);
                     }*/
 
-                    /*long live = (System.nanoTime() - start);
-                    System.out.println("VM Run took: " + organism.vmrun);
-                    System.out.println("Movement computation took: " + organism.comp);
-                    System.out.println("All Run took: " + organism.allrun);
-                    System.out.println("Live took: " + live);
-                    */
+                    //move organism in world to see if it had hit some food or something like that
+                    world.moveOrganismInWorld(organism, lock);
 
                     //start = System.nanoTime();
                     cb.countDown();
@@ -157,7 +155,6 @@ public class PopulationManager {
                 }
 
             };
-
             pool.execute(r);
         }
         try {
@@ -183,15 +180,15 @@ public class PopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = rouletteWheel(totalFit).clone();
-            parent2 = rouletteWheel(totalFit).clone();
+            parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
+            parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.NextDouble();
             //if (mutador > crossoverRate) {
             //mutate genomes
-            parent1 = MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize);
-            parent2 = MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize);
+            parent1 = MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            parent2 = MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
             /*} //crossover
             else {
             //perform crossover
@@ -210,36 +207,14 @@ public class PopulationManager {
         return totalFit;
     }
 
-    //fintess proportionate selection
-
-    private Organism rouletteWheel(int totalFit) {
-        int stopPoint = 0;
-        int fitnessSoFar = 0;
-
-        if (totalFit > 0) {
-            stopPoint = rnd.nextInt(totalFit);
-        }
-
-        for (int i = 0; i < ants.size(); i++) {
-            fitnessSoFar += ants.get(i).food;
-            //this way zero fitness ants are omitted
-            if (fitnessSoFar > stopPoint) {
-                return ants.get(i);
-            }
-        }
-
-        return ants.get(rnd.nextInt(ants.size()));
-    }
 
     //the team effort
-
     private int calculateFitness() {
         int totalFit = 0;
         for (Organism o : ants) {
             totalFit += o.food;
         }
         return totalFit;
-
     }
 
 
