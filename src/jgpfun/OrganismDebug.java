@@ -1,7 +1,6 @@
 package jgpfun;
 
 import jgpfun.jgp.OpCode;
-import jgpfun.world2d.Body2d;
 import jgpfun.world2d.FoodFinder;
 import jgpfun.world2d.PrecisionBody2d;
 
@@ -22,8 +21,9 @@ public class OrganismDebug extends Organism {
     }
 
 
+    //NOTE: this only works with precisionbodys!
     //old experimentally optimized live method from pc version
-    //TODO: refactor the movement related things into extra classes
+    //TODO: refactor all movement related things into extra classes
     @Override
     public void live() throws Exception {
         int left, right, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
