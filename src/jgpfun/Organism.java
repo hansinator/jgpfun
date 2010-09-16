@@ -5,7 +5,6 @@
 package jgpfun;
 
 import jgpfun.world2d.FoodFinder;
-import jgpfun.world2d.TankMotor;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
@@ -23,12 +22,8 @@ public class Organism implements Comparable<Organism> {
     EvoVM2 vm;
 
     OpCode[] program;
-    /*int xpos, ypos;
-    int angle;*/
 
     double dx, dy;
-
-    public double dir;
 
     //public long vmrun, allrun, comp;
     double cosdir;
@@ -44,21 +39,14 @@ public class Organism implements Comparable<Organism> {
     public static final double maxSpeed = 4.0;
 
     //PC - keep this for movement reasons
-    /*
-    public Organism(OpCode[] program, int x, int y, double dir) {
-    this.x = x;
-    this.y = y;
+    /* only the important parts remain, vm stuff stripped
+    public Organism(int x, int y, double dir) {
     dx = x;
     dy = y;
     this.dir = dir;
-    this.food = 0;
     cosdir = Math.cos(dir);
-
-    this.program = program;
-    this.vm = new EvoVM2(24, program);
     }*/
 
-    //LAPPY
     public Organism(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         this.program = program;
         this.vm = new EvoVM2(24, program);
@@ -70,7 +58,6 @@ public class Organism implements Comparable<Organism> {
         }
     }
 
-    //LAPPY
 
     void live() throws Exception {
         double left, right, foodDist;
@@ -101,7 +88,8 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    //PC
+    //old experimentally optimized live method from pc version
+    //TODO: refactor the movement related things into extra classes
     void live(Food nextFoo) throws Exception {
         int left, right, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
         double speed, foodDist = 0.0;
@@ -170,7 +158,7 @@ public class Organism implements Comparable<Organism> {
             y -= cosdir * maxSpeed * speed / 20000;       //try varying it in simulation*/
 
             //TODO: dx and dy are not body specific yet
-            dx += ((Math.sin(dir) * speed) / 30000.0);
+            dx += ((Math.sin(b.dir) * speed) / 30000.0);
             dy -= ((cosdir * speed) / 30000.0);
             b.x = (int) dx;
             b.y = (int) dy;
