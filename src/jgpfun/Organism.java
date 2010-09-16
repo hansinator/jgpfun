@@ -66,7 +66,7 @@ public class Organism implements Comparable<Organism> {
         this.vm = new EvoVM2(24, program);
         this.food = 0;
 
-        bodies = new Body2d[1];
+        bodies = new Body2d[2];
         for (int i = 0; i < bodies.length; i++) {
             bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
         }
@@ -74,7 +74,7 @@ public class Organism implements Comparable<Organism> {
 
     //LAPPY
 
-    void live(FoodFinder fd) throws Exception {
+    void live() throws Exception {
         int out1, out2;
         double left, right, foodDist;
         double scale = 8192.0;
@@ -82,8 +82,8 @@ public class Organism implements Comparable<Organism> {
         //write input registers
         int inreg = 0;
         for (Body2d b : bodies) {
-            b.food = fd.findNearestFood(b.x, b.y);
-            foodDist = fd.foodDist(b.food, b.x, b.y);
+            b.food = b.foodFinder.findNearestFood(b.x, b.y);
+            foodDist = b.foodFinder.foodDist(b.food, b.x, b.y);
 
             vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
