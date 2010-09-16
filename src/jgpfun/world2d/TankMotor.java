@@ -16,7 +16,7 @@ public class TankMotor implements Motor2d {
     @Override
     public void move(double left, double right) {
         double speed;
-        
+
         //find the direction
         body.dir += (right - left) * (Organism.maxForce / 100);
         //max speed is just a twaking parameter; don't get confused by it
