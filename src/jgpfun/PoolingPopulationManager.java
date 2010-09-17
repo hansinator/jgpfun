@@ -40,9 +40,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         }
     }
 
-    static int gen = 0;
-
-
+    
     public void runGeneration(int iterations, MainView mainView, List<String> foodList) {
         long start = System.currentTimeMillis();
         long time;

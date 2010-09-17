@@ -28,6 +28,8 @@ public abstract class AbstractPopulationManager {
 
     protected World2d world;
 
+    protected int gen = 0;
+
     protected boolean slowMode;
 
     public volatile int roundsMod = 800;
