@@ -24,7 +24,7 @@ public class Main implements WindowListener {
 
     private volatile boolean running = true;
 
-    private final PopulationManager pm;
+    private final PoolingPopulationManager pm;
 
     private final JFrame frame;
 
@@ -38,7 +38,7 @@ public class Main implements WindowListener {
 
 
     public Main(int width, int height) {
-        pm = new PopulationManager(width, height, 26, 256, 40);
+        pm = new PoolingPopulationManager(width, height, 26, 256, 40);
 
         mainView = new MainView();
         mainView.setPreferredSize(new Dimension(width, height));

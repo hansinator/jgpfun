@@ -10,7 +10,6 @@ import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
 import java.util.Random;
 import jgpfun.world2d.Body2d;
-import jgpfun.world2d.PrecisionBody2d;
 
 /**
  *
@@ -40,7 +39,7 @@ public class Organism implements Comparable<Organism> {
 
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new PrecisionBody2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
+            bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
         }
     }
 
@@ -56,8 +55,8 @@ public class Organism implements Comparable<Organism> {
             foodDist = b.foodFinder.foodDist(b.food, b.x, b.y);
 
             //cached cosdir and scale as int are meant to speed this up
-            vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
-            //vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
+            //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
+            vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
             
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
@@ -78,7 +77,7 @@ public class Organism implements Comparable<Organism> {
 
 
     static Organism randomOrganism(int xmax, int ymax, int progsize, FoodFinder foodFinder) {
-        OpCode[] program = new OpCode[rnd.nextInt(progsize)];
+        OpCode[] program = new OpCode[rnd.nextInt(progsize) + 1];
 
         for (int i = 0; i < program.length; i++) {
             program[i] = OpCode.randomOpCode(rnd);

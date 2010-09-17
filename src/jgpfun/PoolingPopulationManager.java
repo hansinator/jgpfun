@@ -35,7 +35,7 @@ public class PoolingPopulationManager {
 
     public static final int maxMutations = 4;
 
-    public static final int maxPoolSize = 100;
+    public static final int maxPoolSize = 52;
 
     private final int progSize;
 
@@ -109,9 +109,17 @@ public class PoolingPopulationManager {
         int foodCollected = newGeneration();
         foodList.add(0, foodCollected);
 
+        System.out.println("Pool size: " + organismPool.size());
         System.out.println("Best in pool: " + bestInPool);
 
         world.randomFood();
+    }
+
+    private void printPool() {
+        System.out.println("Pool:");
+        for(int i = 0; i < organismPool.size(); i++) {
+            System.out.println("" + i + ":\t" + organismPool.get(i).food);
+        }
     }
 
 
@@ -156,18 +164,19 @@ public class PoolingPopulationManager {
             Collections.reverse(organismPool);
 
             //drop all superfluous organisms
-            for (int i = organismPool.size() - 1; i > 99; i--) {
+            for (int i = organismPool.size() - 1; i > (maxPoolSize - 1); i--) {
                 organismPool.remove(i);
             }
 
             //reshuffle to make roulettewheel work better
+            Collections.shuffle(organismPool);
             Collections.shuffle(organismPool);
         }
     }
 
 
     private int newGeneration() {
-        int totalFit;
+        int totalFit, currentGenerationFood;
         OpCode[] parent1, parent2;
         double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
@@ -179,6 +188,9 @@ public class PoolingPopulationManager {
         updatePool();
 
         //get the fitness
+        //call order is important, because of:
+        //TODO: global variable bestInPool...
+        currentGenerationFood = calculateFitness(ants);
         totalFit = calculateFitness(organismPool);
 
         //choose crossover operator
@@ -213,7 +225,7 @@ public class PoolingPopulationManager {
         //replace and leave the other to GC
         ants = newAnts;
 
-        return totalFit;
+        return currentGenerationFood;
     }
 
 
@@ -232,5 +244,15 @@ public class PoolingPopulationManager {
         }
 
         return totalFit;
+    }
+
+
+    public boolean isSlowMode() {
+        return slowMode;
+    }
+
+
+    public void setSlowMode(boolean slowMode) {
+        this.slowMode = slowMode;
     }
 }
