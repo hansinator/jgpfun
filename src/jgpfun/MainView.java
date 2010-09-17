@@ -10,10 +10,8 @@
  */
 package jgpfun;
 
-import jgpfun.world2d.TankMotor;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Polygon;
 import java.util.List;
 import jgpfun.world2d.Body2d;
 

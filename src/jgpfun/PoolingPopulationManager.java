@@ -35,7 +35,7 @@ public class PoolingPopulationManager {
 
     public static final int maxMutations = 4;
 
-    public static final int maxPoolSize = 52;
+    public static final int maxPoolSize = 26;
 
     private final int progSize;
 
@@ -48,6 +48,8 @@ public class PoolingPopulationManager {
     private final ThreadPoolExecutor pool;
 
     public volatile int roundsMod = 800;
+
+    int totalFit;
 
 
     public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
@@ -71,7 +73,7 @@ public class PoolingPopulationManager {
     static int gen = 0;
 
 
-    public void runGeneration(int iterations, MainView mainView, List<Integer> foodList) {
+    public void runGeneration(int iterations, MainView mainView, List<String> foodList) {
         long start = System.currentTimeMillis();
         long time;
 
@@ -100,17 +102,20 @@ public class PoolingPopulationManager {
         System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
 
         int avgProgSize = 0;
-        for (Organism o : ants) {
+        for (Organism o : organismPool) {
             avgProgSize += o.program.length;
         }
-        avgProgSize /= ants.size();
-        System.out.println("Avg prog size (current generation): " + avgProgSize);
+        avgProgSize /= (organismPool.size()>0)?organismPool.size():1;
+        System.out.println("Avg pool prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
-        foodList.add(0, foodCollected);
+        foodList.add(0, "Food: " + foodCollected);
 
-        System.out.println("Pool size: " + organismPool.size());
+        System.out.println("Round food: " + foodCollected);
+        System.out.println("Pool food: " + totalFit);
         System.out.println("Best in pool: " + bestInPool);
+        System.out.println("Pool avg food: " + (totalFit / ((organismPool.size()>0)?organismPool.size():1)));
+        System.out.println("Round avg food: " + (foodCollected / ants.size()));
 
         world.randomFood();
     }
@@ -129,6 +134,7 @@ public class PoolingPopulationManager {
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         organism.live();
@@ -176,16 +182,16 @@ public class PoolingPopulationManager {
 
 
     private int newGeneration() {
-        int totalFit, currentGenerationFood;
+        int currentGenerationFood;
         OpCode[] parent1, parent2;
-        double mutador;
+        //double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
-
-        //enqueue all current organisms into our pool
-        organismPool.addAll(ants);
 
         //update the pool
         updatePool();
+        
+        //enqueue all current organisms into our pool
+        organismPool.addAll(ants);
 
         //get the fitness
         //call order is important, because of:

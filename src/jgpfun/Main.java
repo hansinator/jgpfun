@@ -32,7 +32,7 @@ public class Main implements WindowListener {
 
     private final JList foodList;
 
-    private final List<Integer> foodHist = new ArrayList<Integer>();
+    private final List<String> foodHist = new ArrayList<String>();
 
     private boolean slowMode = false;
 

@@ -10,6 +10,7 @@ import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
 import java.util.Random;
 import jgpfun.world2d.Body2d;
+import jgpfun.world2d.WallSense;
 
 /**
  *
@@ -39,10 +40,9 @@ public class Organism implements Comparable<Organism> {
 
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder);
+            bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder, new WallSense(worldWidth, worldHeight));
         }
     }
-
 
     public void live() throws Exception {
         double left, right, foodDist;
@@ -60,6 +60,9 @@ public class Organism implements Comparable<Organism> {
             
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
+
+            //wallsense
+            vm.regs[inreg++] = b.wallSense.lastSenseVal;
         }
 
         vm.run();
@@ -72,6 +75,9 @@ public class Organism implements Comparable<Organism> {
 
             //move
             b.motor.move(left, right);
+
+            //pickup wallsense before coordinates are clipped
+            b.wallSense.sense();
         }
     }
 

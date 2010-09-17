@@ -63,7 +63,7 @@ public class PopulationManager {
     static int gen = 0;
 
 
-    public void runGeneration(int iterations, MainView mainView, List<Integer> foodList) {
+    public void runGeneration(int iterations, MainView mainView, List<String> foodList) {
         long start = System.currentTimeMillis();
         long time;
 
@@ -98,7 +98,7 @@ public class PopulationManager {
         System.out.println("Avg prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
-        foodList.add(0, foodCollected);
+        foodList.add(0, "GEN: " + gen + "\tFood: " + foodCollected);
 
         world.randomFood();
     }
@@ -110,6 +110,7 @@ public class PopulationManager {
         for (final Organism organism : ants) {
             Runnable r = new Runnable() {
 
+                @Override
                 public void run() {
                     //long start = System.nanoTime();
                     //int oldx, oldy;
@@ -169,7 +170,7 @@ public class PopulationManager {
     private int newGeneration() {
         int totalFit = calculateFitness();
         OpCode[] parent1, parent2;
-        double mutador;
+        //double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
         //choose crossover operator
