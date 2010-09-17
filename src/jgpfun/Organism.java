@@ -12,6 +12,12 @@ import java.util.Random;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.WallSense;
 
+/*
+ * TODO: Create a loopback sense that represents the differential (ableitung)
+ * of an output. Also create an integrator. This should ease temporal
+ * memory functions.
+ */
+
 /**
  *
  * @author hansinator

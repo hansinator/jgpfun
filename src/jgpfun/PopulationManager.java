@@ -1,63 +1,33 @@
 package jgpfun;
 
 import jgpfun.jgp.OpCode;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
-import jgpfun.world2d.World2d;
 
 /**
  *
  * @author hansinator
  */
-public class PopulationManager {
-
-    private final Random rnd;
-
-    private List<Organism> ants;
-
-    private final int worldWidth, worldHeight;
-
-    private World2d world;
-
-    public static final int foodTolerance = 10;
-
-    public static final int maxMutations = 3;
+public class PopulationManager extends AbstractPopulationManager {
 
     private final int progSize;
 
-    private boolean slowMode;
-
     private final Object lock = new Object();
-
-    private final ThreadPoolExecutor pool;
-
-    public volatile int roundsMod = 800;
 
 
     public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
-        ants = new ArrayList<Organism>(popSize);
-        rnd = new SecureRandom();
-        world = new World2d(worldWidth, worldHeight, foodCount);
+        super(worldWidth, worldHeight, popSize, foodCount);
+
+        this.progSize = progSize;
 
         for (int i = 0; i < popSize; i++) {
             ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
         }
-
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-        this.progSize = progSize;
-
-        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
-        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     static int gen = 0;
@@ -98,7 +68,7 @@ public class PopulationManager {
         System.out.println("Avg prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
-        foodList.add(0, "GEN: " + gen + "\tFood: " + foodCollected);
+        foodList.add(0, "Food: " + foodCollected);
 
         world.randomFood();
     }
@@ -217,15 +187,4 @@ public class PopulationManager {
         }
         return totalFit;
     }
-
-
-    public boolean isSlowMode() {
-        return slowMode;
-    }
-
-
-    public void setSlowMode(boolean slowMode) {
-        this.slowMode = slowMode;
-    }
-
 }

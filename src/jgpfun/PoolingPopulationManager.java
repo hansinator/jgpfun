@@ -1,73 +1,43 @@
 package jgpfun;
 
 import jgpfun.jgp.OpCode;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
-import jgpfun.world2d.World2d;
 
 /**
  *
  * @author hansinator
  */
-public class PoolingPopulationManager {
-
-    private final Random rnd;
-
-    private List<Organism> ants;
-
-    private List<Organism> organismPool;
-
-    private final int worldWidth, worldHeight;
-
-    private World2d world;
-
-    public static final int foodTolerance = 10;
-
-    public static final int maxMutations = 4;
+public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public static final int maxPoolSize = 26;
+    
+    private List<Organism> organismPool;
 
     private final int progSize;
-
-    private boolean slowMode;
 
     private int bestInPool;
 
     private final Object lock = new Object();
 
-    private final ThreadPoolExecutor pool;
-
-    public volatile int roundsMod = 800;
-
     int totalFit;
 
 
     public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
-        ants = new ArrayList<Organism>(popSize);
-        rnd = new SecureRandom();
-        world = new World2d(worldWidth, worldHeight, foodCount);
+        super(worldWidth, worldHeight, popSize, foodCount);
+        
         organismPool = new ArrayList<Organism>(maxPoolSize);
+        this.progSize = progSize;
 
         for (int i = 0; i < popSize; i++) {
             ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
         }
-
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-        this.progSize = progSize;
-
-        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
-        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     static int gen = 0;
@@ -105,7 +75,7 @@ public class PoolingPopulationManager {
         for (Organism o : organismPool) {
             avgProgSize += o.program.length;
         }
-        avgProgSize /= (organismPool.size()>0)?organismPool.size():1;
+        avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
         System.out.println("Avg pool prog size (current generation): " + avgProgSize);
 
         int foodCollected = newGeneration();
@@ -114,15 +84,16 @@ public class PoolingPopulationManager {
         System.out.println("Round food: " + foodCollected);
         System.out.println("Pool food: " + totalFit);
         System.out.println("Best in pool: " + bestInPool);
-        System.out.println("Pool avg food: " + (totalFit / ((organismPool.size()>0)?organismPool.size():1)));
+        System.out.println("Pool avg food: " + (totalFit / ((organismPool.size() > 0) ? organismPool.size() : 1)));
         System.out.println("Round avg food: " + (foodCollected / ants.size()));
 
         world.randomFood();
     }
 
+
     private void printPool() {
         System.out.println("Pool:");
-        for(int i = 0; i < organismPool.size(); i++) {
+        for (int i = 0; i < organismPool.size(); i++) {
             System.out.println("" + i + ":\t" + organismPool.get(i).food);
         }
     }
@@ -187,9 +158,6 @@ public class PoolingPopulationManager {
         //double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
-        //update the pool
-        updatePool();
-        
         //enqueue all current organisms into our pool
         organismPool.addAll(ants);
 
@@ -231,6 +199,9 @@ public class PoolingPopulationManager {
         //replace and leave the other to GC
         ants = newAnts;
 
+        //update the pool
+        updatePool();
+
         return currentGenerationFood;
     }
 
@@ -252,13 +223,4 @@ public class PoolingPopulationManager {
         return totalFit;
     }
 
-
-    public boolean isSlowMode() {
-        return slowMode;
-    }
-
-
-    public void setSlowMode(boolean slowMode) {
-        this.slowMode = slowMode;
-    }
 }
