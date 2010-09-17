@@ -17,7 +17,7 @@ public class World2d {
 
     private final Random rnd;
 
-    private final int worldWidth, worldHeight;
+    public final int worldWidth, worldHeight;
 
     public final List<Food> food;
 

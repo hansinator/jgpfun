@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -15,48 +16,19 @@ import jgpfun.util.MutationUtils;
  */
 public class PopulationManager extends AbstractPopulationManager {
 
-    private final int progSize;
-
     private final Object lock = new Object();
 
 
-    public PopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
-        super(worldWidth, worldHeight, popSize, foodCount);
-
-        this.progSize = progSize;
-
-        for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
-        }
+    public PopulationManager(World2d world, int popSize, int progSize) {
+        super(world, popSize, progSize);
     }
 
 
-    public void runGeneration(int iterations, MainView mainView, List<String> foodList) {
-        long start = System.currentTimeMillis();
-        long time;
-
-        for (int i = 0; i < iterations; i++) {
-            step();
-            if (slowMode || (i % roundsMod) == 0) {
-                time = System.currentTimeMillis() - start;
-                mainView.drawStuff(world.food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
-                mainView.repaint();
-
-                if (slowMode) {
-                    try {
-                        Thread.sleep(15);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-
-        gen++;
-
+    @Override
+    public void printStats(long rps) {
         System.out.println("");
         System.out.println("GEN: " + gen);
-        System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
+        System.out.println("RPS: " + rps);
 
         int avgProgSize = 0;
         for (Organism o : ants) {
@@ -64,15 +36,11 @@ public class PopulationManager extends AbstractPopulationManager {
         }
         avgProgSize /= ants.size();
         System.out.println("Avg prog size (current generation): " + avgProgSize);
-
-        int foodCollected = newGeneration();
-        foodList.add(0, "Food: " + foodCollected);
-
-        world.randomFood();
     }
 
 
-    void step() {
+    @Override
+    public void step() {
         final CountDownLatch cb = new CountDownLatch(ants.size());
 
         for (final Organism organism : ants) {
@@ -135,7 +103,8 @@ public class PopulationManager extends AbstractPopulationManager {
     }
 
 
-    private int newGeneration() {
+    @Override
+    public int newGeneration() {
         int totalFit = calculateFitness();
         OpCode[] parent1, parent2;
         //double mutador;
@@ -166,8 +135,8 @@ public class PopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, worldWidth, worldHeight, world.foodFinder));
-            newAnts.add(new Organism(parent2, worldWidth, worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent2, world.worldWidth, world.worldHeight, world.foodFinder));
         }
 
         //replace and leave the other to GC

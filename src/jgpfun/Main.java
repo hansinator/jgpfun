@@ -24,7 +24,7 @@ public class Main implements WindowListener {
 
     private volatile boolean running = true;
 
-    private final PopulationManager pm;
+    private final Simulation sim;
 
     private final JFrame frame;
 
@@ -38,10 +38,10 @@ public class Main implements WindowListener {
 
 
     public Main(int width, int height) {
-        pm = new PopulationManager(width, height, 26, 256, 40);
-
         mainView = new MainView();
         mainView.setPreferredSize(new Dimension(width, height));
+
+        sim = new Simulation(width, height, 26, 256, 40, mainView);
 
         foodList = new JList(new UpdatableListModel(foodHist));
         foodList.setPreferredSize(new Dimension(200, 0));
@@ -51,9 +51,10 @@ public class Main implements WindowListener {
         speedSwitch.addActionListener(new ActionListener() {
 
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 slowMode = !slowMode;
-                pm.setSlowMode(slowMode);
+                sim.setSlowMode(slowMode);
             }
         });
 
@@ -95,7 +96,7 @@ public class Main implements WindowListener {
     private void start() {
         running = true;
         while (running) {
-            pm.runGeneration(4000, mainView, foodHist);
+            sim.runGeneration(4000, foodHist);
             ((UpdatableListModel) foodList.getModel()).update();
         }
 
@@ -103,32 +104,39 @@ public class Main implements WindowListener {
     }
 
 
+    @Override
     public void windowOpened(WindowEvent e) {
     }
 
 
+    @Override
     public void windowClosing(WindowEvent e) {
         running = false;
     }
 
 
+    @Override
     public void windowClosed(WindowEvent e) {
         running = false;
     }
 
 
+    @Override
     public void windowIconified(WindowEvent e) {
     }
 
 
+    @Override
     public void windowDeiconified(WindowEvent e) {
     }
 
 
+    @Override
     public void windowActivated(WindowEvent e) {
     }
 
 
+    @Override
     public void windowDeactivated(WindowEvent e) {
     }
 
@@ -142,11 +150,13 @@ public class Main implements WindowListener {
         }
 
 
+        @Override
         public int getSize() {
             return l.size();
         }
 
 
+        @Override
         public Object getElementAt(int index) {
             return l.get(index);
         }

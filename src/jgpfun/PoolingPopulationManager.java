@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -17,75 +18,42 @@ import jgpfun.util.MutationUtils;
 public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public static final int maxPoolSize = 26;
-    
-    private List<Organism> organismPool;
 
-    private final int progSize;
+    private List<Organism> organismPool;
 
     private int bestInPool;
 
     private final Object lock = new Object();
 
-    int totalFit;
+    private int foodCollected;
+
+    private int totalFit;
 
 
-    public PoolingPopulationManager(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
-        super(worldWidth, worldHeight, popSize, foodCount);
-        
+    public PoolingPopulationManager(World2d world, int popSize, int progSize) {
+        super(world, popSize, progSize);
         organismPool = new ArrayList<Organism>(maxPoolSize);
-        this.progSize = progSize;
-
-        for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(worldWidth, worldHeight, progSize, world.foodFinder));
-        }
     }
 
-    
-    public void runGeneration(int iterations, MainView mainView, List<String> foodList) {
-        long start = System.currentTimeMillis();
-        long time;
 
-        for (int i = 0; i < iterations; i++) {
-            //ants.get(0).showdebug = (roundsMod == 1);
-            step();
-            if (slowMode || (i % roundsMod) == 0) {
-                time = System.currentTimeMillis() - start;
-                mainView.drawStuff(world.food, ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
-                mainView.repaint();
-
-                if (slowMode) {
-                    try {
-                        Thread.sleep(15);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-
-        gen++;
-
+    @Override
+    public void printStats(long rps) {
         System.out.println("");
         System.out.println("GEN: " + gen);
-        System.out.println("RPS: " + ((iterations * 1000) / (System.currentTimeMillis() - start)));
+        System.out.println("RPS: " + rps);
 
         int avgProgSize = 0;
         for (Organism o : organismPool) {
             avgProgSize += o.program.length;
         }
         avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
+        
         System.out.println("Avg pool prog size (current generation): " + avgProgSize);
-
-        int foodCollected = newGeneration();
-        foodList.add(0, "Food: " + foodCollected);
-
         System.out.println("Round food: " + foodCollected);
         System.out.println("Pool food: " + totalFit);
         System.out.println("Best in pool: " + bestInPool);
         System.out.println("Pool avg food: " + (totalFit / ((organismPool.size() > 0) ? organismPool.size() : 1)));
         System.out.println("Round avg food: " + (foodCollected / ants.size()));
-
-        world.randomFood();
     }
 
 
@@ -97,7 +65,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     }
 
 
-    void step() {
+    @Override
+    public void step() {
         final CountDownLatch cb = new CountDownLatch(ants.size());
 
         for (final Organism organism : ants) {
@@ -150,8 +119,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     }
 
 
-    private int newGeneration() {
-        int currentGenerationFood;
+    @Override
+    public int newGeneration() {
         OpCode[] parent1, parent2;
         //double mutador;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
@@ -162,7 +131,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         //get the fitness
         //call order is important, because of:
         //TODO: global variable bestInPool...
-        currentGenerationFood = calculateFitness(ants);
+        foodCollected = calculateFitness(ants);
         totalFit = calculateFitness(organismPool);
 
         //choose crossover operator
@@ -190,8 +159,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, worldWidth, worldHeight, world.foodFinder));
-            newAnts.add(new Organism(parent2, worldWidth, worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent2, world.worldWidth, world.worldHeight, world.foodFinder));
         }
 
         //replace and leave the other to GC
@@ -200,7 +169,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         //update the pool
         updatePool();
 
-        return currentGenerationFood;
+        return foodCollected;
     }
 
 

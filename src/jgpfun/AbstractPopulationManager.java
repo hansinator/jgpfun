@@ -22,33 +22,42 @@ public abstract class AbstractPopulationManager {
 
     protected final ThreadPoolExecutor pool;
 
-    protected final int worldWidth, worldHeight;
-    
+    protected final int progSize;
+
     protected List<Organism> ants;
 
-    protected World2d world;
+    protected final World2d world;
 
     protected int gen = 0;
 
     protected boolean slowMode;
 
     public volatile int roundsMod = 800;
-    
 
-    public AbstractPopulationManager(int worldWidth, int worldHeight, int popSize, int foodCount) {
-        rnd = new SecureRandom();
-        
+
+    public AbstractPopulationManager(World2d world, int popSize, int progSize) {
+        this.world = world;
+        this.progSize = progSize;
+
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-
-        world = new World2d(worldWidth, worldHeight, foodCount);
         ants = new ArrayList<Organism>(popSize);
+        rnd = new SecureRandom();
 
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
+        for (int i = 0; i < popSize; i++) {
+            ants.add(Organism.randomOrganism(world.worldWidth, world.worldHeight, progSize, world.foodFinder));
+        }
     }
 
-    public abstract void runGeneration(int iterations, MainView mainView, List<String> foodList);
+
+    public abstract void step();
+
+
+    public abstract void printStats(long rps);
+
+
+    public abstract int newGeneration();
+
 
     public boolean isSlowMode() {
         return slowMode;
