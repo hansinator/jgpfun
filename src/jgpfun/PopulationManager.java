@@ -80,8 +80,8 @@ public class PopulationManager extends AbstractPopulationManager {
                 p1.addAll(Arrays.asList(parent1));
                 p2.addAll(Arrays.asList(parent2));
                 crossOp.cross(p1, p2, rnd);
-                parent1 = p1.toArray(parent1);
-                parent2 = p2.toArray(parent2);
+                parent1 = p1.toArray(new OpCode[p1.size()]);
+                parent2 = p2.toArray(new OpCode[p2.size()]);
             }
 
             //create new ants with the modified genomes and save them
