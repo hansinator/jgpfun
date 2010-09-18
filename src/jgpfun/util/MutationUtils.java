@@ -21,24 +21,18 @@ public class MutationUtils {
 
 
     //make random changes to random locations in the genome
-    public static OpCode[] mutate(OpCode[] genome, int mutCount, int progSize, Random rnd) {
+    public static void mutate(List<OpCode> genome, int mutCount, int progSize, Random rnd) {
         //determine amount of mutations, minimum 1
         //int mutCount = maxMutations;
         //int mutCount = randomR.Next(maxMutations) + 1;
 
         for (int i = 0; i < mutCount; i++) {
-            genome = mutateProgramSpace(genome, progSize, rnd);
+            mutateProgramSpace(genome, progSize, rnd);
         }
-
-        return genome;
     }
 
 
-    public static OpCode[] mutateProgramSpace(OpCode[] program, int progSize, Random rnd) {
-        List<OpCode> programSpace = new ArrayList(program.length);
-        programSpace.addAll(Arrays.asList(program));
-        //fetch programspace and weights
-
+    public static void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd) {
         //define chances for what mutation could happen in some sort of percentage
         int mutateIns = 22, mutateRem = 18, mutateRep = 20, mutateVal = 20;
         int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
@@ -47,7 +41,7 @@ public class MutationUtils {
         //the choice of mutation
         int mutationChoice;
         //choose random location
-        int loc = rnd.nextInt(program.length);
+        int loc = rnd.nextInt(program.size());
         //precalculate a random value, but exclude zero
         //zero is no valid constant, as it tends to create semantic introns
         //(like a = a + 0 or b = n * 0 and so on)
@@ -57,19 +51,19 @@ public class MutationUtils {
         //    val = rnd.Next(Int32.MinValue, Int32.MaxValue);
         //}
 
-        OpCode instr = programSpace.get(loc);
+        OpCode instr = program.get(loc);
 
         //now see what to do
         //either delete an opcode, add a new or mutate an existing one
 
         //first determine which mutations are possible and add up all the chances
         //if we have the max possible opcodes, we can't add a new one
-        if (programSpace.size() >= progSize) {
+        if (program.size() >= progSize) {
             mutateIns = 0;
         }
 
         //if we have only 4 opcodes left, don't delete more
-        if (programSpace.size() < 5) {
+        if (program.size() < 5) {
             mutateRem = 0;
             mutateIns = 100; //TEST: when prog is too small, mutation tends to vary the same loc multiple times...
         }
@@ -91,15 +85,15 @@ public class MutationUtils {
         //mutate ins
         if (mutationChoice < mutateIns) {
             //insert a random instruction at a random location
-            programSpace.add(loc, OpCode.randomOpCode(rnd));
+            program.add(loc, OpCode.randomOpCode(rnd));
         } //mutate rem
         else if (mutationChoice < (mutateIns + mutateRem)) {
             //remove a random instruction
-            programSpace.remove(loc);
+            program.remove(loc);
         } //mutate rep
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {
             //replace a random instruction
-            programSpace.set(loc, OpCode.randomOpCode(rnd));
+            program.set(loc, OpCode.randomOpCode(rnd));
         } //mutate src1 or immediate value
         else if (mutationChoice
                 < (mutateIns + mutateRem + mutateRep + mutateVal)) {
@@ -108,7 +102,7 @@ public class MutationUtils {
             instr.src1 = (instr.src1 + val);
 
             //save modified instruction
-            programSpace.set(loc, instr);
+            program.set(loc, instr);
         } //mutate src2
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
                 + mutateSrc2)) {
@@ -123,7 +117,7 @@ public class MutationUtils {
             }
 
             //save modified instruction
-            programSpace.set(loc, instr);
+            program.set(loc, instr);
         } //mutate trg
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
                 + mutateSrc2 + mutateTrg)) {
@@ -139,7 +133,7 @@ public class MutationUtils {
             //while (!((instr.trg == 4) || (instr.trg == 5)));
 
             //save modified instruction
-            programSpace.set(loc, instr);
+            program.set(loc, instr);
         } //mutate op
         else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
                 + mutateSrc2 + mutateTrg + mutateOp)) {
@@ -147,18 +141,15 @@ public class MutationUtils {
             instr.op = rnd.nextInt();
 
             //save modified instruction
-            programSpace.set(loc, instr);
+            program.set(loc, instr);
         } //mutate opflags
         else {
             //set new random opflags
             instr.immediate = rnd.nextBoolean();
 
             //save modified instruction
-            programSpace.set(loc, instr);
+            program.set(loc, instr);
         }
-
-        program = new OpCode[programSpace.size()];
-        return programSpace.toArray(program);
     }
 
 }

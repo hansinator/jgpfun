@@ -14,6 +14,11 @@ import jgpfun.world2d.World2d;
  */
 public abstract class AbstractPopulationManager {
 
+    /*
+     * The chance with which crossover happens, rest is mutation.
+     */
+    public static final double crossoverRate = 0.2;
+
     public static final int foodTolerance = 10;
 
     public static final int maxMutations = 3;

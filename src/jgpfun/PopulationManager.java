@@ -16,12 +16,6 @@ import jgpfun.world2d.World2d;
  */
 public class PopulationManager extends AbstractPopulationManager {
 
-    /*
-     * The chance with which crossover happens, rest is mutation.
-     */
-    private final static double crossoverRate = 0.2;
-
-
     public PopulationManager(World2d world, int popSize, int progSize) {
         super(world, popSize, progSize);
     }
@@ -49,9 +43,9 @@ public class PopulationManager extends AbstractPopulationManager {
 
     @Override
     public int newGeneration() {
-        int totalFit = calculateFitness();
-        OpCode[] parent1, parent2;
         double mutador;
+        int totalFit = calculateFitness();
+        List<OpCode> parent1 = new ArrayList<OpCode>(), parent2 = new ArrayList<OpCode>();
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
         //choose crossover operator
@@ -62,31 +56,23 @@ public class PopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
+            parent1.addAll(Arrays.asList(EvoUtils.rouletteWheel(ants, totalFit, rnd).clone()));
+            parent2.addAll(Arrays.asList(EvoUtils.rouletteWheel(ants, totalFit, rnd).clone()));
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
             if (mutador > crossoverRate) {
                 //mutate genomes
-                parent1 = MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
-                parent2 = MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            } //crossover
-            else {
+                MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
+                MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            } else {
                 //perform crossover
-                //(crossover operators automatically copy the genomes)
-                ArrayList<OpCode> p1 = new ArrayList<OpCode>();
-                ArrayList<OpCode> p2 = new ArrayList<OpCode>();
-                p1.addAll(Arrays.asList(parent1));
-                p2.addAll(Arrays.asList(parent2));
-                crossOp.cross(p1, p2, rnd);
-                parent1 = p1.toArray(new OpCode[p1.size()]);
-                parent2 = p2.toArray(new OpCode[p2.size()]);
+                crossOp.cross(parent1, parent2, rnd);
             }
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
-            newAnts.add(new Organism(parent2, world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent1.toArray(new OpCode[parent1.size()]), world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent2.toArray(new OpCode[parent2.size()]), world.worldWidth, world.worldHeight, world.foodFinder));
         }
 
         //replace and leave the other to GC

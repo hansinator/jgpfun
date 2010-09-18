@@ -13,10 +13,9 @@ public class TwoPointCrossover implements CrossoverOperator {
 
     @Override
     public void cross(List<OpCode> parent1, List<OpCode> parent2, Random rnd) {
-            //copy source genomes, as we don't want our organisms
-            //to telepathically share code portions!
-            List<OpCode> in1 = Arrays.asList(parent1.toArray(new OpCode[parent1.size()]).clone());
-            List<OpCode> in2 = Arrays.asList(parent2.toArray(new OpCode[parent2.size()]).clone());
+            //copy source genomes
+            List<OpCode> in1 = Arrays.asList(parent1.toArray(new OpCode[parent1.size()]));
+            List<OpCode> in2 = Arrays.asList(parent2.toArray(new OpCode[parent2.size()]));
 
             //clear target genomes
             parent1.clear();
