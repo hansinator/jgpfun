@@ -1,5 +1,6 @@
 package jgpfun.crossover;
 
+import java.util.List;
 import java.util.Random;
 import jgpfun.jgp.OpCode;
 
@@ -11,5 +12,5 @@ public interface CrossoverOperator
 {
     //this function shall cross two parent genomes
     //and place the new ones back into the genomes
-    void cross(OpCode[] parent1, OpCode[] parent2, Random rnd);
+    void cross(List<OpCode> parent1, List<OpCode> parent2, Random rnd);
 }
