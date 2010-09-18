@@ -27,7 +27,7 @@ public class PopulationManager extends AbstractPopulationManager {
 
         int avgProgSize = 0;
         for (Organism o : ants) {
-            avgProgSize += o.program.length;
+            avgProgSize += o.program.size();
         }
         avgProgSize /= ants.size();
         System.out.println("Avg prog size: " + avgProgSize);
@@ -44,6 +44,7 @@ public class PopulationManager extends AbstractPopulationManager {
     @Override
     public int newGeneration() {
         double mutador;
+        List<OpCode> parent1, parent2;
         int totalFit = calculateFitness();
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
@@ -52,13 +53,11 @@ public class PopulationManager extends AbstractPopulationManager {
 
         //create new genomes via cloning and mutation or crossover
         for (int i = 0; i < (ants.size() / 2); i++) {
-            List<OpCode> parent1 = new ArrayList<OpCode>(), parent2 = new ArrayList<OpCode>();
-            
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1.addAll(Arrays.asList(EvoUtils.rouletteWheel(ants, totalFit, rnd).clone()));
-            parent2.addAll(Arrays.asList(EvoUtils.rouletteWheel(ants, totalFit, rnd).clone()));
+            parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
+            parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
@@ -72,8 +71,8 @@ public class PopulationManager extends AbstractPopulationManager {
             }
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1.toArray(new OpCode[parent1.size()]), world.worldWidth, world.worldHeight, world.foodFinder));
-            newAnts.add(new Organism(parent2.toArray(new OpCode[parent2.size()]), world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent2, world.worldWidth, world.worldHeight, world.foodFinder));
         }
 
         //replace and leave the other to GC

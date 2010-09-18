@@ -8,6 +8,7 @@ import jgpfun.world2d.FoodFinder;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -38,16 +39,16 @@ public class Organism implements Comparable<Organism> {
 
     protected final EvoVM2 vm;
 
-    protected final OpCode[] program;
+    protected final List<OpCode> program;
 
     public final Body2d[] bodies;
 
     public int food;
 
 
-    public Organism(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
+    public Organism(List<OpCode> program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         this.program = program;
-        this.vm = new EvoVM2(registerCount, program);
+        this.vm = new EvoVM2(registerCount, program.toArray(new OpCode[program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
@@ -95,11 +96,12 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    static Organism randomOrganism(int xmax, int ymax, int progsize, FoodFinder foodFinder) {
-        OpCode[] program = new OpCode[rnd.nextInt(progsize) + 1];
+    static Organism randomOrganism(int xmax, int ymax, int progSize, FoodFinder foodFinder) {
+        int size = rnd.nextInt(progSize) + 1;
+        List<OpCode> program = new ArrayList<OpCode>(size);
 
-        for (int i = 0; i < program.length; i++) {
-            program[i] = OpCode.randomOpCode(rnd);
+        for (int i = 0; i < size; i++) {
+            program.add(OpCode.randomOpCode(rnd));
         }
 
         return new Organism(program, xmax, ymax, foodFinder);
@@ -107,11 +109,11 @@ public class Organism implements Comparable<Organism> {
 
 
     @Override
-    public OpCode[] clone() {
-        OpCode[] p = new OpCode[program.length];
+    public List<OpCode> clone() {
+        List<OpCode> p = new ArrayList<OpCode>(program.size());
 
-        for (int i = 0; i < program.length; i++) {
-            p[i] = program[i].clone();
+        for (OpCode oc : program) {
+            p.add(oc.clone());
         }
 
         return p;
