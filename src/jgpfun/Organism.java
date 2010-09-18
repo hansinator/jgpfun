@@ -8,6 +8,11 @@ import jgpfun.world2d.FoodFinder;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM2;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.WallSense;
@@ -17,7 +22,6 @@ import jgpfun.world2d.WallSense;
  * of an output. Also create an integrator. This should ease temporal
  * memory functions.
  */
-
 /**
  *
  * @author hansinator
@@ -30,6 +34,8 @@ public class Organism implements Comparable<Organism> {
 
     protected static final Random rnd = new SecureRandom();
 
+    protected final int registerCount = 24;
+
     protected final EvoVM2 vm;
 
     protected final OpCode[] program;
@@ -41,7 +47,7 @@ public class Organism implements Comparable<Organism> {
 
     public Organism(OpCode[] program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         this.program = program;
-        this.vm = new EvoVM2(24, program);
+        this.vm = new EvoVM2(registerCount, program);
         this.food = 0;
 
         bodies = new Body2d[1];
@@ -49,6 +55,7 @@ public class Organism implements Comparable<Organism> {
             bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder, new WallSense(worldWidth, worldHeight));
         }
     }
+
 
     public void live() throws Exception {
         double left, right, foodDist;
@@ -63,7 +70,7 @@ public class Organism implements Comparable<Organism> {
             //cached cosdir and scale as int are meant to speed this up
             //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
             vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
-            
+
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
 

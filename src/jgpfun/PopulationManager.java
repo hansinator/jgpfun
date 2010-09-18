@@ -27,7 +27,14 @@ public class PopulationManager extends AbstractPopulationManager {
             avgProgSize += o.program.length;
         }
         avgProgSize /= ants.size();
-        System.out.println("Avg prog size (current generation): " + avgProgSize);
+        System.out.println("Avg prog size: " + avgProgSize);
+
+        avgProgSize = 0;
+        for (Organism o : ants) {
+            avgProgSize += o.vm.getProgramSize();
+        }
+        avgProgSize /= ants.size();
+        System.out.println("Avg real prog size: " + avgProgSize);
     }
 
 
