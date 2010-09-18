@@ -4,9 +4,6 @@ import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
 import jgpfun.world2d.World2d;
@@ -23,8 +20,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     private int bestInPool;
 
-    private final Object lock = new Object();
-
     private int foodCollected;
 
     private int totalFit;
@@ -38,8 +33,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     @Override
     public void printStats(long rps) {
-        System.out.println("");
-        System.out.println("GEN: " + gen);
         System.out.println("RPS: " + rps);
 
         int avgProgSize = 0;
@@ -64,38 +57,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         }
     }
 
-
-    @Override
-    public void step() {
-        final CountDownLatch cb = new CountDownLatch(ants.size());
-
-        for (final Organism organism : ants) {
-            Runnable r = new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        organism.live();
-                    } catch (Exception ex) {
-                        Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    //move organism in world to see if it had hit some food or something like that
-                    world.moveOrganismInWorld(organism, lock);
-
-                    cb.countDown();
-                }
-
-            };
-
-            pool.execute(r);
-        }
-        try {
-            cb.await();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     //this funtion ensures that the populatio pool
     //does not exceed it's maximum size by purging
