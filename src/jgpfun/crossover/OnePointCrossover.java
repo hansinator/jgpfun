@@ -18,8 +18,9 @@ public class OnePointCrossover implements CrossoverOperator {
     @Override
     public void cross(List<OpCode> parent1, List<OpCode> parent2, Random rnd) {
             //copy source genomes
-            List<OpCode> in1 = Arrays.asList(parent1.toArray(new OpCode[parent1.size()]));
-            List<OpCode> in2 = Arrays.asList(parent2.toArray(new OpCode[parent2.size()]));
+            List<OpCode> in1 = new ArrayList(parent1.size()), in2 = new ArrayList(parent2.size());
+            in1.addAll(parent1);
+            in2.addAll(parent2);
 
             //clear target genomes
             parent1.clear();

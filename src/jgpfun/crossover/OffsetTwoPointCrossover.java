@@ -8,7 +8,7 @@ import jgpfun.jgp.OpCode;
 /**
  * Basically the same as TwoPointCrossover, only that the exchanged
  * part is not at the exact same position in both genomes, but offset
- * by a random value
+ * by a random value.
  *
  * @author hansinator
  */
