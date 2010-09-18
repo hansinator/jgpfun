@@ -45,7 +45,6 @@ public class PopulationManager extends AbstractPopulationManager {
     public int newGeneration() {
         double mutador;
         int totalFit = calculateFitness();
-        List<OpCode> parent1 = new ArrayList<OpCode>(), parent2 = new ArrayList<OpCode>();
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
         //choose crossover operator
@@ -53,6 +52,8 @@ public class PopulationManager extends AbstractPopulationManager {
 
         //create new genomes via cloning and mutation or crossover
         for (int i = 0; i < (ants.size() / 2); i++) {
+            List<OpCode> parent1 = new ArrayList<OpCode>(), parent2 = new ArrayList<OpCode>();
+            
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
