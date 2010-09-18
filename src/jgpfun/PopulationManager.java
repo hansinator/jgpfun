@@ -2,6 +2,7 @@ package jgpfun;
 
 import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.OnePointCrossover;
@@ -74,7 +75,13 @@ public class PopulationManager extends AbstractPopulationManager {
             else {
                 //perform crossover
                 //(crossover operators automatically copy the genomes)
-                crossOp.cross(parent1, parent2, rnd);
+                ArrayList<OpCode> p1 = new ArrayList<OpCode>();
+                ArrayList<OpCode> p2 = new ArrayList<OpCode>();
+                p1.addAll(Arrays.asList(parent1));
+                p2.addAll(Arrays.asList(parent2));
+                crossOp.cross(p1, p2, rnd);
+                parent1 = p1.toArray(parent1);
+                parent2 = p2.toArray(parent2);
             }
 
             //create new ants with the modified genomes and save them
