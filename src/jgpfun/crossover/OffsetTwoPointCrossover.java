@@ -14,6 +14,12 @@ import jgpfun.jgp.OpCode;
  */
 public class OffsetTwoPointCrossover implements CrossoverOperator {
 
+    private int maxWndSize;
+
+    public OffsetTwoPointCrossover(int maxWndSize) {
+        this.maxWndSize = maxWndSize;
+    }
+
     @Override
     public void cross(List<OpCode> parent1, List<OpCode> parent2, Random rnd) {
         //copy source genomes
@@ -25,7 +31,7 @@ public class OffsetTwoPointCrossover implements CrossoverOperator {
         parent2.clear();
 
         //exchanged part width and offset in each target genome
-        int width = rnd.nextInt(Math.min(in1.size(), in2.size()));
+        int width = rnd.nextInt(Math.min(Math.min(in1.size(), in2.size()), maxWndSize));
         int off1 = rnd.nextInt(in1.size() - width);
         int off2 = rnd.nextInt(in2.size() - width);
 

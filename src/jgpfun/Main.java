@@ -41,7 +41,8 @@ public class Main implements WindowListener {
         mainView = new MainView();
         mainView.setPreferredSize(new Dimension(width, height));
 
-        sim = new Simulation(width, height, 26, 256, 40, mainView);
+        //sim = new Simulation(width, height, 26, 256, 40, mainView);
+        sim = new Simulation(width, height, 32, 512, 40, mainView);
 
         foodList = new JList(new UpdatableListModel(foodHist));
         foodList.setPreferredSize(new Dimension(200, 0));

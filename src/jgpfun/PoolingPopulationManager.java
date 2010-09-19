@@ -2,7 +2,6 @@ package jgpfun;
 
 import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;

@@ -35,7 +35,8 @@ public class Organism implements Comparable<Organism> {
 
     protected static final Random rnd = new SecureRandom();
 
-    protected final int registerCount = 24;
+    //protected final int registerCount = 24;
+    protected final int registerCount = 32;
 
     protected final EvoVM2 vm;
 
@@ -76,7 +77,7 @@ public class Organism implements Comparable<Organism> {
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
 
             //wallsense
-            //vm.regs[inreg++] = b.wallSense.lastSenseVal;
+            vm.regs[inreg++] = b.wallSense.lastSenseVal;
         }
 
         vm.run();
@@ -91,7 +92,7 @@ public class Organism implements Comparable<Organism> {
             b.motor.move(left, right);
 
             //pickup wallsense before coordinates are clipped
-            //b.wallSense.sense();
+            b.wallSense.sense();
         }
     }
 

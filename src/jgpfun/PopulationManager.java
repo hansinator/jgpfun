@@ -2,7 +2,6 @@ package jgpfun;
 
 import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.OffsetTwoPointCrossover;
@@ -49,7 +48,7 @@ public class PopulationManager extends AbstractPopulationManager {
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
         //choose crossover operator
-        CrossoverOperator crossOp = new OffsetTwoPointCrossover();
+        CrossoverOperator crossOp = new OffsetTwoPointCrossover(progSize / 8);
 
         //create new genomes via cloning and mutation or crossover
         for (int i = 0; i < (ants.size() / 2); i++) {
