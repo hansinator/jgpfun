@@ -119,24 +119,6 @@ is divided into following sections:
                 <istrue value="${do.archive}"/>
             </and>
         </condition>
-        <condition property="manifest.available+mkdist.available">
-            <and>
-                <istrue value="${manifest.available}"/>
-                <isset property="do.mkdist"/>
-            </and>
-        </condition>
-        <condition property="manifest.available-mkdist.available">
-            <or>
-                <istrue value="${manifest.available}"/>
-                <isset property="do.mkdist"/>
-            </or>
-        </condition>
-        <condition property="manifest.available+main.class-mkdist.available">
-            <or>
-                <istrue value="${manifest.available+main.class}"/>
-                <isset property="do.mkdist"/>
-            </or>
-        </condition>
         <condition property="have.tests">
             <or>
                 <available file="${test.src.dir}"/>
