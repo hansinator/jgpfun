@@ -59,15 +59,15 @@ public class PopulationManager extends AbstractPopulationManager {
             parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
 
             //mutate or crossover with a user defined chance
-            mutador = rnd.nextDouble();
-            if (mutador > crossoverRate) {
+            //mutador = rnd.nextDouble();
+            //if (mutador > crossoverRate) {
                 //mutate genomes
                 MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
                 MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            } else {
+            /* else {
                 //perform crossover
                 crossOp.cross(parent1, parent2, rnd);
-            }
+            }*/
 
             //create new ants with the modified genomes and save them
             newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
@@ -89,5 +89,4 @@ public class PopulationManager extends AbstractPopulationManager {
         }
         return totalFit;
     }
-
 }

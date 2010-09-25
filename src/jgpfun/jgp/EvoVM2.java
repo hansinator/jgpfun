@@ -125,8 +125,8 @@ public class EvoVM2 {
         //add the output registers to the effective registers
         //in the current case these are magically number 3 and 4,
         //but this may change, beware!
+        effectiveRegisters.put(3, new Object());
         effectiveRegisters.put(4, new Object());
-        effectiveRegisters.put(5, new Object());
 
         //also add the temp registers... oops!
         //they are necessary to compute temporary values that survive

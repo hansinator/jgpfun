@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.world2d.World2d;
 
+//TODO: add a generations per second/minute output
+
 /**
  *
  * @author hansinator

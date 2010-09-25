@@ -4,8 +4,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import jgpfun.world2d.World2d;
 
 /**
@@ -49,5 +47,10 @@ public abstract class AbstractPopulationManager {
 
 
     public abstract int newGeneration();
+
+
+    public List<Organism> getAnts() {
+        return ants;
+    }
 
 }

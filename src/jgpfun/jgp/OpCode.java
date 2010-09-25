@@ -61,4 +61,18 @@ public class OpCode {
         }
         return true;
     }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + this.op;
+        hash = 29 * hash + this.src1;
+        hash = 29 * hash + this.src2;
+        hash = 29 * hash + this.trg;
+        hash = 29 * hash + (this.immediate ? 1 : 0);
+        return hash;
+    }
+
+    
 }

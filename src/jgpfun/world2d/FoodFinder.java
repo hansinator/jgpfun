@@ -25,8 +25,8 @@ public class FoodFinder {
         for (int i = 0; i < food.size(); i++) {
             curDist = foodDist(food.get(i), x, y);
             //limit visible range to 200
-            if (curDist > 200)
-                continue;
+            //if (curDist > 200)
+                //continue;
             if (curDist < minDist) {
                 minDist = curDist;
                 indexMinDist = i;
