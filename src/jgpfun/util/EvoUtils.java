@@ -17,6 +17,8 @@ public class EvoUtils {
 
         if (totalFit > 0) {
             stopPoint = rnd.nextInt(totalFit);
+        } else {
+            return ants.get(rnd.nextInt(ants.size()));
         }
 
         for (int i = 0; i < ants.size(); i++) {
@@ -30,4 +32,24 @@ public class EvoUtils {
         return ants.get(rnd.nextInt(ants.size()));
     }
 
+    
+    //tournament selection
+    public static Organism tournament(List<Organism> ants, int size, Random rnd) {
+        int maxFit = -1;
+        Organism fittest = null;
+
+        if((size == 0) || (ants.size() < size))
+            return null;
+
+        for (int i = 0; i < size; i++) {
+            Organism candidate = ants.get(rnd.nextInt(ants.size()));
+
+            if(candidate.food > maxFit) {
+                maxFit = candidate.food;
+                fittest = candidate;
+            }
+        }
+
+        return fittest;
+    }
 }
