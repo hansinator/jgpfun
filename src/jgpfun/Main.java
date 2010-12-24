@@ -67,14 +67,14 @@ public class Main implements WindowListener {
 
         JScrollPane scrollPane = new JScrollPane(mainView);
 
-        frame = new JFrame("BAH! Bonn!!1!11!!!");
+        frame = new MainFrame();
 
         Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
         contentPane.add(scrollPane);
         contentPane.add(controlPanel);
 
-        frame.setMinimumSize(new Dimension(0, 0));
+        //frame.setMinimumSize(new Dimension(0, 0));
         frame.pack();
         frame.setVisible(true);
 
