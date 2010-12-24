@@ -110,15 +110,15 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
-            if (mutador > crossoverRate) {
+            //if (mutador > crossoverRate) {
                 //mutate genomes
                 MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
                 MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            }
+            /*}
             else {
                 //perform crossover
                 crossOp.cross(parent1, parent2, rnd);
-            }
+            }*/
 
             //create new ants with the modified genomes and save them
             newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
