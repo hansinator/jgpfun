@@ -87,7 +87,7 @@ public class PopulationManager extends AbstractPopulationManager {
     private int calculateFitness() {
         int totalFit = 0;
         for (Organism o : ants) {
-            totalFit += o.food;
+            totalFit += o.getFitness();
         }
         return totalFit;
     }

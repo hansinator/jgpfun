@@ -55,7 +55,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     private void printPool() {
         System.out.println("Pool:");
         for (int i = 0; i < organismPool.size(); i++) {
-            System.out.println("" + i + ":\t" + organismPool.get(i).food);
+            System.out.println("" + i + ":\t" + organismPool.get(i).getFitness());
         }
     }
 
@@ -141,11 +141,11 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         bestInPool = 0;
 
         for (Organism o : organisms) {
-            totalFit += o.food;
+            totalFit += o.getFitness();
 
             //remember the best
-            if (o.food > bestInPool) {
-                bestInPool = o.food;
+            if (o.getFitness() > bestInPool) {
+                bestInPool = o.getFitness();
             }
         }
 

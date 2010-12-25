@@ -22,7 +22,7 @@ public class EvoUtils {
         }
 
         for (int i = 0; i < ants.size(); i++) {
-            fitnessSoFar += ants.get(i).food;
+            fitnessSoFar += ants.get(i).getFitness();
             //this way zero fitness ants are omitted
             if (fitnessSoFar > stopPoint) {
                 return ants.get(i);
@@ -44,8 +44,8 @@ public class EvoUtils {
         for (int i = 0; i < size; i++) {
             Organism candidate = ants.get(rnd.nextInt(ants.size()));
 
-            if(candidate.food > maxFit) {
-                maxFit = candidate.food;
+            if(candidate.getFitness() > maxFit) {
+                maxFit = candidate.getFitness();
                 fittest = candidate;
             }
         }

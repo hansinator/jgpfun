@@ -40,7 +40,7 @@ public class Organism implements Comparable<Organism> {
 
     public final Body2d[] bodies;
 
-    public int food;
+    private int food;
 
 
     public Organism(List<OpCode> program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
@@ -132,5 +132,11 @@ public class Organism implements Comparable<Organism> {
         return vm;
     }
 
-    
+    public void incFood() {
+        food++;
+    }
+
+    public int getFitness() {
+        return food;
+    }
 }

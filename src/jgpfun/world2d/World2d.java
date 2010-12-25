@@ -59,7 +59,7 @@ public class World2d {
                         && (b.food.x <= (b.x + PopulationManager.foodTolerance))
                         && (b.food.y >= (b.y - PopulationManager.foodTolerance))
                         && (b.food.y <= (b.y + PopulationManager.foodTolerance))) {
-                    organism.food++;
+                    organism.incFood();
                     b.food.x = rnd.nextInt(worldWidth);
                     b.food.y = rnd.nextInt(worldHeight);
                 }
