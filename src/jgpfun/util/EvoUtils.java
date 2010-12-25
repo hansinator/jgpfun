@@ -1,5 +1,6 @@
 package jgpfun.util;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import jgpfun.Organism;
@@ -20,6 +21,15 @@ public class EvoUtils {
         } else {
             return ants.get(rnd.nextInt(ants.size()));
         }
+
+        /*
+         * Shuffle the organism list to make roulettewheel work better.
+         * In case this method is called multiple times on the same list,
+         * the same organisms with a huge fitness values at the beginning
+         * of the list would have a greater chance of being selected.
+         * This shuffle hopefully eliminates this problem, if it does exist.
+         */
+        Collections.shuffle(ants);
 
         for (int i = 0; i < ants.size(); i++) {
             fitnessSoFar += ants.get(i).getFitness();

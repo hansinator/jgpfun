@@ -74,10 +74,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             for (int i = organismPool.size() - 1; i > (maxPoolSize - 1); i--) {
                 organismPool.remove(i);
             }
-
-            //reshuffle to make roulettewheel work better
-            Collections.shuffle(organismPool);
-            Collections.shuffle(organismPool);
         }
     }
 
