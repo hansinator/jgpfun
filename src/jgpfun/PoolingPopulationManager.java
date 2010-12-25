@@ -121,8 +121,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, world.worldWidth, world.worldHeight, world.foodFinder));
-            newAnts.add(new Organism(parent2, world.worldWidth, world.worldHeight, world.foodFinder));
+            newAnts.add(new Organism(parent1, world));
+            newAnts.add(new Organism(parent2, world));
         }
 
         //replace and leave the other to GC

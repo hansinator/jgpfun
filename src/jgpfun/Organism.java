@@ -4,7 +4,6 @@
  */
 package jgpfun;
 
-import jgpfun.world2d.FoodFinder;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM;
 import java.security.SecureRandom;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.WallSense;
+import jgpfun.world2d.World2d;
 
 /*
  * TODO: Create a loopback sense that represents the differential (ableitung)
@@ -43,14 +43,14 @@ public class Organism implements Comparable<Organism> {
     private int food;
 
 
-    public Organism(List<OpCode> program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
+    public Organism(List<OpCode> program, World2d world) {
         this.program = program;
         this.vm = new EvoVM(registerCount, program.toArray(new OpCode[program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), rnd.nextDouble(), foodFinder, new WallSense(worldWidth, worldHeight));
+            bodies[i] = new Body2d(rnd.nextInt(world.worldWidth), rnd.nextInt(world.worldHeight), rnd.nextDouble(), world.foodFinder, new WallSense(world.worldWidth, world.worldHeight));
         }
     }
 
@@ -93,7 +93,7 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    static Organism randomOrganism(int xmax, int ymax, int progSize, FoodFinder foodFinder) {
+    static Organism randomOrganism(World2d world, int progSize) {
         int size = rnd.nextInt(progSize) + 1;
         List<OpCode> program = new ArrayList<OpCode>(size);
 
@@ -101,7 +101,7 @@ public class Organism implements Comparable<Organism> {
             program.add(OpCode.randomOpCode(rnd));
         }
 
-        return new Organism(program, xmax, ymax, foodFinder);
+        return new Organism(program, world);
     }
 
 

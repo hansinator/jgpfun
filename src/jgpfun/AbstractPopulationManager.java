@@ -38,7 +38,7 @@ public abstract class AbstractPopulationManager {
         rnd = new SecureRandom();
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(world.worldWidth, world.worldHeight, progSize, world.foodFinder));
+            ants.add(Organism.randomOrganism(world, progSize));
         }
     }
 
