@@ -6,7 +6,7 @@ package jgpfun;
 
 import jgpfun.world2d.FoodFinder;
 import jgpfun.jgp.OpCode;
-import jgpfun.jgp.EvoVM2;
+import jgpfun.jgp.EvoVM;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class Organism implements Comparable<Organism> {
     protected final int registerCount = 24;
     //protected final int registerCount = 32;
 
-    protected final EvoVM2 vm;
+    protected final EvoVM vm;
 
     protected final List<OpCode> program;
 
@@ -45,7 +45,7 @@ public class Organism implements Comparable<Organism> {
 
     public Organism(List<OpCode> program, int worldWidth, int worldHeight, FoodFinder foodFinder) {
         this.program = program;
-        this.vm = new EvoVM2(registerCount, program.toArray(new OpCode[program.size()]));
+        this.vm = new EvoVM(registerCount, program.toArray(new OpCode[program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
@@ -128,7 +128,7 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    public EvoVM2 getVm() {
+    public EvoVM getVm() {
         return vm;
     }
 
