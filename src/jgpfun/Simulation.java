@@ -18,8 +18,6 @@ public class Simulation {
 
     private static int roundsMod = 800;
 
-    private final MainView mainView;
-
     private final ThreadPoolExecutor pool;
 
     private final Object lock = new Object();
@@ -33,16 +31,15 @@ public class Simulation {
     private final AbstractPopulationManager populationManager;
 
 
-    public Simulation(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount, MainView mainView) {
+    public Simulation(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         world = new World2d(worldWidth, worldHeight, foodCount);
         populationManager = new PopulationManager(world, popSize, progSize);
-        this.mainView = mainView;
     }
 
 
-    public void runGeneration(int iterations, List<String> foodList) {
+    public void runGeneration(int iterations, List<String> foodList, MainView view) {
         long start = System.currentTimeMillis();
         long time;
 
@@ -51,8 +48,8 @@ public class Simulation {
 
             if (slowMode || (i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
-                mainView.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
-                mainView.repaint();
+                view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                view.repaint();
 
                 if (slowMode) {
                     try {

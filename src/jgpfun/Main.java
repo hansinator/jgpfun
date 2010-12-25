@@ -26,11 +26,9 @@ public class Main implements WindowListener {
 
 
     public Main(int width, int height) {
-
-        //FIXME: add events to the simulation, so that a main view can draw upon an event
-        sim = new Simulation(width, height, 48, 256, 40, mainView);
-        //sim = new Simulation(width, height, 26, 256, 40, mainView);
-        //sim = new Simulation(width, height, 32, 512, 40, mainView);
+        sim = new Simulation(width, height, 48, 256, 40);
+        //sim = new Simulation(width, height, 26, 256, 40);
+        //sim = new Simulation(width, height, 32, 512, 40);
 
         frame = new MainFrame(width, height, new ActionListener() {
 
@@ -41,10 +39,6 @@ public class Main implements WindowListener {
             }
 
         }, new UpdatableListModel(foodHist));
-
-        //maybe i'd put this somewhere else, as i'm leaking a reference
-        //while in the constructor
-        frame.addWindowListener(this);
 
         System.out.println("MainView size: " + frame.mainView.getWidth() + "x" + frame.mainView.getHeight());
     }
@@ -59,9 +53,12 @@ public class Main implements WindowListener {
 
 
     private void start() {
+        frame.addWindowListener(this);
+        
         running = true;
         while (running) {
-            sim.runGeneration(4000, foodHist);
+            //FIXME: add events to the simulation, so that a main view can draw upon an event
+            sim.runGeneration(4000, foodHist, frame.mainView);
             frame.updateFoodList();
         }
 
