@@ -55,10 +55,10 @@ public class PopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            //parent1 = EvoUtils.tournament(ants, 3, rnd).clone();
-            //parent2 = EvoUtils.tournament(ants, 3, rnd).clone();
+            //parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
+            //parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
+            parent1 = EvoUtils.tournament(ants, 3, rnd).clone();
+            parent2 = EvoUtils.tournament(ants, 3, rnd).clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.nextDouble();
