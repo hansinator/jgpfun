@@ -1,4 +1,4 @@
-package jgpfun;
+package jgpfun.gui;
 
 import java.awt.Container;
 import java.awt.Dimension;

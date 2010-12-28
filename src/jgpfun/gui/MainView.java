@@ -8,11 +8,13 @@
  *
  * Created on Apr 16, 2010, 8:42:34 PM
  */
-package jgpfun;
+package jgpfun.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
+import jgpfun.Food;
+import jgpfun.Organism;
 import jgpfun.world2d.Body2d;
 
 /**
