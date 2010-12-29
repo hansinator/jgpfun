@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 
 //TODO: add a generations per second/minute output
@@ -40,7 +41,7 @@ public class Simulation {
     }
 
 
-    public void runGeneration(int iterations, List<String> foodList, MainView view) {
+    public void runGeneration(int iterations, StatisticsHistoryModel statsHist, MainView view) {
         long start = System.currentTimeMillis();
         long time;
 
@@ -65,7 +66,7 @@ public class Simulation {
         gen++;
 
         int foodCollected = populationManager.newGeneration();
-        foodList.add(0, "Food: " + foodCollected);
+        statsHist.appendEntry(gen, foodCollected, 0, 0, 0);
 
         System.out.println("");
         System.out.println("GEN: " + gen);

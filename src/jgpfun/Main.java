@@ -8,6 +8,7 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractListModel;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 
 /**
  *
@@ -21,7 +22,7 @@ public class Main implements WindowListener {
 
     private final MainFrame frame;
 
-    private final List<String> foodHist = new ArrayList<String>();
+    private final StatisticsHistoryModel statsHist = new StatisticsHistoryModel();
 
     private boolean slowMode = false;
 
@@ -39,7 +40,7 @@ public class Main implements WindowListener {
                 sim.setSlowMode(slowMode);
             }
 
-        }, new UpdatableListModel(foodHist));
+        }, statsHist);
 
         System.out.println("MainView size: " + frame.mainView.getWidth() + "x" + frame.mainView.getHeight());
     }
@@ -59,8 +60,7 @@ public class Main implements WindowListener {
         running = true;
         while (running) {
             //FIXME: add events to the simulation, so that a main view can draw upon an event
-            sim.runGeneration(4000, foodHist, frame.mainView);
-            frame.updateFoodList();
+            sim.runGeneration(4000, statsHist, frame.mainView);
         }
 
         System.exit(0);
@@ -102,32 +102,5 @@ public class Main implements WindowListener {
     @Override
     public void windowDeactivated(WindowEvent e) {
     }
-
-    public static class UpdatableListModel extends AbstractListModel {
-
-        private final List l;
-
-
-        public UpdatableListModel(List l) {
-            this.l = l;
-        }
-
-
-        @Override
-        public int getSize() {
-            return l.size();
-        }
-
-
-        @Override
-        public Object getElementAt(int index) {
-            return l.get(index);
-        }
-
-
-        public void update() {
-            fireContentsChanged(this, 0, l.size() - 1);
-        }
-
-    }
+    
 }

@@ -1,15 +1,15 @@
 package jgpfun.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import jgpfun.Main.UpdatableListModel;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 
 /**
  *
@@ -17,46 +17,57 @@ import jgpfun.Main.UpdatableListModel;
  */
 public class MainFrame extends JFrame {
 
-    public final MainView mainView;
+    public MainView mainView;
 
-    private final JList foodList;
+    private JList foodList;
 
-    public void updateFoodList() {
-        ((UpdatableListModel) foodList.getModel()).update();
-    }
+    private final JScrollPane centerPane;
 
-    public MainFrame(int width, int height, ActionListener speedListener, UpdatableListModel foodHist) {
+    public final JPanel sidePaneLeft, sidePaneRight;
+
+    public final BottomPanel bottomPane;
+
+
+    public MainFrame(int width, int height, ActionListener speedListener, StatisticsHistoryModel statisticsHistory) {
         super("BAH! Bonn!!1!11!!!");
 
-        mainView = new MainView();
-        mainView.setPreferredSize(new Dimension(width, height));
+        // create all direct clients
+        centerPane = new JScrollPane();
+        sidePaneLeft = new JPanel();
+        sidePaneRight = new StatisticsHistoryPanel(statisticsHistory);
+        bottomPane = new BottomPanel(speedListener);
 
-        foodList = new JList(foodHist);
-        foodList.setPreferredSize(new Dimension(200, 0));
-        foodList.setAlignmentY(Container.TOP_ALIGNMENT);
+        // set default center pane size properties
+        centerPane.setPreferredSize(new Dimension(800, 600));
 
-        JButton speedSwitch = new JButton("fast/slow");
-        speedSwitch.addActionListener(speedListener);
+        // init application specific content
+        initClientViews(width, height);
 
-
-        JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-        controlPanel.setAlignmentY(Container.TOP_ALIGNMENT);
-        controlPanel.add(speedSwitch);
-        controlPanel.add(foodList);
-
-        JScrollPane scrollPane = new JScrollPane(mainView);
-
+        // setup and add all stuff to the content pane
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
-        contentPane.add(scrollPane);
-        contentPane.add(controlPanel);
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(centerPane, BorderLayout.CENTER);
+        contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
+        contentPane.add(sidePaneRight, BorderLayout.LINE_END);
+        contentPane.add(bottomPane, BorderLayout.PAGE_END);
 
-        //do i need this?
-        setMinimumSize(new Dimension(0, 0));
-
-        //get ready for action
+        // get ready for action
         pack();
         setVisible(true);
     }
+
+
+    private void initClientViews(int width, int height) {
+        // to be put elsewhere
+        mainView = new MainView();
+        mainView.setPreferredSize(new Dimension(width, height));
+
+        setCenterPaneView(mainView);
+    }
+
+
+    public void setCenterPaneView(Component view) {
+        centerPane.setViewportView(view);
+    }
+
 }
