@@ -1,5 +1,6 @@
 package jgpfun.gui;
 
+import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -8,7 +9,6 @@ import java.util.Enumeration;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -23,25 +23,12 @@ public class StatisticsHistoryTable extends JTable {
         setColumnSelectionAllowed(false);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        addHierarchyListener(new HierarchyListener() {
-
-            @Override
-            public void hierarchyChanged(HierarchyEvent e) {
-                Component c = e.getComponent().getParent();
-                if(c != null)
-
-            }
-        });
-//        FontMetrics fm = getGraphics().getFontMetrics();
-        for(Enumeration<TableColumn> cols = columnModel.getColumns(); cols.hasMoreElements();) {
+        FontMetrics fm = getFontMetrics(getFont());
+        for (Enumeration<TableColumn> cols = columnModel.getColumns(); cols.hasMoreElements();) {
             final TableColumn col = cols.nextElement();
-//            col.setPreferredWidth(SwingUtilities.computeStringWidth(fm, col.getHeaderValue().toString()));
-            col.setPreferredWidth(SwingUtilities.computeStringWidth(fm, col.getHeaderValue().toString()));
+            col.setPreferredWidth(SwingUtilities.computeStringWidth(fm, col.getHeaderValue().toString()) + 10);
         }
     }
-
-
-
 
     private static class StatisticsHistoryEntry {
 
@@ -62,15 +49,22 @@ public class StatisticsHistoryTable extends JTable {
 
 
         private int getValueAt(int columnIndex) {
-            switch(columnIndex) {
-                case 0: return generation;
-                case 1: return totalFood;
-                case 2: return averageFood;
-                case 3: return averageProgramSize;
-                case 4: return averageRealProgramSize;
-                default: throw new ArrayIndexOutOfBoundsException(columnIndex);
+            switch (columnIndex) {
+                case 0:
+                    return generation;
+                case 1:
+                    return totalFood;
+                case 2:
+                    return averageFood;
+                case 3:
+                    return averageProgramSize;
+                case 4:
+                    return averageRealProgramSize;
+                default:
+                    throw new ArrayIndexOutOfBoundsException(columnIndex);
             }
         }
+
     }
 
 
@@ -82,6 +76,7 @@ public class StatisticsHistoryTable extends JTable {
         private final ArrayList<StatisticsHistoryEntry> list = new ArrayList<StatisticsHistoryEntry>();
 
         private String[] columnNames = {"Gen", "Food", "Avg Food", "Avg Prg", "Avg Real Prg"};
+
 
         public void appendEntry(int generation, int totalFood, int averageFood, int averageProgramSize, int averageRealProgramSize) {
             list.add(new StatisticsHistoryEntry(generation, totalFood, averageFood, averageProgramSize, averageRealProgramSize));
@@ -113,6 +108,7 @@ public class StatisticsHistoryTable extends JTable {
             return Integer.class;
         }
 
+
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
@@ -121,7 +117,7 @@ public class StatisticsHistoryTable extends JTable {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return list.get(list.size()-1-rowIndex).getValueAt(columnIndex);
+            return list.get(list.size() - 1 - rowIndex).getValueAt(columnIndex);
         }
 
     }
