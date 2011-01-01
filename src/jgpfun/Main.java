@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -21,6 +22,8 @@ public class Main implements WindowListener {
 
     private final StatisticsHistoryModel statsHist = new StatisticsHistoryModel();
 
+    private final XYSeries chartData = new XYSeries("fitness");
+
     private boolean slowMode = false;
 
 
@@ -28,6 +31,8 @@ public class Main implements WindowListener {
         sim = new Simulation(width, height, 48, 256, 40);
         //sim = new Simulation(width, height, 26, 256, 40);
         //sim = new Simulation(width, height, 32, 512, 40);
+
+        chartData.setMaximumItemCount(500);
 
         frame = new MainFrame(width, height, new ActionListener() {
 
@@ -37,7 +42,7 @@ public class Main implements WindowListener {
                 sim.setSlowMode(slowMode);
             }
 
-        }, statsHist);
+        }, statsHist, chartData);
 
         System.out.println("MainView size: " + frame.mainView.getWidth() + "x" + frame.mainView.getHeight());
     }
@@ -57,7 +62,7 @@ public class Main implements WindowListener {
         running = true;
         while (running) {
             //FIXME: add events to the simulation, so that a main view can draw upon an event
-            sim.runGeneration(4000, statsHist, frame.mainView);
+            sim.runGeneration(4000, statsHist, chartData, frame.mainView, frame.bottomPane.infoPanel);
         }
 
         System.exit(0);

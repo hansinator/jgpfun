@@ -1,14 +1,15 @@
 package jgpfun;
 
 import jgpfun.gui.MainView;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jgpfun.gui.InfoPanel;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
+import org.jfree.data.xy.XYSeries;
 
 //TODO: add a generations per second/minute output
 
@@ -41,7 +42,7 @@ public class Simulation {
     }
 
 
-    public void runGeneration(int iterations, StatisticsHistoryModel statsHist, MainView view) {
+    public void runGeneration(int iterations, StatisticsHistoryModel statsHist, XYSeries chartData, MainView view, InfoPanel infoPanel) {
         long start = System.currentTimeMillis();
         long time;
 
@@ -50,6 +51,7 @@ public class Simulation {
 
             if (slowMode || (i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
+                infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 view.repaint();
 
@@ -74,6 +76,7 @@ public class Simulation {
 
         // population statistics
         populationManager.printStats(statsHist, foodCollected, gen);
+        chartData.add(gen, foodCollected);
 
         world.randomFood();
     }

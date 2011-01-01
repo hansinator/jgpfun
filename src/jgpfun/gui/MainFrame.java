@@ -10,6 +10,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -28,14 +29,14 @@ public class MainFrame extends JFrame {
     public final BottomPanel bottomPane;
 
 
-    public MainFrame(int width, int height, ActionListener speedListener, StatisticsHistoryModel statisticsHistory) {
+    public MainFrame(int width, int height, ActionListener speedListener, StatisticsHistoryModel statisticsHistory, XYSeries chartData) {
         super("BAH! Bonn!!1!11!!!");
 
         // create all direct clients
         centerPane = new JScrollPane();
         sidePaneLeft = new JPanel();
         sidePaneRight = new StatisticsHistoryPanel(statisticsHistory);
-        bottomPane = new BottomPanel(speedListener);
+        bottomPane = new BottomPanel(speedListener, chartData);
 
         // set default center pane size properties
         centerPane.setPreferredSize(new Dimension(800, 600));
