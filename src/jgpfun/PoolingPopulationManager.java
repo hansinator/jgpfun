@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.TwoPointCrossover;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
 import jgpfun.world2d.World2d;
@@ -34,21 +35,41 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
 
     @Override
-    public void printStats(long rps) {
-        System.out.println("RPS: " + rps);
+    public void printStats(StatisticsHistoryModel statsHistory, int totalFood, int generation) {
+        int avgProgSize = 0, avgRealProgSize = 0;
 
-        int avgProgSize = 0;
+        // pool statistics
         for (Organism o : organismPool) {
             avgProgSize += o.program.size();
         }
         avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
-        
-        System.out.println("Avg pool prog size (current generation): " + avgProgSize);
-        System.out.println("Round food: " + foodCollected);
+
+        for (Organism o : organismPool) {
+            avgRealProgSize += o.vm.getProgramSize();
+        }
+        avgRealProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
+
+        System.out.println("Avg pool prg size (cur gen): " + avgProgSize);
+        System.out.println("Avg real pool prg size (cur gen): " + avgRealProgSize);
         System.out.println("Pool food: " + totalFit);
-        System.out.println("Best in pool: " + bestInPool);
         System.out.println("Pool avg food: " + (totalFit / ((organismPool.size() > 0) ? organismPool.size() : 1)));
-        System.out.println("Round avg food: " + (foodCollected / ants.size()));
+        System.out.println("Best in pool: " + bestInPool);
+
+        
+        // generation statistics
+        avgProgSize = 0;
+        for (Organism o : ants) {
+            avgProgSize += o.program.size();
+        }
+        avgProgSize /= ants.size();
+
+        avgRealProgSize = 0;
+        for (Organism o : ants) {
+            avgRealProgSize += o.vm.getProgramSize();
+        }
+        avgRealProgSize /= ants.size();
+
+        statsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
     }
 
 

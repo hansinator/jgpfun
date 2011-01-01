@@ -66,11 +66,14 @@ public class Simulation {
         gen++;
 
         int foodCollected = populationManager.newGeneration();
-        statsHist.appendEntry(gen, foodCollected, 0, 0, 0);
 
+        // simulation statistics
         System.out.println("");
         System.out.println("GEN: " + gen);
-        populationManager.printStats((iterations * 1000) / (System.currentTimeMillis() - start));
+        System.out.println("RPS: " + (iterations * 1000) / (System.currentTimeMillis() - start));
+
+        // population statistics
+        populationManager.printStats(statsHist, foodCollected, gen);
 
         world.randomFood();
     }

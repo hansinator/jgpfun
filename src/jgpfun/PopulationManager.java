@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.OffsetTwoPointCrossover;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
 import jgpfun.world2d.World2d;
@@ -21,22 +22,20 @@ public class PopulationManager extends AbstractPopulationManager {
 
 
     @Override
-    public void printStats(long rps) {
-        System.out.println("RPS: " + rps);
+    public void printStats(StatisticsHistoryModel statsHistory, int totalFood, int generation) {
+        int avgProgSize = 0, avgRealProgSize = 0;
 
-        int avgProgSize = 0;
         for (Organism o : ants) {
             avgProgSize += o.program.size();
         }
         avgProgSize /= ants.size();
-        System.out.println("Avg prog size: " + avgProgSize);
 
-        avgProgSize = 0;
         for (Organism o : ants) {
-            avgProgSize += o.vm.getProgramSize();
+            avgRealProgSize += o.vm.getProgramSize();
         }
-        avgProgSize /= ants.size();
-        System.out.println("Avg real prog size: " + avgProgSize);
+        avgRealProgSize /= ants.size();
+
+        statsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
     }
 
 

@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 
 /**
@@ -43,7 +44,7 @@ public abstract class AbstractPopulationManager {
     }
 
 
-    public abstract void printStats(long rps);
+    public abstract void printStats(StatisticsHistoryModel statsHistory, int totalFood, int generation);
 
 
     public abstract int newGeneration();
