@@ -41,6 +41,11 @@ public class Simulation {
         populationManager = new PopulationManager(world, popSize, progSize);
     }
 
+    public void reset() {
+        populationManager.reset();
+        world.randomFood();
+    }
+
 
     public void runGeneration(int iterations, StatisticsHistoryModel statsHist, XYSeries chartData, MainView view, InfoPanel infoPanel) {
         long start = System.currentTimeMillis();

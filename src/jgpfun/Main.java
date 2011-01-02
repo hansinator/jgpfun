@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Calendar;
+import java.util.Date;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import org.jfree.data.xy.XYSeries;
 
@@ -43,8 +45,6 @@ public class Main implements WindowListener {
             }
 
         }, statsHist, chartData);
-
-        System.out.println("MainView size: " + frame.mainView.getWidth() + "x" + frame.mainView.getHeight());
     }
 
 
@@ -57,6 +57,9 @@ public class Main implements WindowListener {
 
 
     private void start() {
+        System.out.println("MainView size: " + frame.mainView.getWidth() + "x" + frame.mainView.getHeight());
+        System.out.println("Start time: " + new Date());
+
         frame.addWindowListener(this);
         
         running = true;

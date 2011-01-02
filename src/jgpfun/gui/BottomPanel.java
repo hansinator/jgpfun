@@ -1,6 +1,7 @@
 package jgpfun.gui;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -36,6 +37,7 @@ public class BottomPanel extends JPanel {
         axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         axis.setLowerMargin(0.0);
         axis.setUpperMargin(0.0);
+        axis.setTickLabelFont(axis.getTickLabelFont().deriveFont(11.0f));
 
         axis = (NumberAxis)xyPlot.getDomainAxis();
         axis.setRangeType(RangeType.POSITIVE);
@@ -44,9 +46,11 @@ public class BottomPanel extends JPanel {
         axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         axis.setLowerMargin(0.0);
         axis.setUpperMargin(0.0);
+        axis.setTickLabelFont(axis.getTickLabelFont().deriveFont(11.0f));
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(0, 200));
+        chartPanel.setMaximumDrawWidth(2000);
 
         setPreferredSize(new Dimension(0, 200));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

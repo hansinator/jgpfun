@@ -26,6 +26,8 @@ public abstract class AbstractPopulationManager {
 
     protected final int progSize;
 
+    protected final int popSize;
+
     protected List<Organism> ants;
 
     protected final World2d world;
@@ -34,10 +36,20 @@ public abstract class AbstractPopulationManager {
     public AbstractPopulationManager(World2d world, int popSize, int progSize) {
         this.world = world;
         this.progSize = progSize;
+        this.popSize = popSize;
 
         ants = new ArrayList<Organism>(popSize);
         rnd = new SecureRandom();
 
+        for (int i = 0; i < popSize; i++) {
+            ants.add(Organism.randomOrganism(world, progSize));
+        }
+    }
+
+
+    public void reset() {
+        ants.clear();
+        
         for (int i = 0; i < popSize; i++) {
             ants.add(Organism.randomOrganism(world, progSize));
         }
