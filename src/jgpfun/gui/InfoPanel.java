@@ -1,36 +1,60 @@
 package jgpfun.gui;
 
-import java.awt.Container;
 import java.awt.Dimension;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.plaf.BorderUIResource;
+import layout.SpringUtilities;
 
 /**
  *
  * @author Hansinator
  */
 public class InfoPanel extends JPanel {
+
     private final JLabel labelRPS;
+
     private final JLabel labelProgress;
 
-    public void updateInfo(Integer rps, Integer progress) {
+    private final JLabel labelGeneration;
+
+
+    public void updateInfo(Integer rps, Integer progress, Integer generation) {
         labelRPS.setText(rps.toString());
         labelProgress.setText(progress.toString());
+        labelGeneration.setText(generation.toString());
     }
+
 
     public InfoPanel() {
+        JLabel labelRPSText = new JLabel("RPS:");
+        JLabel labelProgessText = new JLabel("Progress:");
+        JLabel labelGenerationText = new JLabel("Generation:");
         labelRPS = new JLabel();
         labelProgress = new JLabel();
+        labelGeneration = new JLabel();
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setAlignmentX(Container.LEFT_ALIGNMENT);
-        setAlignmentY(Container.TOP_ALIGNMENT);
+        labelRPSText.setLabelFor(labelRPS);
+        labelProgessText.setLabelFor(labelProgress);
+
+        setLayout(new SpringLayout());
         setPreferredSize(new Dimension(150, 200));
+        setMinimumSize(new Dimension(0, 200));
         setBorder(BorderUIResource.getEtchedBorderUIResource());
+        setAlignmentY(TOP_ALIGNMENT);
 
+        add(labelRPSText);
         add(labelRPS);
+        add(labelProgessText);
         add(labelProgress);
+        add(labelGenerationText);
+        add(labelGeneration);
+
+        SpringUtilities.makeCompactGrid(this,
+                                3, 2,        //rows, cols
+                                6, 6,        //initX, initY
+                                6, 6);       //xPad, yPad
     }
+
 }

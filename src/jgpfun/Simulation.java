@@ -56,7 +56,7 @@ public class Simulation {
 
             if (slowMode || (i % roundsMod) == 0) {
                 time = System.currentTimeMillis() - start;
-                infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen);
                 view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                 view.repaint();
 
