@@ -119,11 +119,13 @@ public class MainView extends javax.swing.JPanel {
             for (Body2d b : o.bodies) {
                 double sindir = Math.sin(b.dir);
                 double cosdir = Math.cos(b.dir);
-                int xrot = (int) Math.floor(8.0 * sindir);
-                int yrot = (int) Math.floor(8.0 * cosdir);
+                int xrot = (int) Math.round(8.0 * sindir);
+                int yrot = (int) Math.round(8.0 * cosdir);
+                int x = Math.round((float)b.x);
+                int y = Math.round((float)b.y);
 
-                g.drawLine(b.x, b.y, b.x + xrot, b.y - yrot);
-                g.fillOval(b.x, b.y, 4, 4);
+                g.drawLine(x, y, x + xrot, y - yrot);
+                g.fillOval(x, y, 4, 4);
 
                 //Polygon p = new Polygon();
                 /*

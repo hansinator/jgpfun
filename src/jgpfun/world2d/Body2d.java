@@ -14,12 +14,12 @@ public class Body2d {
 
     public double dir;
 
-    public int x;
+    public double x;
 
-    public int y;
+    public double y;
 
 
-    public Body2d(int x, int y, double dir, FoodFinder foodFinder, WallSense wallSense) {
+    public Body2d(double x, double y, double dir, FoodFinder foodFinder, WallSense wallSense) {
         this.x = x;
         this.y = y;
         this.dir = dir;

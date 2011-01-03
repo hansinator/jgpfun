@@ -27,16 +27,16 @@ public class OrganismDebug extends Organism {
     //old experimentally optimized live method from pc version
     @Override
     public void live() throws Exception {
-        int left, right, oldx = 0, oldy = 0, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
-        double foodDist = 0.0;
+        int left, right, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
+        double foodDist = 0.0, oldx = 0.0, oldy = 0.0;
 
         //long start2 = System.nanoTime();
 
         //write input registers
         int inreg = 0;
         for (Body2d b : bodies) {
-            b.food = b.foodFinder.findNearestFood(b.x, b.y);
-            foodDist = b.foodFinder.foodDist(b.food, b.x, b.y);
+            b.food = b.foodFinder.findNearestFood(Math.round((float)b.x), Math.round((float)b.y));
+            foodDist = b.foodFinder.foodDist(b.food, Math.round((float)b.x), Math.round((float)b.y));
 
             if (showdebug) {
                 System.out.println("");

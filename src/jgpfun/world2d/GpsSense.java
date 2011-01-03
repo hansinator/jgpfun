@@ -13,11 +13,11 @@ public class GpsSense {
         this.body = body;
     }
 
-    public int getX() {
+    public double getX() {
         return body.x;
     }
 
-    public int getY() {
+    public double getY() {
         return body.y;
     }
 }

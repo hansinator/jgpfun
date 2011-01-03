@@ -1,7 +1,6 @@
 package jgpfun.gui;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -9,7 +8,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.Range;
@@ -52,11 +50,18 @@ public class BottomPanel extends JPanel {
         chartPanel.setPreferredSize(new Dimension(0, 200));
         chartPanel.setMaximumDrawWidth(2000);
 
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+        groupPanel.setAlignmentY(TOP_ALIGNMENT);
+        groupPanel.setAlignmentX(LEFT_ALIGNMENT);
+        groupPanel.setPreferredSize(new Dimension(132, 200));
+        groupPanel.add(infoPanel);
+        groupPanel.add(new ControlPanel(speedListener));
+
         setPreferredSize(new Dimension(0, 200));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        add(groupPanel);
         add(chartPanel);
-        add(infoPanel);
-        add(new ControlPanel(speedListener));
     }
 
 }

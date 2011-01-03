@@ -42,6 +42,8 @@ public class Organism implements Comparable<Organism> {
 
     private int food;
 
+    public boolean debug = false;
+
 
     public Organism(List<OpCode> program, World2d world) {
         this.program = program;
@@ -50,7 +52,7 @@ public class Organism implements Comparable<Organism> {
 
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(rnd.nextInt(world.worldWidth), rnd.nextInt(world.worldHeight), rnd.nextDouble(), world.foodFinder, new WallSense(world.worldWidth, world.worldHeight));
+            bodies[i] = new Body2d(rnd.nextInt(world.worldWidth), rnd.nextInt(world.worldHeight), rnd.nextDouble() * 2 * Math.PI, world.foodFinder, new WallSense(world.worldWidth, world.worldHeight));
         }
     }
 
@@ -62,8 +64,8 @@ public class Organism implements Comparable<Organism> {
         //write input registers
         int inreg = 0;
         for (Body2d b : bodies) {
-            b.food = b.foodFinder.findNearestFood(b.x, b.y);
-            foodDist = b.foodFinder.foodDist(b.food, b.x, b.y);
+            b.food = b.foodFinder.findNearestFood(Math.round((float)b.x), Math.round((float)b.y));
+            foodDist = b.foodFinder.foodDist(b.food, Math.round((float)b.x), Math.round((float)b.y));
 
             //cached cosdir and scale as int are meant to speed this up
             //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
@@ -84,8 +86,16 @@ public class Organism implements Comparable<Organism> {
             left = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
             right = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
 
+            if (debug) {
+                System.out.println("left = " + left);
+                System.out.println("right = " + right);
+                System.out.println("x = " + b.x);
+                System.out.println("y = " + b.y);
+            }
+
             //move
-            b.motor.move(left, right);
+            //b.motor.move(left, right);
+            b.motor.move(0.0, 1.0);
 
             //pickup wallsense before coordinates are clipped
             //b.wallSense.sense();
@@ -132,11 +142,14 @@ public class Organism implements Comparable<Organism> {
         return vm;
     }
 
+
     public void incFood() {
         food++;
     }
 
+
     public int getFitness() {
         return food;
     }
+
 }

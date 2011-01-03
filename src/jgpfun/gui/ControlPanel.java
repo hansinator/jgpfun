@@ -19,7 +19,9 @@ public class ControlPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setAlignmentY(TOP_ALIGNMENT);
-        setMinimumSize(new Dimension(0, 200));
+        setAlignmentX(LEFT_ALIGNMENT);
+        setPreferredSize(new Dimension(120, 0));
+        setMinimumSize(new Dimension(120, 0));
         setBorder(BorderUIResource.getEtchedBorderUIResource());
 
         add(speedSwitch);
