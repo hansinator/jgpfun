@@ -42,8 +42,6 @@ public class Organism implements Comparable<Organism> {
 
     private int food;
 
-    public boolean debug = false;
-
 
     public Organism(List<OpCode> program, World2d world) {
         this.program = program;
@@ -86,16 +84,8 @@ public class Organism implements Comparable<Organism> {
             left = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
             right = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
 
-            if (debug) {
-                System.out.println("left = " + left);
-                System.out.println("right = " + right);
-                System.out.println("x = " + b.x);
-                System.out.println("y = " + b.y);
-            }
-
             //move
-            //b.motor.move(left, right);
-            b.motor.move(0.0, 1.0);
+            b.motor.move(left, right);
 
             //pickup wallsense before coordinates are clipped
             //b.wallSense.sense();
