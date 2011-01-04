@@ -78,7 +78,7 @@ public class Organism implements Comparable<Organism> {
             vm.regs[inreg++] = Math.round((float)foodDist);
 
             //wallsense
-            //vm.regs[inreg++] = b.wallSense.lastSenseVal;
+            vm.regs[inreg++] = b.wallSense.lastSenseVal;
         }
 
         vm.run();
@@ -93,7 +93,7 @@ public class Organism implements Comparable<Organism> {
             b.motor.move(left, right);
 
             //pickup wallsense before coordinates are clipped
-            //b.wallSense.sense();
+            b.wallSense.sense();
         }
     }
 

@@ -37,22 +37,13 @@ public class MainFrame extends JFrame {
         centerPane = new JScrollPane();
         sidePaneLeft = new JPanel();
         sidePaneRight = new StatisticsHistoryPanel(simulation.statisticsHistory);
-        bottomPane = new BottomPanel(new ActionListener() {
-
-            boolean slowMode = false;
-
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                slowMode = !slowMode;
-                simulation.setSlowMode(slowMode);
-            }
-
-        }, simulation.foodChartData, simulation.progSizeChartData, simulation.realProgSizeChartData);
+        bottomPane = new BottomPanel(simulation);
 
         // populate menu bar
-        menuBar.add(new JMenu("File"));
-        menuBar.add(new JMenu("Simulation")).add(new JMenuItem("Reset")).addActionListener(new ActionListener() {
+        menuBar.add(new JMenu("File")).add(new JMenuItem("Exit"));
+
+        JMenu simulationMenu = new JMenu("Simulation");
+        simulationMenu.add(new JMenuItem("Reset")).addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,6 +51,8 @@ public class MainFrame extends JFrame {
             }
 
         });
+        simulationMenu.add(new JMenuItem("Preferences"));
+        menuBar.add(simulationMenu);
 
         // set default center pane size properties
         centerPane.setPreferredSize(new Dimension(800, 600));

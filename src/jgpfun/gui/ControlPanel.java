@@ -8,7 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
+import jgpfun.Simulation;
 
 /**
  *
@@ -16,12 +19,32 @@ import javax.swing.plaf.BorderUIResource;
  */
 public class ControlPanel extends JPanel {
 
-    public ControlPanel(ActionListener speedListener) {
+    public ControlPanel(final Simulation simulation) {
         JCheckBox speedSwitch = new JCheckBox("Fast mode", true);
-        speedSwitch.addActionListener(speedListener);
+        speedSwitch.addActionListener(new ActionListener() {
 
-        JSlider speedSlider = new JSlider(1, 4000);
+            boolean slowMode = false;
+
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                slowMode = !slowMode;
+                simulation.setSlowMode(slowMode);
+            }
+
+        });
+
+        final JSlider speedSlider = new JSlider(1, 4000);
         speedSlider.setMaximumSize(new Dimension(200, 20));
+        speedSlider.setValue(simulation.getRoundsMod());
+        speedSlider.addChangeListener(new ChangeListener() {
+
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                simulation.setRoundsMod(speedSlider.getValue());
+            }
+        });
 
         final JButton pauseButton = new JButton("Pause");
         pauseButton.addActionListener(new ActionListener() {

@@ -18,7 +18,7 @@ import org.jfree.data.xy.XYSeries;
  */
 public class Simulation {
 
-    private static int roundsMod = 800;
+    private int roundsMod = 800;
 
     private final ThreadPoolExecutor pool;
 
@@ -85,7 +85,7 @@ public class Simulation {
 
                 if (slowMode || (i % roundsMod) == 0) {
                     time = System.currentTimeMillis() - start;
-                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen);
+                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen+1);
                     view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                     view.repaint();
 
@@ -187,6 +187,16 @@ public class Simulation {
 
     public void setSlowMode(boolean slowMode) {
         this.slowMode = slowMode;
+    }
+
+
+    public int getRoundsMod() {
+        return roundsMod;
+    }
+
+
+    public void setRoundsMod(int roundsMod) {
+        this.roundsMod = roundsMod;
     }
 
 }
