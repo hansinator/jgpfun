@@ -12,7 +12,6 @@ import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
 //TODO: add a generations per second/minute output
-
 /**
  *
  * @author hansinator
@@ -33,57 +32,88 @@ public class Simulation {
 
     private final AbstractPopulationManager populationManager;
 
+    public final StatisticsHistoryModel statisticsHistory = new StatisticsHistoryModel();
+
+    public final XYSeries foodChartData = new XYSeries("fitness");
+
+    public final XYSeries progSizeChartData = new XYSeries("prg size");
+
+    public final XYSeries realProgSizeChartData = new XYSeries("real prg size");
+
+    private volatile boolean abort = false;
+
+    private final Object runLock = new Object();
+
 
     public Simulation(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         world = new World2d(worldWidth, worldHeight, foodCount);
         populationManager = new PopulationManager(world, popSize, progSize);
+        foodChartData.setMaximumItemCount(500);
+        progSizeChartData.setMaximumItemCount(500);
+        realProgSizeChartData.setMaximumItemCount(500);
     }
+
 
     public void reset() {
-        populationManager.reset();
-        world.randomFood();
+        abort = true;
+        synchronized (runLock) {
+            populationManager.reset();
+            world.randomFood();
+        }
+        gen = 0;
+        foodChartData.clear();
+        progSizeChartData.clear();
+        realProgSizeChartData.clear();
+        statisticsHistory.clear();
+        abort = false;
     }
 
 
-    public void runGeneration(int iterations, StatisticsHistoryModel statsHist, XYSeries chartData, MainView view, InfoPanel infoPanel) {
+    public void runGeneration(int iterations, MainView view, InfoPanel infoPanel) {
         long start = System.currentTimeMillis();
         long time;
 
-        for (int i = 0; i < iterations; i++) {
-            step();
+        synchronized (runLock) {
+            for (int i = 0; i < iterations; i++) {
+                if (abort) {
+                    break;
+                }
 
-            if (slowMode || (i % roundsMod) == 0) {
-                time = System.currentTimeMillis() - start;
-                infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen);
-                view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
-                view.repaint();
+                step();
 
-                if (slowMode) {
-                    try {
-                        Thread.sleep(15);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                if (slowMode || (i % roundsMod) == 0) {
+                    time = System.currentTimeMillis() - start;
+                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen);
+                    view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                    view.repaint();
+
+                    if (slowMode) {
+                        try {
+                            Thread.sleep(15);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
+
+            gen++;
+
+            int foodCollected = populationManager.newGeneration();
+
+            // simulation statistics
+            System.out.println("");
+            System.out.println("GEN: " + gen);
+            System.out.println("RPS: " + (iterations * 1000) / (System.currentTimeMillis() - start));
+
+            // population statistics
+            populationManager.printStats(statisticsHistory, foodCollected, gen, progSizeChartData, realProgSizeChartData);
+            foodChartData.add(gen, foodCollected);
+
+            world.randomFood();
         }
-
-        gen++;
-
-        int foodCollected = populationManager.newGeneration();
-
-        // simulation statistics
-        System.out.println("");
-        System.out.println("GEN: " + gen);
-        System.out.println("RPS: " + (iterations * 1000) / (System.currentTimeMillis() - start));
-
-        // population statistics
-        populationManager.printStats(statsHist, foodCollected, gen);
-        chartData.add(gen, foodCollected);
-
-        world.randomFood();
     }
 
 
@@ -108,7 +138,7 @@ public class Simulation {
 
                     //System.out.println("Find food took: " + (System.nanoTime() - start));
                     //start = System.nanoTime();
-                    
+
                     try {
                         organism.live();
                     } catch (Exception ex) {
@@ -141,6 +171,7 @@ public class Simulation {
 
             pool.execute(r);
         }
+
         try {
             cb.await();
         } catch (InterruptedException ex) {

@@ -25,7 +25,10 @@ import jgpfun.world2d.World2d;
  */
 public class Organism implements Comparable<Organism> {
 
-    public static final double maxForce = 10.0;
+    //public static final double maxForce = 10.0;
+
+    // testing lower max force to discourage immediate direction setting
+    public static final double maxForce = 0.1;
 
     public static final double maxSpeed = 4.0;
 
@@ -71,6 +74,8 @@ public class Organism implements Comparable<Organism> {
 
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
+            vm.regs[inreg++] = (int) (foodDist * scale);
+            vm.regs[inreg++] = Math.round((float)foodDist);
 
             //wallsense
             //vm.regs[inreg++] = b.wallSense.lastSenseVal;

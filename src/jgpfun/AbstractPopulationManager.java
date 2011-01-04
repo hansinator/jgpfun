@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
+import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -56,7 +57,7 @@ public abstract class AbstractPopulationManager {
     }
 
 
-    public abstract void printStats(StatisticsHistoryModel statsHistory, int totalFood, int generation);
+    public abstract void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation, XYSeries progSizeChartData, XYSeries realProgSizeChartData);
 
 
     public abstract int newGeneration();

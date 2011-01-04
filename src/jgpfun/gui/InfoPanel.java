@@ -39,8 +39,8 @@ public class InfoPanel extends JPanel {
         labelProgessText.setLabelFor(labelProgress);
 
         setLayout(new SpringLayout());
-        setPreferredSize(new Dimension(120, 0));
-        setMinimumSize(new Dimension(120, 0));
+        setPreferredSize(new Dimension(200, 1));
+        setMinimumSize(new Dimension(200, 1));
         setBorder(BorderUIResource.getEtchedBorderUIResource());
         setAlignmentY(TOP_ALIGNMENT);
         setAlignmentX(LEFT_ALIGNMENT);

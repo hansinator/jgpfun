@@ -9,6 +9,7 @@ import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.util.EvoUtils;
 import jgpfun.util.MutationUtils;
 import jgpfun.world2d.World2d;
+import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -22,7 +23,7 @@ public class PopulationManager extends AbstractPopulationManager {
 
 
     @Override
-    public void printStats(StatisticsHistoryModel statsHistory, int totalFood, int generation) {
+    public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation, XYSeries progSizeChartData, XYSeries realProgSizeChartData) {
         int avgProgSize = 0, avgRealProgSize = 0;
 
         for (Organism o : ants) {
@@ -35,7 +36,9 @@ public class PopulationManager extends AbstractPopulationManager {
         }
         avgRealProgSize /= ants.size();
 
-        statsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
+        statisticsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
+        progSizeChartData.add(generation, avgProgSize);
+        realProgSizeChartData.add(generation, avgRealProgSize);
     }
 
 

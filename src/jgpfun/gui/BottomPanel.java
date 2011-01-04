@@ -23,10 +23,14 @@ public class BottomPanel extends JPanel {
 
     public final InfoPanel infoPanel = new InfoPanel();
 
-    public BottomPanel(ActionListener speedListener, XYSeries chartData) {
-        XYSeriesCollection xyDataset = new XYSeriesCollection(chartData);
-        JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL, false, false, false);
-        XYPlot xyPlot = chart.getXYPlot();
+    public BottomPanel(ActionListener speedListener, XYSeries foodChartData, XYSeries progSizeChartData, XYSeries realProgSizeChartData) {
+        /*
+         * Food chart
+         */
+
+        XYSeriesCollection xyDataset = new XYSeriesCollection(foodChartData);
+        JFreeChart foodChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL, false, false, false);
+        XYPlot xyPlot = foodChart.getXYPlot();
         
         NumberAxis axis = (NumberAxis)xyPlot.getRangeAxis();
         axis.setRangeType(RangeType.POSITIVE);
@@ -46,9 +50,40 @@ public class BottomPanel extends JPanel {
         axis.setUpperMargin(0.0);
         axis.setTickLabelFont(axis.getTickLabelFont().deriveFont(11.0f));
 
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(0, 200));
-        chartPanel.setMaximumDrawWidth(2000);
+        ChartPanel foodChartPanel = new ChartPanel(foodChart);
+        foodChartPanel.setPreferredSize(new Dimension(0, 200));
+        foodChartPanel.setMaximumDrawWidth(2000);
+
+        /*
+         * Prog size chart
+         */
+
+        xyDataset = new XYSeriesCollection(progSizeChartData);
+        xyDataset.addSeries(realProgSizeChartData);
+        JFreeChart progSizeChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL, false, false, false);
+        xyPlot = progSizeChart.getXYPlot();
+
+        axis = (NumberAxis)xyPlot.getRangeAxis();
+        axis.setRangeType(RangeType.POSITIVE);
+        axis.setDefaultAutoRange(new Range(0.0, 255.0));
+        axis.setAutoRangeMinimumSize(255.0);
+        axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        axis.setLowerMargin(0.0);
+        axis.setUpperMargin(1.0);
+        axis.setTickLabelFont(axis.getTickLabelFont().deriveFont(11.0f));
+
+        axis = (NumberAxis)xyPlot.getDomainAxis();
+        axis.setRangeType(RangeType.POSITIVE);
+        axis.setDefaultAutoRange(new Range(0.0, 500.0));
+        axis.setAutoRangeMinimumSize(500.0);
+        axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        axis.setLowerMargin(0.0);
+        axis.setUpperMargin(0.0);
+        axis.setTickLabelFont(axis.getTickLabelFont().deriveFont(11.0f));
+
+        ChartPanel progSizeChartPanel = new ChartPanel(progSizeChart);
+        foodChartPanel.setPreferredSize(new Dimension(0, 200));
+        foodChartPanel.setMaximumDrawWidth(2000);
 
         JPanel groupPanel = new JPanel();
         groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
@@ -61,7 +96,8 @@ public class BottomPanel extends JPanel {
         setPreferredSize(new Dimension(0, 200));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(groupPanel);
-        add(chartPanel);
+        add(foodChartPanel);
+        add(progSizeChartPanel);
     }
 
 }

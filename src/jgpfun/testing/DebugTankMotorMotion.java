@@ -37,11 +37,11 @@ public class DebugTankMotorMotion {
         double xDelta = Math.sin(body.dir) * Organism.maxSpeed * speed / 10.0;
         double yDelta = Math.cos(body.dir) * Organism.maxSpeed * speed / 10.0;
 
-        /*System.out.println("dirDelta = " + dirDelta);
+        System.out.println("dirDelta = " + dirDelta);
         System.out.println("dir      = " + body.dir);
         System.out.println("speed    = " + speed);
         System.out.println("sinDir   = " + Math.sin(body.dir));
-        System.out.println("cosDir   = " + Math.cos(body.dir));*/
+        System.out.println("cosDir   = " + Math.cos(body.dir));
         System.out.println("xDelta   = " + xDelta);
         System.out.println("yDelta   = " + yDelta);
 
