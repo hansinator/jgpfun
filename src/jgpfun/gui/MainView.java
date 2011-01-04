@@ -35,7 +35,6 @@ public class MainView extends javax.swing.JPanel {
     /*
      * TODO:
      * add setters for things to draw or make a worldmodel including all stuff to draw
-     * split up gui in control panel JPanel parts and the world drawing view
      * possibly make object lists for world objects, like bodies and food
      */
 
