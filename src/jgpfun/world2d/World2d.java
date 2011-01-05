@@ -70,9 +70,18 @@ public class World2d {
 
 
     public void randomFood() {
-        food.clear();
-        for (int i = 0; i < foodCount; i++) {
-            food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
+        //FIXME: this seems to interfere with drawing, at least i'm getting an occasional concurrent list modification from within the food painting method
+        //TEMP FIX - this might be faster than creating tons of food object every round
+        if (food.size() != foodCount) {
+            food.clear();
+            for (int i = 0; i < foodCount; i++) {
+                food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
+            }
+        } else {
+            for (Food f : food) {
+                f.x = rnd.nextInt(worldWidth);
+                f.y = rnd.nextInt(worldHeight);
+            }
         }
     }
 

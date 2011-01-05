@@ -120,9 +120,20 @@ public class MainFrame extends JFrame implements WindowListener {
 
         //TODO: thread this and put it somewhere else
         running = true;
+        int startGen = 0;
+        long startTime = System.currentTimeMillis();
+        long now = 0;
         while (running) {
             //FIXME: add events to the simulation, so that a main view can draw upon an event
             simulation.runGeneration(4000, mainView, bottomPane.infoPanel);
+
+            //print generations per minute info
+            now = System.currentTimeMillis();
+            if((now - startTime) >= 3000) {
+                System.out.println("GPM: " + ((simulation.getGeneration() - startGen) * (60000 / (now - startTime))));
+                startGen = simulation.getGeneration();
+                startTime = now;
+            }
         }
 
         System.exit(0);

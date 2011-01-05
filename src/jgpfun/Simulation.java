@@ -85,7 +85,7 @@ public class Simulation {
 
                 if (slowMode || (i % roundsMod) == 0) {
                     time = System.currentTimeMillis() - start;
-                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen+1);
+                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen + 1);
                     view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                     view.repaint();
 
@@ -197,6 +197,11 @@ public class Simulation {
 
     public void setRoundsMod(int roundsMod) {
         this.roundsMod = roundsMod;
+    }
+
+
+    public int getGeneration() {
+        return gen;
     }
 
 }
