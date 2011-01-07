@@ -10,11 +10,7 @@ import jgpfun.world2d.World2d;
  */
 public class Main {
 
-    public static void startSimulation(int worldWith, int worldHeight) {
-        World2d world = new World2d(worldWith, worldHeight, Settings.getInt("foodCount"));
-        AbstractPopulationManager popMan = new PopulationManager(world, Settings.getInt("popSize"), Settings.getInt("progSize"));
-        Simulation sim = new Simulation(world, popMan);
-        new MainFrame(worldWith, worldHeight, sim).startSimulation();
+    public static void startSimulation() {
     }
 
 
@@ -23,7 +19,12 @@ public class Main {
      */
     public static void main(String[] args) {
         Settings.load(new File("default.properties"));
-        startSimulation(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"));
+
+        int worldWith = Settings.getInt("worldWidth"), worldHeight = Settings.getInt("worldHeight");
+        World2d world = new World2d(worldWith, worldHeight, Settings.getInt("foodCount"));
+        AbstractPopulationManager popMan = new PopulationManager(world, Settings.getInt("popSize"), Settings.getInt("progSize"));
+        Simulation sim = new Simulation(world, popMan);
+        new MainFrame(worldWith, worldHeight, sim).startSimulation();
     }
 
 }
