@@ -31,9 +31,9 @@ public class Organism implements Comparable<Organism> {
 
     public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
 
-    protected final int registerCount = Settings.getInt("registerCount");
-
     protected final double intScaleFactor = Settings.getDouble("intScaleFactor");
+
+    protected final int registerCount = Settings.getInt("registerCount");
 
     protected static final Random rnd = new SecureRandom();
 
@@ -64,8 +64,8 @@ public class Organism implements Comparable<Organism> {
         //write input registers
         int inreg = 0;
         for (Body2d b : bodies) {
-            b.food = b.foodFinder.findNearestFood(Math.round((float)b.x), Math.round((float)b.y));
-            foodDist = b.foodFinder.foodDist(b.food, Math.round((float)b.x), Math.round((float)b.y));
+            b.food = b.foodFinder.findNearestFood(Math.round((float) b.x), Math.round((float) b.y));
+            foodDist = b.foodFinder.foodDist(b.food, Math.round((float) b.x), Math.round((float) b.y));
 
             //cached cosdir and scale as int are meant to speed this up
             //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
@@ -74,7 +74,8 @@ public class Organism implements Comparable<Organism> {
             vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * intScaleFactor);
             vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * intScaleFactor);
             vm.regs[inreg++] = (int) (foodDist * intScaleFactor);
-            vm.regs[inreg++] = Math.round((float)foodDist);
+            vm.regs[inreg++] = Math.round((float) foodDist);
+            vm.regs[inreg++] = (int) (b.lastSpeed * intScaleFactor);
 
             //wallsense
             vm.regs[inreg++] = b.wallSense.lastSenseVal;

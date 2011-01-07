@@ -22,6 +22,7 @@ public class TankMotor implements Motor2d {
         //max speed is just a tweaking parameter; don't get confused by it
         //try varying it in simulation
         speed = (right + left) / 2.0;
+        body.lastSpeed = speed;
         body.x += Math.sin(body.dir) * Organism.maxSpeed * speed / 10.0;
         body.y -= Math.cos(body.dir) * Organism.maxSpeed * speed / 10.0;
     }

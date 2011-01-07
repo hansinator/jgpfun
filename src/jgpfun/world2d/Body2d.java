@@ -18,6 +18,8 @@ public class Body2d {
 
     public double y;
 
+    public double lastSpeed = 0.0;
+
 
     public Body2d(double x, double y, double dir, FoodFinder foodFinder, WallSense wallSense) {
         this.x = x;
