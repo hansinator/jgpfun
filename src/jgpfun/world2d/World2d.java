@@ -55,10 +55,10 @@ public class World2d {
             //eat food
             synchronized (worldLock) {
                 if ((food.contains(b.food))
-                        && (b.food.x >= (b.x - PopulationManager.foodTolerance))
-                        && (b.food.x <= (b.x + PopulationManager.foodTolerance))
-                        && (b.food.y >= (b.y - PopulationManager.foodTolerance))
-                        && (b.food.y <= (b.y + PopulationManager.foodTolerance))) {
+                        && (b.food.x >= (b.x - Organism.foodPickupRadius))
+                        && (b.food.x <= (b.x + Organism.foodPickupRadius))
+                        && (b.food.y >= (b.y - Organism.foodPickupRadius))
+                        && (b.food.y <= (b.y + Organism.foodPickupRadius))) {
                     organism.incFood();
                     b.food.x = rnd.nextInt(worldWidth);
                     b.food.y = rnd.nextInt(worldHeight);

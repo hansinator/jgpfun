@@ -18,6 +18,7 @@ import org.jfree.data.xy.XYSeries;
  */
 public class Simulation {
 
+    //(it is questionable if this must be included in propertiers... it's fine if it's hardcoded for a while or two!)
     private int roundsMod = 800;
 
     private final ThreadPoolExecutor pool;
@@ -45,11 +46,12 @@ public class Simulation {
     private final Object runLock = new Object();
 
 
-    public Simulation(int worldWidth, int worldHeight, int popSize, int progSize, int foodCount) {
+    public Simulation(World2d world, AbstractPopulationManager populationManager) {
+        this.world = world;
+        this.populationManager = populationManager;
+
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
         pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        world = new World2d(worldWidth, worldHeight, foodCount);
-        populationManager = new PopulationManager(world, popSize, progSize);
         foodChartData.setMaximumItemCount(500);
         progSizeChartData.setMaximumItemCount(500);
         realProgSizeChartData.setMaximumItemCount(500);

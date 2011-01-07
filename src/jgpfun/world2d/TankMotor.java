@@ -18,7 +18,7 @@ public class TankMotor implements Motor2d {
         double speed;
 
         //find the direction
-        body.dir += (right - left) * (Organism.maxForce / 100.0);
+        body.dir += (right - left) * (Organism.maxSteerForce / 100.0);
         //max speed is just a tweaking parameter; don't get confused by it
         //try varying it in simulation
         speed = (right + left) / 2.0;

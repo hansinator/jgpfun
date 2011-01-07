@@ -25,17 +25,17 @@ import jgpfun.world2d.World2d;
  */
 public class Organism implements Comparable<Organism> {
 
-    //public static final double maxForce = 10.0;
+    public static final double maxSteerForce = Settings.getDouble("maxSteerForce");
 
-    // testing lower max force to discourage immediate direction setting
-    public static final double maxForce = 0.1;
+    public static final double maxSpeed = Settings.getDouble("maxSpeed");
 
-    public static final double maxSpeed = 4.0;
+    public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
+
+    protected final int registerCount = Settings.getInt("registerCount");
+
+    protected final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
     protected static final Random rnd = new SecureRandom();
-
-    protected final int registerCount = 24;
-    //protected final int registerCount = 32;
 
     protected final EvoVM vm;
 
@@ -60,7 +60,6 @@ public class Organism implements Comparable<Organism> {
 
     public void live() throws Exception {
         double left, right, foodDist;
-        double scale = 8192.0;
 
         //write input registers
         int inreg = 0;
@@ -70,11 +69,11 @@ public class Organism implements Comparable<Organism> {
 
             //cached cosdir and scale as int are meant to speed this up
             //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
-            vm.regs[inreg++] = (int) (Math.cos(b.dir) * scale);
+            vm.regs[inreg++] = (int) (Math.cos(b.dir) * intScaleFactor);
 
-            vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * scale);
-            vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * scale);
-            vm.regs[inreg++] = (int) (foodDist * scale);
+            vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * intScaleFactor);
+            vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * intScaleFactor);
+            vm.regs[inreg++] = (int) (foodDist * intScaleFactor);
             vm.regs[inreg++] = Math.round((float)foodDist);
 
             //wallsense
@@ -86,8 +85,8 @@ public class Organism implements Comparable<Organism> {
         //use output values
         for (Body2d b : bodies) {
             //fetch, limit and scale outputs
-            left = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
-            right = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / scale;
+            left = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / intScaleFactor;
+            right = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / intScaleFactor;
 
             //move
             b.motor.move(left, right);

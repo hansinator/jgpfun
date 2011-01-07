@@ -32,18 +32,33 @@ public final class Settings {
     }
 
 
-    public synchronized static Settings getInstance() {
-        return instance;
-    }
-
-
-    public static String getProperty(String key) {
+    public static String getString(String key) {
         return instance.properties.getProperty(key);
     }
 
 
-    public static String setProperty(String key, String value) {
+    public static int getInt(String key) {
+        return Integer.parseInt(instance.properties.getProperty(key));
+    }
+
+
+    public static double getDouble(String key) {
+        return Double.parseDouble(instance.properties.getProperty(key));
+    }
+
+
+    public static String setString(String key, String value) {
         return (String) instance.properties.setProperty(key, value);
+    }
+
+
+    public static String setInt(String key, Integer value) {
+        return (String) instance.properties.setProperty(key, value.toString());
+    }
+
+
+    public static String setDouble(String key, Double value) {
+        return (String) instance.properties.setProperty(key, value.toString());
     }
 
 

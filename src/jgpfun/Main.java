@@ -1,6 +1,8 @@
 package jgpfun;
 
+import java.io.File;
 import jgpfun.gui.MainFrame;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -8,12 +10,11 @@ import jgpfun.gui.MainFrame;
  */
 public class Main {
 
-    public static void startSimulation(int width, int height) {
-        Simulation sim = new Simulation(width, height, 48, 256, 40);
-        //sim = new Simulation(width, height, 26, 256, 40);
-        //sim = new Simulation(width, height, 32, 512, 40);
-
-        new MainFrame(width, height, sim).startSimulation();
+    public static void startSimulation(int worldWith, int worldHeight) {
+        World2d world = new World2d(worldWith, worldHeight, Settings.getInt("foodCount"));
+        AbstractPopulationManager popMan = new PopulationManager(world, Settings.getInt("popSize"), Settings.getInt("progSize"));
+        Simulation sim = new Simulation(world, popMan);
+        new MainFrame(worldWith, worldHeight, sim).startSimulation();
     }
 
 
@@ -21,7 +22,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        startSimulation(2048, 1536);
+        Settings.load(new File("default.properties"));
+        startSimulation(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"));
     }
 
 }

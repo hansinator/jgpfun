@@ -24,7 +24,7 @@ public class DebugTankMotorMotion {
         double speed;
 
         //find the direction
-        double dirAmp = (Organism.maxForce / 100.0);
+        double dirAmp = (Organism.maxSteerForce / 100.0);
         double dirDelta = (right - left) * dirAmp;
         body.dir += dirDelta;
 
