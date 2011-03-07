@@ -1,18 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package jgpfun;
+package jgpfun.world2d;
 
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import jgpfun.world2d.Body2d;
-import jgpfun.world2d.WallSense;
-import jgpfun.world2d.World2d;
+import jgpfun.BaseOrganism;
+import jgpfun.Genome;
+import jgpfun.Settings;
 
 /*
  * TODO: Create a loopback sense that represents the differential (ableitung)
@@ -23,24 +15,22 @@ import jgpfun.world2d.World2d;
  *
  * @author hansinator
  */
-public class Organism implements Comparable<Organism> {
+public class Organism2d extends BaseOrganism {
 
     static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
     static final int registerCount = Settings.getInt("registerCount");
 
-    protected static final Random rnd = new SecureRandom();
-
     protected final Genome genome;
 
-    protected final EvoVM vm;
+    public final EvoVM vm;
 
     public final Body2d[] bodies;
 
     private int food;
 
 
-    public Organism(Genome genome, World2d world) {
+    public Organism2d(Genome genome, World2d world) {
         this.genome = genome;
         this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
@@ -90,12 +80,7 @@ public class Organism implements Comparable<Organism> {
             b.wallSense.sense();
         }
     }
-
-
-    static Organism randomOrganism(World2d world, int progSize) {
-        return new Organism(Genome.randomGenome(progSize), world);
-    }
-
+    
 
     public Genome getGenome() {
         return genome;
@@ -103,18 +88,13 @@ public class Organism implements Comparable<Organism> {
 
 
     @Override
-    public int compareTo(Organism o) {
-        return new Integer(food).compareTo(o.food);
+    public int getFitness() {
+        return food;
     }
 
 
     public void incFood() {
         food++;
-    }
-
-
-    public int getFitness() {
-        return food;
     }
 
 }

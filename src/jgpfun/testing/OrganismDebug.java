@@ -1,7 +1,7 @@
 package jgpfun.testing;
 
 import jgpfun.Genome;
-import jgpfun.Organism;
+import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.PrecisionBody2d;
 import jgpfun.world2d.World2d;
@@ -10,7 +10,7 @@ import jgpfun.world2d.World2d;
  *
  * @author hansinator
  */
-public class OrganismDebug extends Organism {
+public class OrganismDebug extends Organism2d {
 
     public boolean showdebug = false;
 

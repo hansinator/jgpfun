@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.world2d.Organism2d;
 import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +20,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public static final int maxPoolSize = 26;
 
-    private List<Organism> organismPool;
+    private List<Organism2d> organismPool;
 
     private int bestInPool;
 
@@ -30,7 +31,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public PoolingPopulationManager(World2d world, int popSize, int progSize) {
         super(world, popSize, progSize);
-        organismPool = new ArrayList<Organism>(maxPoolSize);
+        organismPool = new ArrayList<Organism2d>(maxPoolSize);
     }
 
 
@@ -39,12 +40,12 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         int avgProgSize = 0, avgRealProgSize = 0;
 
         // pool statistics
-        for (Organism o : organismPool) {
-            avgProgSize += o.genome.program.size();
+        for (Organism2d o : organismPool) {
+            avgProgSize += o.getGenome().program.size();
         }
         avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
-        for (Organism o : organismPool) {
+        for (Organism2d o : organismPool) {
             avgRealProgSize += o.vm.getProgramSize();
         }
         avgRealProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
@@ -58,13 +59,13 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         
         // generation statistics
         avgProgSize = 0;
-        for (Organism o : ants) {
-            avgProgSize += o.genome.program.size();
+        for (Organism2d o : ants) {
+            avgProgSize += o.getGenome().program.size();
         }
         avgProgSize /= ants.size();
 
         avgRealProgSize = 0;
-        for (Organism o : ants) {
+        for (Organism2d o : ants) {
             avgRealProgSize += o.vm.getProgramSize();
         }
         avgRealProgSize /= ants.size();
@@ -105,7 +106,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     public int newGeneration() {
         double mutador;
         Genome parent1, parent2;
-        List<Organism> newAnts = new ArrayList<Organism>(ants.size());
+        List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
 
         //choose crossover operator
         CrossoverOperator crossOp = new TwoPointCrossover();
@@ -124,8 +125,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).genome.clone();
-            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).genome.clone();
+            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).getGenome().clone();
+            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).getGenome().clone();
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
@@ -140,8 +141,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, world));
-            newAnts.add(new Organism(parent2, world));
+            newAnts.add(new Organism2d(parent1, world));
+            newAnts.add(new Organism2d(parent2, world));
         }
 
         //replace and leave the other to GC
@@ -155,11 +156,11 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
 
     //the team effort
-    private int calculateFitness(List<Organism> organisms) {
+    private int calculateFitness(List<Organism2d> organisms) {
         int totalFit = 0;
         bestInPool = 0;
 
-        for (Organism o : organisms) {
+        for (Organism2d o : organisms) {
             totalFit += o.getFitness();
 
             //remember the best

@@ -13,7 +13,7 @@ import jgpfun.jgp.operations.UnaryOperation;
  */
 public class Genome {
 
-    protected final List<OpCode> program;
+    public final List<OpCode> program;
 
     protected static final Random rnd = new SecureRandom();
 

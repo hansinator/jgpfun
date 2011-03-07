@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.world2d.Organism2d;
 import jgpfun.gui.MainView;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -122,7 +123,7 @@ public class Simulation {
     private void step() {
         final CountDownLatch cb = new CountDownLatch(populationManager.ants.size());
 
-        for (final Organism organism : populationManager.ants) {
+        for (final Organism2d organism : populationManager.ants) {
             Runnable r = new Runnable() {
 
                 @Override

@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
@@ -24,12 +25,12 @@ public class PopulationManager extends AbstractPopulationManager {
     public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation, XYSeries progSizeChartData, XYSeries realProgSizeChartData) {
         int avgProgSize = 0, avgRealProgSize = 0;
 
-        for (Organism o : ants) {
-            avgProgSize += o.genome.size();
+        for (Organism2d o : ants) {
+            avgProgSize += o.getGenome().size();
         }
         avgProgSize /= ants.size();
 
-        for (Organism o : ants) {
+        for (Organism2d o : ants) {
             avgRealProgSize += o.vm.getProgramSize();
         }
         avgRealProgSize /= ants.size();
@@ -45,7 +46,7 @@ public class PopulationManager extends AbstractPopulationManager {
         double mutador;
         Genome parent1, parent2;
         int totalFit = calculateFitness();
-        List<Organism> newAnts = new ArrayList<Organism>(ants.size());
+        List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
 
         //choose crossover operator
         CrossoverOperator crossOp = new OffsetTwoPointCrossover(progSize / 8);
@@ -57,8 +58,8 @@ public class PopulationManager extends AbstractPopulationManager {
             //as the genome is passed by reference
             //parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
             //parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            parent1 = EvoUtils.tournament(ants, 3, rnd).genome.clone();
-            parent2 = EvoUtils.tournament(ants, 3, rnd).genome.clone();
+            parent1 = EvoUtils.tournament(ants, 3, rnd).getGenome().clone();
+            parent2 = EvoUtils.tournament(ants, 3, rnd).getGenome().clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.nextDouble();
@@ -72,8 +73,8 @@ public class PopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants with the modified genomes and save them
-            newAnts.add(new Organism(parent1, world));
-            newAnts.add(new Organism(parent2, world));
+            newAnts.add(new Organism2d(parent1, world));
+            newAnts.add(new Organism2d(parent2, world));
         }
 
         //replace and leave the other to GC
@@ -86,7 +87,7 @@ public class PopulationManager extends AbstractPopulationManager {
     //the team effort
     private int calculateFitness() {
         int totalFit = 0;
-        for (Organism o : ants) {
+        for (Organism2d o : ants) {
             totalFit += o.getFitness();
         }
         return totalFit;

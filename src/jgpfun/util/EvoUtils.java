@@ -3,7 +3,7 @@ package jgpfun.util;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import jgpfun.Organism;
+import jgpfun.world2d.Organism2d;
 
 /**
  *
@@ -12,7 +12,7 @@ import jgpfun.Organism;
 public class EvoUtils {
 
     //fitness proportionate selection
-    public static Organism rouletteWheel(List<Organism> ants, int totalFit, Random rnd) {
+    public static Organism2d rouletteWheel(List<Organism2d> ants, int totalFit, Random rnd) {
         int stopPoint = 0;
         int fitnessSoFar = 0;
 
@@ -44,15 +44,15 @@ public class EvoUtils {
 
     
     //tournament selection
-    public static Organism tournament(List<Organism> ants, int size, Random rnd) {
+    public static Organism2d tournament(List<Organism2d> ants, int size, Random rnd) {
         int maxFit = -1;
-        Organism fittest = null;
+        Organism2d fittest = null;
 
         if((size == 0) || (ants.size() < size))
             return null;
 
         for (int i = 0; i < size; i++) {
-            Organism candidate = ants.get(rnd.nextInt(ants.size()));
+            Organism2d candidate = ants.get(rnd.nextInt(ants.size()));
 
             if(candidate.getFitness() > maxFit) {
                 maxFit = candidate.getFitness();

@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.world2d.Organism2d;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public abstract class AbstractPopulationManager {
 
     protected final int popSize;
 
-    protected List<Organism> ants;
+    protected List<Organism2d> ants;
 
     protected final World2d world;
 
@@ -37,11 +38,11 @@ public abstract class AbstractPopulationManager {
         this.progSize = progSize;
         this.popSize = popSize;
 
-        ants = new ArrayList<Organism>(popSize);
+        ants = new ArrayList<Organism2d>(popSize);
         rnd = new SecureRandom();
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(world, progSize));
+            ants.add(new Organism2d(Genome.randomGenome(progSize), world));
         }
     }
 
@@ -50,7 +51,7 @@ public abstract class AbstractPopulationManager {
         ants.clear();
         
         for (int i = 0; i < popSize; i++) {
-            ants.add(Organism.randomOrganism(world, progSize));
+            ants.add(new Organism2d(Genome.randomGenome(progSize), world));
         }
     }
 
@@ -61,7 +62,7 @@ public abstract class AbstractPopulationManager {
     public abstract int newGeneration();
 
 
-    public List<Organism> getAnts() {
+    public List<Organism2d> getAnts() {
         return ants;
     }
 

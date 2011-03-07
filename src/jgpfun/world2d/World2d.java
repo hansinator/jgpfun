@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import jgpfun.Food;
-import jgpfun.Organism;
 import jgpfun.Settings;
 
 /**
@@ -41,7 +40,7 @@ public class World2d {
     }
 
 
-    public void moveOrganismInWorld(Organism organism, Object worldLock) {
+    public void moveOrganismInWorld(Organism2d organism, Object worldLock) {
         //TODO: have a more compex world, add a barrier in the middle of the screen
         //TODO: take into account ant size, so it can't hide outside of the screen
         //start = System.nanoTime();
