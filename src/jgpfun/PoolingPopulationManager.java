@@ -8,7 +8,6 @@ import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.TwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.util.EvoUtils;
-import jgpfun.util.MutationUtils;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
@@ -41,7 +40,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
         // pool statistics
         for (Organism o : organismPool) {
-            avgProgSize += o.program.size();
+            avgProgSize += o.genome.program.size();
         }
         avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
@@ -60,7 +59,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         // generation statistics
         avgProgSize = 0;
         for (Organism o : ants) {
-            avgProgSize += o.program.size();
+            avgProgSize += o.genome.program.size();
         }
         avgProgSize /= ants.size();
 
@@ -105,7 +104,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     @Override
     public int newGeneration() {
         double mutador;
-        List<OpCode> parent1, parent2;
+        Genome parent1, parent2;
         List<Organism> newAnts = new ArrayList<Organism>(ants.size());
 
         //choose crossover operator
@@ -125,15 +124,15 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).clone();
-            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).clone();
+            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).genome.clone();
+            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).genome.clone();
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
             //if (mutador > crossoverRate) {
                 //mutate genomes
-                MutationUtils.mutate(parent1, rnd.nextInt(maxMutations) + 1, progSize, rnd);
-                MutationUtils.mutate(parent2, rnd.nextInt(maxMutations) + 1, progSize, rnd);
+                parent1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+                parent2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
             /*}
             else {
                 //perform crossover

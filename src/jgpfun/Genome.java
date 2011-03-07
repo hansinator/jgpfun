@@ -1,5 +1,7 @@
-package jgpfun.util;
+package jgpfun;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import jgpfun.jgp.OpCode;
@@ -7,29 +9,67 @@ import jgpfun.jgp.operations.UnaryOperation;
 
 /**
  *
- * @author hansinator
+ * @author Hansinator
  */
-public class MutationUtils {
+public class Genome {
 
-    final static int maxRegisterValDelta = 16;
+    protected final List<OpCode> program;
 
-    final static int maxConstantValDelta = 16384;
-    //final int maxConstantValDelta = Integer.maxValue / 2;
+    protected static final Random rnd = new SecureRandom();
 
 
+    public Genome(List<OpCode> program) {
+        this.program = program;
+    }
+
+
+    public static Genome randomGenome(int progSize) {
+        int size = rnd.nextInt(progSize - 200) + 201;
+        List<OpCode> program = new ArrayList<OpCode>(size);
+
+        for (int i = 0; i < size; i++) {
+            program.add(OpCode.randomOpCode(rnd));
+        }
+
+        return new Genome(program);
+    }
+
+
+    @Override
+    public Genome clone() {
+        List<OpCode> p = new ArrayList<OpCode>(program.size());
+
+        for (OpCode oc : program) {
+            p.add(oc.clone());
+        }
+
+        return new Genome(p);
+    }
+
+
+    public int size() {
+        return program.size();
+    }
+    
+    
     //make random changes to random locations in the genome
-    public static void mutate(List<OpCode> genome, int mutCount, int progSize, Random rnd) {
+    public void mutate(int mutCount, int progSize, Random rnd) {
         //determine amount of mutations, minimum 1
         //int mutCount = maxMutations;
         //int mutCount = randomR.Next(maxMutations) + 1;
 
         for (int i = 0; i < mutCount; i++) {
-            mutateProgramSpace(genome, progSize, rnd);
+            mutateProgramSpace(program, progSize, rnd);
         }
     }
 
 
-    public static void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd) {
+    private final static int maxRegisterValDelta = 16;
+
+    private final static int maxConstantValDelta = 16384;
+    //final int maxConstantValDelta = Integer.maxValue / 2;
+
+    private void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd) {
         //define chances for what mutation could happen in some sort of percentage
         int mutateIns = 22, mutateRem = 18, mutateRep = 20, mutateVal = 20;
         int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;

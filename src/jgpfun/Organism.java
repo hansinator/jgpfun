@@ -37,18 +37,18 @@ public class Organism implements Comparable<Organism> {
 
     protected static final Random rnd = new SecureRandom();
 
-    protected final EvoVM vm;
+    protected final Genome genome;
 
-    protected final List<OpCode> program;
+    protected final EvoVM vm;
 
     public final Body2d[] bodies;
 
     private int food;
 
 
-    public Organism(List<OpCode> program, World2d world) {
-        this.program = program;
-        this.vm = new EvoVM(registerCount, program.toArray(new OpCode[program.size()]));
+    public Organism(Genome genome, World2d world) {
+        this.genome = genome;
+        this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
@@ -99,37 +99,18 @@ public class Organism implements Comparable<Organism> {
 
 
     static Organism randomOrganism(World2d world, int progSize) {
-        int size = rnd.nextInt(progSize) + 1;
-        List<OpCode> program = new ArrayList<OpCode>(size);
-
-        for (int i = 0; i < size; i++) {
-            program.add(OpCode.randomOpCode(rnd));
-        }
-
-        return new Organism(program, world);
+        return new Organism(Genome.randomGenome(progSize), world);
     }
 
 
-    @Override
-    public List<OpCode> clone() {
-        List<OpCode> p = new ArrayList<OpCode>(program.size());
-
-        for (OpCode oc : program) {
-            p.add(oc.clone());
-        }
-
-        return p;
+    public Genome getGenome() {
+        return genome;
     }
 
 
     @Override
     public int compareTo(Organism o) {
         return new Integer(food).compareTo(o.food);
-    }
-
-
-    public List<OpCode> getProgram() {
-        return program;
     }
 
 

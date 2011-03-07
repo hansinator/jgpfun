@@ -1,8 +1,7 @@
 package jgpfun.testing;
 
-import java.util.List;
+import jgpfun.Genome;
 import jgpfun.Organism;
-import jgpfun.jgp.OpCode;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.PrecisionBody2d;
 import jgpfun.world2d.World2d;
@@ -19,8 +18,8 @@ public class OrganismDebug extends Organism {
     //public long vmrun, allrun, comp;
 
     
-    public OrganismDebug(List<OpCode> program, World2d world) {
-        super(program, world);
+    public OrganismDebug(Genome genome, World2d world) {
+        super(genome, world);
     }
 
 
