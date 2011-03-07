@@ -86,7 +86,7 @@ public class EvoVM {
     }
 
 
-    public void run() throws Exception {
+    public void run() {
         pc = 0;
         while (pc < program.length) {
             execute(pc++);
@@ -94,7 +94,7 @@ public class EvoVM {
     }
 
 
-    public void execute(int pc) throws Exception {
+    public void execute(int pc) {
         OpCode curop = program[pc];
         
         /*if (op instanceof BranchOperation) {

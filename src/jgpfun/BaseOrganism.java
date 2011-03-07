@@ -9,9 +9,12 @@ import java.util.Random;
  */
 public abstract class BaseOrganism implements Comparable<BaseOrganism> {
 
-    public abstract int getFitness();
-
     protected static final Random rnd = new SecureRandom();
+    
+    
+    public abstract void live();
+
+    public abstract int getFitness();
     
     @Override
     public int compareTo(BaseOrganism o) {

@@ -42,7 +42,8 @@ public class Organism2d extends BaseOrganism {
     }
 
 
-    public void live() throws Exception {
+    @Override
+    public void live() {
         double left, right, foodDist;
 
         //write input registers
