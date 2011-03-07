@@ -1,6 +1,7 @@
 package jgpfun.jgp;
 
 import java.util.Random;
+import jgpfun.jgp.operations.Operation;
 
 public class OpCode {
 
@@ -9,6 +10,7 @@ public class OpCode {
     public int src2;
     public int trg;
     public boolean immediate;
+    Operation operation;
 
     public static OpCode randomOpCode(Random rnd) {
         OpCode oc = new OpCode();

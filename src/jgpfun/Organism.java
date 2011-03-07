@@ -114,11 +114,6 @@ public class Organism implements Comparable<Organism> {
     }
 
 
-    public EvoVM getVm() {
-        return vm;
-    }
-
-
     public void incFood() {
         food++;
     }

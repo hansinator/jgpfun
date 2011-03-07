@@ -79,6 +79,7 @@ public class EvoVM {
             }
             curop.trg = Math.abs(curop.trg) % numRegs;
             curop.op = Math.abs(curop.op) % ops.length;
+            curop.operation = ops[curop.op];
         }
 
         return program;
@@ -95,8 +96,7 @@ public class EvoVM {
 
     public void execute(int pc) throws Exception {
         OpCode curop = program[pc];
-        Operation op = ops[curop.op];
-
+        
         /*if (op instanceof BranchOperation) {
         if(op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2])) != 1) {
         pc++;
@@ -110,7 +110,7 @@ public class EvoVM {
         //do nothing*/
         //} else {
         //execute the operation
-        regs[curop.trg] = op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
+        regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
         //}
     }
 
