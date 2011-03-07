@@ -25,15 +25,9 @@ import jgpfun.world2d.World2d;
  */
 public class Organism implements Comparable<Organism> {
 
-    public static final double maxSteerForce = Settings.getDouble("maxSteerForce");
+    static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
-    public static final double maxSpeed = Settings.getDouble("maxSpeed");
-
-    public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
-
-    protected final double intScaleFactor = Settings.getDouble("intScaleFactor");
-
-    protected final int registerCount = Settings.getInt("registerCount");
+    static final int registerCount = Settings.getInt("registerCount");
 
     protected static final Random rnd = new SecureRandom();
 

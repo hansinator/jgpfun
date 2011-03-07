@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Random;
 import jgpfun.Food;
 import jgpfun.Organism;
-import jgpfun.PopulationManager;
+import jgpfun.Settings;
 
 /**
  *
  * @author hansinator
  */
 public class World2d {
+
+    public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
 
     private final Random rnd;
 
@@ -55,10 +57,10 @@ public class World2d {
             //eat food
             synchronized (worldLock) {
                 if ((food.contains(b.food))
-                        && (b.food.x >= (b.x - Organism.foodPickupRadius))
-                        && (b.food.x <= (b.x + Organism.foodPickupRadius))
-                        && (b.food.y >= (b.y - Organism.foodPickupRadius))
-                        && (b.food.y <= (b.y + Organism.foodPickupRadius))) {
+                        && (b.food.x >= (b.x - foodPickupRadius))
+                        && (b.food.x <= (b.x + foodPickupRadius))
+                        && (b.food.y >= (b.y - foodPickupRadius))
+                        && (b.food.y <= (b.y + foodPickupRadius))) {
                     organism.incFood();
                     b.food.x = rnd.nextInt(worldWidth);
                     b.food.y = rnd.nextInt(worldHeight);

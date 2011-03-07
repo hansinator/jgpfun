@@ -4,9 +4,8 @@ package jgpfun.testing;
 
 import java.security.SecureRandom;
 import java.util.Random;
-import jgpfun.Organism;
 import jgpfun.world2d.Body2d;
-import jgpfun.world2d.Body2d;
+import jgpfun.world2d.TankMotor;
 import jgpfun.world2d.WallSense;
 
 /**
@@ -24,7 +23,7 @@ public class DebugTankMotorMotion {
         double speed;
 
         //find the direction
-        double dirAmp = (Organism.maxSteerForce / 100.0);
+        double dirAmp = (TankMotor.maxSteerForce / 100.0);
         double dirDelta = (right - left) * dirAmp;
         body.dir += dirDelta;
 
@@ -34,8 +33,8 @@ public class DebugTankMotorMotion {
         //try varying it in simulation
         speed = (right + left) / 2.0;
 
-        double xDelta = Math.sin(body.dir) * Organism.maxSpeed * speed / 10.0;
-        double yDelta = Math.cos(body.dir) * Organism.maxSpeed * speed / 10.0;
+        double xDelta = Math.sin(body.dir) * TankMotor.maxSpeed * speed / 10.0;
+        double yDelta = Math.cos(body.dir) * TankMotor.maxSpeed * speed / 10.0;
 
         System.out.println("dirDelta = " + dirDelta);
         System.out.println("dir      = " + body.dir);
