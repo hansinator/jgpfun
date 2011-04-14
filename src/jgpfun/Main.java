@@ -11,10 +11,6 @@ import jgpfun.world2d.World2d;
  */
 public class Main {
 
-    public static void startSimulation() {
-    }
-
-
     /**
      * @param args the command line arguments
      */
