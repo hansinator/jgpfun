@@ -1,6 +1,6 @@
 package jgpfun.testing;
 
-import jgpfun.Genome;
+import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.PrecisionBody2d;

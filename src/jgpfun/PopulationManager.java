@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
 import java.util.List;

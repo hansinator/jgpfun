@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.genetics.Genome;
 import java.security.SecureRandom;
 import java.util.Random;
 
