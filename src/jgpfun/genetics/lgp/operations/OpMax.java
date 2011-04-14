@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.genetics.jgp.operations;
+package jgpfun.genetics.lgp.operations;
 
 /**
  *
  * @author dahmen
  */
-public class OpMul implements Operation {
+public class OpMax implements Operation {
 
     @Override
     public int execute(int src1, int src2) {
-        return src1 * src2;
+        return Math.max(src1, src2);
     }
 
 }

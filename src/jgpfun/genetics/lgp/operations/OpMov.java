@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.genetics.jgp.operations;
+package jgpfun.genetics.lgp.operations;
 
 /**
  *
- * @author Administrator
+ * @author dahmen
  */
-public class OpDec implements Operation, UnaryOperation {
+public class OpMov implements Operation, UnaryOperation {
 
     @Override
     public int execute(int src1, int src2) {
-        return src1--;
+        return src1;
     }
 
 }

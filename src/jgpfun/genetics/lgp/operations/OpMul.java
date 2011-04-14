@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.genetics.jgp.operations;
+package jgpfun.genetics.lgp.operations;
 
 /**
  *
  * @author dahmen
  */
-public class OpSin implements Operation, UnaryOperation {
+public class OpMul implements Operation {
 
     @Override
     public int execute(int src1, int src2) {
-        return (int)(Math.sin(src1 / 65535.0) * 65535);
+        return src1 * src2;
     }
-    
+
 }

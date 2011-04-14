@@ -1,22 +1,22 @@
-package jgpfun.genetics.jgp;
+package jgpfun.genetics.lgp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import jgpfun.genetics.jgp.operations.OpAbs;
-import jgpfun.genetics.jgp.operations.OpAdd;
-import jgpfun.genetics.jgp.operations.OpDiv;
-import jgpfun.genetics.jgp.operations.OpMax;
-import jgpfun.genetics.jgp.operations.OpMin;
-import jgpfun.genetics.jgp.operations.OpMod;
-import jgpfun.genetics.jgp.operations.OpMov;
-import jgpfun.genetics.jgp.operations.OpMul;
-import jgpfun.genetics.jgp.operations.OpNeg;
-import jgpfun.genetics.jgp.operations.OpSqrt;
-import jgpfun.genetics.jgp.operations.OpSub;
-import jgpfun.genetics.jgp.operations.Operation;
-import jgpfun.genetics.jgp.operations.UnaryOperation;
+import jgpfun.genetics.lgp.operations.OpAbs;
+import jgpfun.genetics.lgp.operations.OpAdd;
+import jgpfun.genetics.lgp.operations.OpDiv;
+import jgpfun.genetics.lgp.operations.OpMax;
+import jgpfun.genetics.lgp.operations.OpMin;
+import jgpfun.genetics.lgp.operations.OpMod;
+import jgpfun.genetics.lgp.operations.OpMov;
+import jgpfun.genetics.lgp.operations.OpMul;
+import jgpfun.genetics.lgp.operations.OpNeg;
+import jgpfun.genetics.lgp.operations.OpSqrt;
+import jgpfun.genetics.lgp.operations.OpSub;
+import jgpfun.genetics.lgp.operations.Operation;
+import jgpfun.genetics.lgp.operations.UnaryOperation;
 
 /**
  *

@@ -1,7 +1,7 @@
-package jgpfun.genetics.jgp;
+package jgpfun.genetics.lgp;
 
 import java.util.Random;
-import jgpfun.genetics.jgp.operations.Operation;
+import jgpfun.genetics.lgp.operations.Operation;
 
 public class OpCode {
 

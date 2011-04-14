@@ -3,7 +3,7 @@ package jgpfun.genetics.crossover;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import jgpfun.genetics.jgp.OpCode;
+import jgpfun.genetics.lgp.OpCode;
 
 /**
  * Basically the same as TwoPointCrossover, only that the exchanged

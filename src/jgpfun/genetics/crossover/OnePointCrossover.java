@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import jgpfun.genetics.jgp.OpCode;
+import jgpfun.genetics.lgp.OpCode;
 
 /**
  *

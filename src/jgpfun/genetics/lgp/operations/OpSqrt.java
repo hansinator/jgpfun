@@ -2,16 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jgpfun.genetics.jgp.operations;
+
+package jgpfun.genetics.lgp.operations;
 
 /**
  *
  * @author dahmen
  */
-public class OpAdd implements Operation {
+public class OpSqrt implements Operation, UnaryOperation {
 
     @Override
     public int execute(int src1, int src2) {
-        return src1 + src2;
+        return (int)Math.sqrt(src1);
     }
+
 }

@@ -4,8 +4,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import jgpfun.genetics.jgp.OpCode;
-import jgpfun.genetics.jgp.operations.UnaryOperation;
+import jgpfun.genetics.lgp.OpCode;
+import jgpfun.genetics.lgp.operations.UnaryOperation;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.World2d;
 

@@ -3,7 +3,7 @@ package jgpfun.genetics.crossover;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import jgpfun.genetics.jgp.OpCode;
+import jgpfun.genetics.lgp.OpCode;
 
 /**
  *
