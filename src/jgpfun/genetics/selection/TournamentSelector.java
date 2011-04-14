@@ -5,7 +5,7 @@ package jgpfun.genetics.selection;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
-import jgpfun.world2d.Organism2d;
+import jgpfun.BaseOrganism;
 
 /**
  *
@@ -24,10 +24,10 @@ public class TournamentSelector implements SelectionStrategy {
 
 
     @Override
-    public Organism2d select(List<Organism2d> organisms) {
+    public BaseOrganism select(List<BaseOrganism> organisms) {
         int maxFit = -1;
         int size;
-        Organism2d fittest = null;
+        BaseOrganism fittest = null;
 
         if (organisms.size() < tournamentSize) {
             size = organisms.size();
@@ -40,7 +40,7 @@ public class TournamentSelector implements SelectionStrategy {
         }
 
         for (int i = 0; i < size; i++) {
-            Organism2d candidate = organisms.get(rnd.nextInt(organisms.size()));
+            BaseOrganism candidate = organisms.get(rnd.nextInt(organisms.size()));
 
             if (candidate.getFitness() > maxFit) {
                 maxFit = candidate.getFitness();

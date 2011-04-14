@@ -4,7 +4,7 @@
 package jgpfun.genetics.selection;
 
 import java.util.List;
-import jgpfun.world2d.Organism2d;
+import jgpfun.BaseOrganism;
 
 /**
  *
@@ -12,5 +12,5 @@ import jgpfun.world2d.Organism2d;
  */
 public interface SelectionStrategy {
 
-    public Organism2d select(List<Organism2d> organisms);
+    public BaseOrganism select(List<BaseOrganism> organisms);
 }

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import jgpfun.AbstractPopulationManager;
-import jgpfun.world2d.Organism2d;
+import jgpfun.BaseOrganism;
 
 /**
  *
@@ -29,7 +29,7 @@ public class RouletteWheelSelector implements SelectionStrategy {
      * fitness proportionate selection
      */
     @Override
-    public Organism2d select(List<Organism2d> organisms) {
+    public BaseOrganism select(List<BaseOrganism> organisms) {
         int stopPoint = 0;
         int fitnessSoFar = 0;
         final int totalFit = populationManager.getCurrentPopulationFitness();
