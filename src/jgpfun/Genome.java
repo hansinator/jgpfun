@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 import jgpfun.jgp.OpCode;
 import jgpfun.jgp.operations.UnaryOperation;
+import jgpfun.world2d.Organism2d;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -189,4 +191,8 @@ public class Genome {
         }
     }
 
+
+    public Organism2d synthesize(World2d world) {
+        return new Organism2d(this, world);
+    }
 }

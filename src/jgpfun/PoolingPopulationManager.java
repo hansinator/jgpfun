@@ -106,9 +106,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         Genome parent1, parent2;
         List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
 
-        //choose crossover operator
-        CrossoverOperator crossOp = new TwoPointCrossover();
-
         //enqueue all current organisms into our pool
         organismPool.addAll(ants);
 
@@ -135,12 +132,12 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             /*}
             else {
                 //perform crossover
-                crossOp.cross(parent1, parent2, rnd);
+                crossover.cross(parent1, parent2, rnd);
             }*/
 
-            //create new ants with the modified genomes and save them
-            newAnts.add(new Organism2d(parent1, world));
-            newAnts.add(new Organism2d(parent2, world));
+            //create new ants from the modified genomes and save them
+            newAnts.add(parent1.synthesize(world));
+            newAnts.add(parent2.synthesize(world));
         }
 
         //replace and leave the other to GC

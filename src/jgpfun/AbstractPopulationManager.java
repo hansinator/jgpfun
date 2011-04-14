@@ -5,6 +5,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import jgpfun.crossover.CrossoverOperator;
+import jgpfun.crossover.OffsetTwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.selection.SelectionStrategy;
 import jgpfun.selection.TournamentSelector;
@@ -36,12 +38,15 @@ public abstract class AbstractPopulationManager {
 
     protected final SelectionStrategy selector = new TournamentSelector(3);
 
+    protected final CrossoverOperator crossover;
+
 
     public AbstractPopulationManager(World2d world, int popSize, int progSize) {
         this.world = world;
         this.progSize = progSize;
         this.popSize = popSize;
-
+        
+        crossover = new OffsetTwoPointCrossover(progSize / 8);
         ants = new ArrayList<Organism2d>(popSize);
         rnd = new SecureRandom();
 

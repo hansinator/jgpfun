@@ -49,9 +49,6 @@ public class PopulationManager extends AbstractPopulationManager {
         totalFit = calculateFitness();
         List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
 
-        //choose crossover operator
-        CrossoverOperator crossOp = new OffsetTwoPointCrossover(progSize / 8);
-
         //create new genomes via cloning and mutation or crossover
         for (int i = 0; i < (ants.size() / 2); i++) {
             //select two source genomes and clone them
@@ -68,12 +65,12 @@ public class PopulationManager extends AbstractPopulationManager {
             parent2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
             /* else {
             //perform crossover
-            crossOp.cross(parent1, parent2, rnd);
+            crossover.cross(parent1, parent2, rnd);
             }*/
 
-            //create new ants with the modified genomes and save them
-            newAnts.add(new Organism2d(parent1, world));
-            newAnts.add(new Organism2d(parent2, world));
+            //create new ants from the modified genomes and save them
+            newAnts.add(parent1.synthesize(world));
+            newAnts.add(parent2.synthesize(world));
         }
 
         //replace and leave the other to GC
