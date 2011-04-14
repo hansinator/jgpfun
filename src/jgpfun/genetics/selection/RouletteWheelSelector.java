@@ -6,8 +6,8 @@ import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import jgpfun.AbstractPopulationManager;
-import jgpfun.BaseOrganism;
+import jgpfun.life.AbstractPopulationManager;
+import jgpfun.life.BaseOrganism;
 
 /**
  *

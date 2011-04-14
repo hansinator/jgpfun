@@ -1,5 +1,9 @@
 package jgpfun;
 
+import jgpfun.life.PoolingPopulationManager;
+import jgpfun.life.AbstractPopulationManager;
+import jgpfun.life.BaseOrganism;
+import jgpfun.life.PopulationManager;
 import java.util.List;
 import jgpfun.world2d.Organism2d;
 import jgpfun.gui.MainView;

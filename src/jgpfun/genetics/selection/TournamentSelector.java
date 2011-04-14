@@ -5,7 +5,7 @@ package jgpfun.genetics.selection;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
-import jgpfun.BaseOrganism;
+import jgpfun.life.BaseOrganism;
 
 /**
  *

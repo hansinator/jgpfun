@@ -1,4 +1,4 @@
-package jgpfun;
+package jgpfun.life;
 
 import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;

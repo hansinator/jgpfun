@@ -4,7 +4,7 @@
 package jgpfun.genetics.selection;
 
 import java.util.List;
-import jgpfun.BaseOrganism;
+import jgpfun.life.BaseOrganism;
 
 /**
  *

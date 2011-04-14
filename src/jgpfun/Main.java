@@ -1,5 +1,7 @@
 package jgpfun;
 
+import jgpfun.life.AbstractPopulationManager;
+import jgpfun.life.PopulationManager;
 import jgpfun.util.Settings;
 import java.io.File;
 import jgpfun.gui.MainFrame;
