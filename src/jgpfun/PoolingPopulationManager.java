@@ -1,14 +1,12 @@
 package jgpfun;
 
 import jgpfun.world2d.Organism2d;
-import jgpfun.jgp.OpCode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.TwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import jgpfun.util.EvoUtils;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
@@ -125,8 +123,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).getGenome().clone();
-            parent2 = EvoUtils.rouletteWheel(organismPool, totalFit, rnd).getGenome().clone();
+            parent1 = selector.select(organismPool).getGenome().clone();
+            parent2 = selector.select(organismPool).getGenome().clone();
 
             //mutate or crossover with a user defined chance
             mutador = rnd.nextDouble();
@@ -169,6 +167,12 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             }
         }
 
+        return totalFit;
+    }
+
+
+    @Override
+    public int getCurrentPopulationFitness() {
         return totalFit;
     }
 

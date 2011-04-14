@@ -6,7 +6,6 @@ import java.util.List;
 import jgpfun.crossover.CrossoverOperator;
 import jgpfun.crossover.OffsetTwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import jgpfun.util.EvoUtils;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
@@ -15,6 +14,8 @@ import org.jfree.data.xy.XYSeries;
  * @author hansinator
  */
 public class PopulationManager extends AbstractPopulationManager {
+
+    private int totalFit;
 
     public PopulationManager(World2d world, int popSize, int progSize) {
         super(world, popSize, progSize);
@@ -45,7 +46,7 @@ public class PopulationManager extends AbstractPopulationManager {
     public int newGeneration() {
         double mutador;
         Genome parent1, parent2;
-        int totalFit = calculateFitness();
+        totalFit = calculateFitness();
         List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
 
         //choose crossover operator
@@ -56,10 +57,8 @@ public class PopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            //parent1 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            //parent2 = EvoUtils.rouletteWheel(ants, totalFit, rnd).clone();
-            parent1 = EvoUtils.tournament(ants, 3, rnd).getGenome().clone();
-            parent2 = EvoUtils.tournament(ants, 3, rnd).getGenome().clone();
+            parent1 = selector.select(ants).getGenome().clone();
+            parent2 = selector.select(ants).getGenome().clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.nextDouble();
@@ -90,6 +89,12 @@ public class PopulationManager extends AbstractPopulationManager {
         for (Organism2d o : ants) {
             totalFit += o.getFitness();
         }
+        return totalFit;
+    }
+
+
+    @Override
+    public int getCurrentPopulationFitness() {
         return totalFit;
     }
 

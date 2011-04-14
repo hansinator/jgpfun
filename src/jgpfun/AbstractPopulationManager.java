@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import jgpfun.selection.SelectionStrategy;
+import jgpfun.selection.TournamentSelector;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
@@ -31,6 +33,8 @@ public abstract class AbstractPopulationManager {
     protected List<Organism2d> ants;
 
     protected final World2d world;
+
+    protected final SelectionStrategy selector = new TournamentSelector(3);
 
 
     public AbstractPopulationManager(World2d world, int popSize, int progSize) {
@@ -60,6 +64,9 @@ public abstract class AbstractPopulationManager {
 
 
     public abstract int newGeneration();
+
+
+    public abstract int getCurrentPopulationFitness();
 
 
     public List<Organism2d> getAnts() {

@@ -26,7 +26,7 @@ public class OrganismDebug extends Organism2d {
     //NOTE: this only works with precisionbodys!
     //old experimentally optimized live method from pc version
     @Override
-    public void live() throws Exception {
+    public void live() {
         int left, right, scale = 65535;//(int)((Integer.MAX_VALUE / (2.0*Math.PI)));
         double foodDist = 0.0, oldx = 0.0, oldy = 0.0;
 
