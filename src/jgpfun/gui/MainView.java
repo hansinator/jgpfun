@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
 import jgpfun.BaseOrganism;
-import jgpfun.Food;
+import jgpfun.world2d.Food;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
 

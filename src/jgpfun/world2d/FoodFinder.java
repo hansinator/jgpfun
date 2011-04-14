@@ -1,7 +1,6 @@
 package jgpfun.world2d;
 
 import java.util.List;
-import jgpfun.Food;
 
 public class FoodFinder {
 

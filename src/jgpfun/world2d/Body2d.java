@@ -1,7 +1,5 @@
 package jgpfun.world2d;
 
-import jgpfun.Food;
-
 public class Body2d {
 
     public final WallSense wallSense;
