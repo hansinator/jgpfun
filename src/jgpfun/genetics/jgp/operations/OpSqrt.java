@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.jgp.operations;
+package jgpfun.genetics.jgp.operations;
 
 /**
  *
  * @author dahmen
  */
-public class OpNeg implements Operation, UnaryOperation {
+public class OpSqrt implements Operation, UnaryOperation {
 
     @Override
     public int execute(int src1, int src2) {
-        return -src1;
+        return (int)Math.sqrt(src1);
     }
 
 }

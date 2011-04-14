@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.jgp.operations;
+package jgpfun.genetics.jgp.operations;
 
 /**
  *
- * @author Administrator
+ * @author dahmen
  */
-public class JumpOp implements Operation {
+public class OpAbs implements Operation, UnaryOperation {
 
     @Override
     public int execute(int src1, int src2) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Math.abs(src1);
     }
 
 }

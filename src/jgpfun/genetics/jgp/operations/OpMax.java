@@ -3,17 +3,17 @@
  * and open the template in the editor.
  */
 
-package jgpfun.jgp.operations;
+package jgpfun.genetics.jgp.operations;
 
 /**
  *
- * @author Administrator
+ * @author dahmen
  */
-public class OpReadReg implements Operation {
+public class OpMax implements Operation {
 
     @Override
     public int execute(int src1, int src2) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Math.max(src1, src2);
     }
 
 }

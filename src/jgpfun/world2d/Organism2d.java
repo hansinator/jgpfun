@@ -1,7 +1,7 @@
 package jgpfun.world2d;
 
-import jgpfun.jgp.OpCode;
-import jgpfun.jgp.EvoVM;
+import jgpfun.genetics.jgp.OpCode;
+import jgpfun.genetics.jgp.EvoVM;
 import jgpfun.BaseOrganism;
 import jgpfun.Genome;
 import jgpfun.util.Settings;

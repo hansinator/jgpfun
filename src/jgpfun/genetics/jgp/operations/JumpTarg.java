@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package jgpfun.jgp.operations;
+package jgpfun.genetics.jgp.operations;
 
 /**
  *
  * @author Administrator
  */
-public class OpWriteReg implements Operation {
+public class JumpTarg implements Operation {
 
     @Override
     public int execute(int src1, int src2) {

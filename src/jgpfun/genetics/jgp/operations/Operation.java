@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jgpfun.jgp.operations;
+package jgpfun.genetics.jgp.operations;
 
 import java.io.Serializable;
 
