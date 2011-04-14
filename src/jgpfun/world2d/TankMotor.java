@@ -1,6 +1,6 @@
 package jgpfun.world2d;
 
-import jgpfun.Settings;
+import jgpfun.util.Settings;
 
 public class TankMotor implements Motor2d {
 

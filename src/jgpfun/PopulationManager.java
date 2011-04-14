@@ -24,17 +24,17 @@ public class PopulationManager extends AbstractPopulationManager {
     public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation, XYSeries progSizeChartData, XYSeries realProgSizeChartData) {
         int avgProgSize = 0, avgRealProgSize = 0;
 
-        for (Organism2d o : ants) {
+        for (BaseOrganism o : organisms) {
             avgProgSize += o.getGenome().size();
         }
-        avgProgSize /= ants.size();
+        avgProgSize /= organisms.size();
 
-        for (Organism2d o : ants) {
-            avgRealProgSize += o.vm.getProgramSize();
+        for (BaseOrganism o : organisms) {
+            avgRealProgSize += ((Organism2d)o).vm.getProgramSize();
         }
-        avgRealProgSize /= ants.size();
+        avgRealProgSize /= organisms.size();
 
-        statisticsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
+        statisticsHistory.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
         progSizeChartData.add(generation, avgProgSize);
         realProgSizeChartData.add(generation, avgRealProgSize);
     }
@@ -45,15 +45,15 @@ public class PopulationManager extends AbstractPopulationManager {
         double mutador;
         Genome parent1, parent2;
         totalFit = calculateFitness();
-        List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
+        List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
 
         //create new genomes via cloning and mutation or crossover
-        for (int i = 0; i < (ants.size() / 2); i++) {
+        for (int i = 0; i < (organisms.size() / 2); i++) {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = selector.select(ants).getGenome().clone();
-            parent2 = selector.select(ants).getGenome().clone();
+            parent1 = selector.select(organisms).getGenome().clone();
+            parent2 = selector.select(organisms).getGenome().clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.nextDouble();
@@ -72,7 +72,7 @@ public class PopulationManager extends AbstractPopulationManager {
         }
 
         //replace and leave the other to GC
-        ants = newAnts;
+        organisms = newAnts;
 
         return totalFit;
     }
@@ -81,7 +81,7 @@ public class PopulationManager extends AbstractPopulationManager {
     //the team effort
     private int calculateFitness() {
         int totalFit = 0;
-        for (Organism2d o : ants) {
+        for (BaseOrganism o : organisms) {
             totalFit += o.getFitness();
         }
         return totalFit;

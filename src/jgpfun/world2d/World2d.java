@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import jgpfun.Food;
-import jgpfun.Settings;
+import jgpfun.util.Settings;
 
 /**
  *

@@ -4,8 +4,8 @@ import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import jgpfun.crossover.CrossoverOperator;
-import jgpfun.crossover.TwoPointCrossover;
+import jgpfun.genetics.crossover.CrossoverOperator;
+import jgpfun.genetics.crossover.TwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
@@ -18,7 +18,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public static final int maxPoolSize = 26;
 
-    private List<Organism2d> organismPool;
+    private List<BaseOrganism> organismPool;
 
     private int bestInPool;
 
@@ -29,7 +29,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
     public PoolingPopulationManager(World2d world, int popSize, int progSize) {
         super(world, popSize, progSize);
-        organismPool = new ArrayList<Organism2d>(maxPoolSize);
+        organismPool = new ArrayList<BaseOrganism>(maxPoolSize);
     }
 
 
@@ -38,13 +38,13 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         int avgProgSize = 0, avgRealProgSize = 0;
 
         // pool statistics
-        for (Organism2d o : organismPool) {
+        for (BaseOrganism o : organismPool) {
             avgProgSize += o.getGenome().program.size();
         }
         avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
-        for (Organism2d o : organismPool) {
-            avgRealProgSize += o.vm.getProgramSize();
+        for (BaseOrganism o : organismPool) {
+            avgRealProgSize += ((Organism2d)o).vm.getProgramSize();
         }
         avgRealProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
@@ -57,18 +57,18 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         
         // generation statistics
         avgProgSize = 0;
-        for (Organism2d o : ants) {
+        for (BaseOrganism o : organisms) {
             avgProgSize += o.getGenome().program.size();
         }
-        avgProgSize /= ants.size();
+        avgProgSize /= organisms.size();
 
         avgRealProgSize = 0;
-        for (Organism2d o : ants) {
-            avgRealProgSize += o.vm.getProgramSize();
+        for (BaseOrganism o : organisms) {
+            avgRealProgSize += ((Organism2d)o).vm.getProgramSize();
         }
-        avgRealProgSize /= ants.size();
+        avgRealProgSize /= organisms.size();
 
-        statisticsHistory.appendEntry(generation, totalFood, totalFood / ants.size(), avgProgSize, avgRealProgSize);
+        statisticsHistory.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
         progSizeChartData.add(generation, avgProgSize);
         realProgSizeChartData.add(generation, avgRealProgSize);
     }
@@ -104,19 +104,19 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     public int newGeneration() {
         double mutador;
         Genome parent1, parent2;
-        List<Organism2d> newAnts = new ArrayList<Organism2d>(ants.size());
+        List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
 
         //enqueue all current organisms into our pool
-        organismPool.addAll(ants);
+        organismPool.addAll(organisms);
 
         //get the fitness
         //call order is important, because of:
         //TODO: global variable bestInPool...
-        foodCollected = calculateFitness(ants);
+        foodCollected = calculateFitness(organisms);
         totalFit = calculateFitness(organismPool);
 
         //create new genomes via cloning and mutation or crossover
-        for (int i = 0; i < (ants.size() / 2); i++) {   
+        for (int i = 0; i < (organisms.size() / 2); i++) {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
@@ -141,7 +141,7 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
         }
 
         //replace and leave the other to GC
-        ants = newAnts;
+        organisms = newAnts;
 
         //update the pool
         updatePool();
@@ -151,11 +151,11 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
 
 
     //the team effort
-    private int calculateFitness(List<Organism2d> organisms) {
+    private int calculateFitness(List<BaseOrganism> organisms) {
         int totalFit = 0;
         bestInPool = 0;
 
-        for (Organism2d o : organisms) {
+        for (BaseOrganism o : organisms) {
             totalFit += o.getFitness();
 
             //remember the best

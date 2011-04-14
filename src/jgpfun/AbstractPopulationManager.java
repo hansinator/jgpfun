@@ -1,15 +1,16 @@
 package jgpfun;
 
+import jgpfun.util.Settings;
 import jgpfun.world2d.Organism2d;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import jgpfun.crossover.CrossoverOperator;
-import jgpfun.crossover.OffsetTwoPointCrossover;
+import jgpfun.genetics.crossover.CrossoverOperator;
+import jgpfun.genetics.crossover.OffsetTwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import jgpfun.selection.SelectionStrategy;
-import jgpfun.selection.TournamentSelector;
+import jgpfun.genetics.selection.SelectionStrategy;
+import jgpfun.genetics.selection.TournamentSelector;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
@@ -32,7 +33,7 @@ public abstract class AbstractPopulationManager {
 
     protected final int popSize;
 
-    protected List<Organism2d> ants;
+    protected List<BaseOrganism> organisms;
 
     protected final World2d world;
 
@@ -47,20 +48,20 @@ public abstract class AbstractPopulationManager {
         this.popSize = popSize;
         
         crossover = new OffsetTwoPointCrossover(progSize / 8);
-        ants = new ArrayList<Organism2d>(popSize);
+        organisms = new ArrayList<BaseOrganism>(popSize);
         rnd = new SecureRandom();
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(Genome.randomGenome(progSize).synthesize(world));
+            organisms.add(Genome.randomGenome(progSize).synthesize(world));
         }
     }
 
 
     public void reset() {
-        ants.clear();
+        organisms.clear();
         
         for (int i = 0; i < popSize; i++) {
-            ants.add(new Organism2d(Genome.randomGenome(progSize), world));
+            organisms.add(new Organism2d(Genome.randomGenome(progSize), world));
         }
     }
 
@@ -74,8 +75,8 @@ public abstract class AbstractPopulationManager {
     public abstract int getCurrentPopulationFitness();
 
 
-    public List<Organism2d> getAnts() {
-        return ants;
+    public List<BaseOrganism> getOrganisms() {
+        return organisms;
     }
 
 }

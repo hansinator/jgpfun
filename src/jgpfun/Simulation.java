@@ -1,5 +1,6 @@
 package jgpfun;
 
+import java.util.List;
 import jgpfun.world2d.Organism2d;
 import jgpfun.gui.MainView;
 import java.util.concurrent.CountDownLatch;
@@ -89,7 +90,7 @@ public class Simulation {
                 if (slowMode || (i % roundsMod) == 0) {
                     time = System.currentTimeMillis() - start;
                     infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen + 1);
-                    view.drawStuff(world.food, populationManager.ants, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                    view.drawStuff(world.food, populationManager.organisms, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                     view.repaint();
 
                     if (slowMode) {
@@ -121,9 +122,9 @@ public class Simulation {
 
 
     private void step() {
-        final CountDownLatch cb = new CountDownLatch(populationManager.ants.size());
+        final CountDownLatch cb = new CountDownLatch(populationManager.organisms.size());
 
-        for (final Organism2d organism : populationManager.ants) {
+        for (final BaseOrganism organism : populationManager.organisms) {
             Runnable r = new Runnable() {
 
                 @Override
@@ -163,7 +164,7 @@ public class Simulation {
                     }*/
 
                     //move organism in world to see if it had hit some food or something like that
-                    world.moveOrganismInWorld(organism, lock);
+                    world.moveOrganismInWorld((Organism2d)organism, lock);
 
                     //start = System.nanoTime();
                     cb.countDown();

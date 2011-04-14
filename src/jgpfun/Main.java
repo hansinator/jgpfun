@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.util.Settings;
 import java.io.File;
 import jgpfun.gui.MainFrame;
 import jgpfun.world2d.World2d;

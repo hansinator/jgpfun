@@ -13,6 +13,7 @@ package jgpfun.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
+import jgpfun.BaseOrganism;
 import jgpfun.Food;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
@@ -25,7 +26,7 @@ public class MainView extends javax.swing.JPanel {
 
     List<Food> curFood;
 
-    List<Organism2d> curOrganisms;
+    List<BaseOrganism> curOrganisms;
 
     private int rps;
 
@@ -94,7 +95,7 @@ public class MainView extends javax.swing.JPanel {
     }
 
 
-    public void drawStuff(List<Food> food, List<Organism2d> organisms, int rps, int progress) {
+    public void drawStuff(List<Food> food, List<BaseOrganism> organisms, int rps, int progress) {
         this.curFood = food;
         this.curOrganisms = organisms;
         this.rps = rps;
@@ -111,11 +112,11 @@ public class MainView extends javax.swing.JPanel {
     }
 
 
-    private void drawOrganisms(List<Organism2d> organisms, Graphics g) {
+    private void drawOrganisms(List<BaseOrganism> organisms, Graphics g) {
         g.setColor(Color.red);
 
-        for (Organism2d o : organisms) {
-            for (Body2d b : o.bodies) {
+        for (BaseOrganism o : organisms) {
+            for (Body2d b : ((Organism2d)o).bodies) {
                 double sindir = Math.sin(b.dir);
                 double cosdir = Math.cos(b.dir);
                 int xrot = (int) Math.round(8.0 * sindir);

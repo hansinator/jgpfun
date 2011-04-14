@@ -4,7 +4,7 @@ import jgpfun.jgp.OpCode;
 import jgpfun.jgp.EvoVM;
 import jgpfun.BaseOrganism;
 import jgpfun.Genome;
-import jgpfun.Settings;
+import jgpfun.util.Settings;
 
 /*
  * TODO: Create a loopback sense that represents the differential (ableitung)
@@ -21,8 +21,6 @@ public class Organism2d extends BaseOrganism {
 
     static final int registerCount = Settings.getInt("registerCount");
 
-    protected final Genome genome;
-
     public final EvoVM vm;
 
     public final Body2d[] bodies;
@@ -31,7 +29,7 @@ public class Organism2d extends BaseOrganism {
 
 
     public Organism2d(Genome genome, World2d world) {
-        this.genome = genome;
+        super(genome);
         this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
@@ -80,11 +78,6 @@ public class Organism2d extends BaseOrganism {
             //pickup wallsense before coordinates are clipped
             b.wallSense.sense();
         }
-    }
-    
-
-    public Genome getGenome() {
-        return genome;
     }
 
 
