@@ -3,8 +3,6 @@ package jgpfun;
 import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
 import java.util.List;
-import jgpfun.crossover.CrossoverOperator;
-import jgpfun.crossover.OffsetTwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;

@@ -51,7 +51,7 @@ public abstract class AbstractPopulationManager {
         rnd = new SecureRandom();
 
         for (int i = 0; i < popSize; i++) {
-            ants.add(new Organism2d(Genome.randomGenome(progSize), world));
+            ants.add(Genome.randomGenome(progSize).synthesize(world));
         }
     }
 
