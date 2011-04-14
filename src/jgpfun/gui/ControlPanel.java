@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
-import jgpfun.Simulation;
+import jgpfun.life.Simulation;
 
 /**
  *

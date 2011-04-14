@@ -1,4 +1,4 @@
-package jgpfun;
+package jgpfun.life;
 
 import jgpfun.life.PoolingPopulationManager;
 import jgpfun.life.AbstractPopulationManager;

@@ -3,7 +3,7 @@ package jgpfun.gui;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import jgpfun.Simulation;
+import jgpfun.life.Simulation;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;

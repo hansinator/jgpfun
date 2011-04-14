@@ -1,5 +1,6 @@
 package jgpfun;
 
+import jgpfun.life.Simulation;
 import jgpfun.life.AbstractPopulationManager;
 import jgpfun.life.PopulationManager;
 import jgpfun.util.Settings;
