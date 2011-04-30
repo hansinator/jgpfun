@@ -1,5 +1,6 @@
 package jgpfun.world2d;
 
+import java.awt.Point;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,11 +26,14 @@ public class World2d {
 
     private final int foodCount;
 
+    private final List<World2dObject> objects;
+
 
     public World2d(int worldWidth, int worldHeight, int foodCount) {
         rnd = new SecureRandom();
 
         food = new ArrayList<Food>(foodCount);
+        objects = new ArrayList<World2dObject>();
         foodFinder = new FoodFinder(Collections.unmodifiableList(food));
         randomFood();
 
@@ -69,7 +73,7 @@ public class World2d {
     }
 
 
-    public void randomFood() {
+    public final void randomFood() {
         //FIXME: this seems to interfere with drawing, at least i'm getting an occasional concurrent list modification from within the food painting method
         //TEMP FIX - this might be faster than creating tons of food object every round
         if (food.size() != foodCount) {
@@ -84,14 +88,17 @@ public class World2d {
             }
         }
     }
+    
 
+    public static abstract class World2dObject extends Point {
 
-    private boolean checkBarrier(int inx, int iny, int x1, int y1, int x2,
-            int y2) {
-        if (((inx >= x1) && (inx <= x2)) && ((iny >= y1) && (iny <= y2))) {
-            return false;
+        final World2d world;
+
+        public World2dObject(World2d world, int x, int y) {
+            super(x, y);
+
+            this.world = world;
         }
-        return true;
-    }
 
+    }
 }
