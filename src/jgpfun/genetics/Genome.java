@@ -7,7 +7,6 @@ import java.util.Random;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.genetics.lgp.operations.UnaryOperation;
 import jgpfun.world2d.Organism2d;
-import jgpfun.world2d.World2d;
 
 /**
  *

@@ -78,6 +78,10 @@ public class Simulation {
         long start = System.currentTimeMillis();
         long time;
 
+        // scatter organisms in the world
+        for(BaseOrganism organism : populationManager.organisms)
+            ((Organism2d)organism).addToWorld(world);
+
         synchronized (runLock) {
             for (int i = 0; i < iterations; i++) {
                 if (abort) {
