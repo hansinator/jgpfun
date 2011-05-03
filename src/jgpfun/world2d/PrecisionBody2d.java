@@ -12,8 +12,8 @@ public class PrecisionBody2d extends Body2d {
     //caching
     public double cosdir;
 
-    public PrecisionBody2d(int x, int y, double dir, FoodFinder foodFinder, WallSense wallSense) {
-        super(x, y, dir, foodFinder, wallSense);
+    public PrecisionBody2d(int x, int y, double dir) {
+        super(x, y, dir);
 
         dx = x;
         dy = y;

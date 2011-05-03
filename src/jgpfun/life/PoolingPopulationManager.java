@@ -28,8 +28,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     private int totalFit;
 
 
-    public PoolingPopulationManager(World2d world, int popSize, int progSize) {
-        super(world, popSize, progSize);
+    public PoolingPopulationManager(int popSize, int progSize) {
+        super(popSize, progSize);
         organismPool = new ArrayList<BaseOrganism>(maxPoolSize);
     }
 
@@ -137,8 +137,8 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants from the modified genomes and save them
-            newAnts.add(parent1.synthesize(world));
-            newAnts.add(parent2.synthesize(world));
+            newAnts.add(parent1.synthesize());
+            newAnts.add(parent2.synthesize());
         }
 
         //replace and leave the other to GC

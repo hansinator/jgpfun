@@ -28,14 +28,25 @@ public class Organism2d extends BaseOrganism {
     private int food;
 
 
-    public Organism2d(Genome genome, World2d world) {
+    public Organism2d(Genome genome) {
         super(genome);
         this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(rnd.nextInt(world.worldWidth), rnd.nextInt(world.worldHeight), rnd.nextDouble() * 2 * Math.PI, world.foodFinder, new WallSense(world.worldWidth, world.worldHeight));
+            bodies[i] = new Body2d(0.0, 0.0, rnd.nextDouble() * 2 * Math.PI);
+        }
+    }
+
+
+    public void addToWorld(World2d world) {
+        for (int i = 0; i < bodies.length; i++) {
+            bodies[i].x = rnd.nextInt(world.worldWidth);
+            bodies[i].y = rnd.nextInt(world.worldHeight);
+            bodies[i].foodFinder = world.foodFinder;
+            bodies[i].wallSense = new WallSense(0, 0);
+            bodies[i].wallSense.setBody(bodies[i]);
         }
     }
 

@@ -22,7 +22,7 @@ public class Main {
 
         int worldWith = Settings.getInt("worldWidth"), worldHeight = Settings.getInt("worldHeight");
         World2d world = new World2d(worldWith, worldHeight, Settings.getInt("foodCount"));
-        AbstractPopulationManager popMan = new PopulationManager(world, Settings.getInt("popSize"), Settings.getInt("progSize"));
+        AbstractPopulationManager popMan = new PopulationManager(Settings.getInt("popSize"), Settings.getInt("progSize"));
         Simulation sim = new Simulation(world, popMan);
         new MainFrame(worldWith, worldHeight, sim).startSimulation();
     }

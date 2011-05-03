@@ -19,7 +19,8 @@ public class OrganismDebug extends Organism2d {
 
     
     public OrganismDebug(Genome genome, World2d world) {
-        super(genome, world);
+        super(genome);
+        addToWorld(world);
     }
 
 

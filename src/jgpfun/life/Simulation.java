@@ -106,6 +106,10 @@ public class Simulation {
 
             int foodCollected = populationManager.newGeneration();
 
+            // scatter organisms in the world
+            for(BaseOrganism organism : populationManager.organisms)
+                ((Organism2d)organism).addToWorld(world);
+
             // simulation statistics
             System.out.println("");
             System.out.println("GEN: " + gen);

@@ -16,8 +16,8 @@ public class PopulationManager extends AbstractPopulationManager {
 
     private int totalFit;
 
-    public PopulationManager(World2d world, int popSize, int progSize) {
-        super(world, popSize, progSize);
+    public PopulationManager(int popSize, int progSize) {
+        super(popSize, progSize);
     }
 
 
@@ -68,8 +68,8 @@ public class PopulationManager extends AbstractPopulationManager {
             }*/
 
             //create new ants from the modified genomes and save them
-            newAnts.add(parent1.synthesize(world));
-            newAnts.add(parent2.synthesize(world));
+            newAnts.add(parent1.synthesize());
+            newAnts.add(parent2.synthesize());
         }
 
         //replace and leave the other to GC

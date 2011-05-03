@@ -192,7 +192,7 @@ public class Genome {
     }
 
 
-    public Organism2d synthesize(World2d world) {
-        return new Organism2d(this, world);
+    public Organism2d synthesize() {
+        return new Organism2d(this);
     }
 }

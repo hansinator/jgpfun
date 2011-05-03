@@ -2,7 +2,6 @@ package jgpfun.life;
 
 import jgpfun.genetics.Genome;
 import jgpfun.util.Settings;
-import jgpfun.world2d.Organism2d;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import jgpfun.genetics.crossover.OffsetTwoPointCrossover;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.genetics.selection.SelectionStrategy;
 import jgpfun.genetics.selection.TournamentSelector;
-import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
 /**
@@ -36,15 +34,12 @@ public abstract class AbstractPopulationManager {
 
     protected List<BaseOrganism> organisms;
 
-    protected final World2d world;
-
     protected final SelectionStrategy selector = new TournamentSelector(3);
 
     protected final CrossoverOperator crossover;
 
 
-    public AbstractPopulationManager(World2d world, int popSize, int progSize) {
-        this.world = world;
+    public AbstractPopulationManager( int popSize, int progSize) {
         this.progSize = progSize;
         this.popSize = popSize;
         
@@ -52,17 +47,14 @@ public abstract class AbstractPopulationManager {
         organisms = new ArrayList<BaseOrganism>(popSize);
         rnd = new SecureRandom();
 
-        for (int i = 0; i < popSize; i++) {
-            organisms.add(Genome.randomGenome(progSize).synthesize(world));
-        }
+        reset();
     }
 
 
     public void reset() {
         organisms.clear();
-        
         for (int i = 0; i < popSize; i++) {
-            organisms.add(new Organism2d(Genome.randomGenome(progSize), world));
+            organisms.add(Genome.randomGenome(progSize).synthesize());
         }
     }
 

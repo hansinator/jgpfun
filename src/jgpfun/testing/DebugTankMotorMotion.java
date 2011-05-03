@@ -64,7 +64,8 @@ public class DebugTankMotorMotion {
 
 
     public DebugTankMotorMotion(int width, int height) {
-        body = new Body2d(5.0, 5.0, 0.0, null, new WallSense(width, height));
+        body = new Body2d(5.0, 5.0, 0.0);
+        body.wallSense = new WallSense(width, height);
     }
 
 
