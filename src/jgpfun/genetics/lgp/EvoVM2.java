@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jgpfun.genetics.lgp.operations.OpAbs;
 import jgpfun.genetics.lgp.operations.OpAdd;
 import jgpfun.genetics.lgp.operations.OpDiv;
@@ -21,6 +23,7 @@ import jgpfun.genetics.lgp.operations.UnaryOperation;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -69,12 +72,22 @@ public abstract class EvoVM2 {
     public int[] regs;
 
 
-    public static EvoVM2 compile(int numRegs, OpCode[] program) throws IOException {
+    public static EvoVM2 compile(final int numRegs, OpCode[] program) throws IOException {
         ClassReader cr = new ClassReader(EvoVM2.class.getCanonicalName());
         ClassWriter cw = new ClassWriter(cr, 0);
         final OpCode[] prg = stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs);
 
         cr.accept(new ClassAdapter(cw) {
+
+
+            @Override
+            public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+                if(name.equals("regs")) {
+                    super.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL, "regs", "[Ljava/lang/Integer]", null, "new int[" + numRegs + "]");
+                }
+
+                return super.visitField(access, name, desc, signature, value);
+            }
 
             @Override
             public MethodVisitor visitMethod(int i, String name, String desc, String signature, String[] exceptions) {
@@ -84,12 +97,12 @@ public abstract class EvoVM2 {
                     //compile source to bytecode here
                     for (OpCode op : prg) {
                         //get operand
-                        mg.getStatic(Type.getType(EvoVM2.class), "ops", Type.getType("[Ljgpfun.genetics.lgp.operations.Operation];"));
+                        mg.getStatic(Type.getType(EvoVM2.class), "ops", Type.getType("[Ljgpfun/genetics/lgp/operations/Operation];"));
                         mg.push(op.op);
                         mg.arrayLoad(Type.getType(Operation.class));
 
                         // get src 1 value
-                        mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava.lang.Integer];"));
+                        mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava/lang/Integer];"));
                         mg.push(op.src1);
                         mg.arrayLoad(Type.INT_TYPE);
 
@@ -97,7 +110,7 @@ public abstract class EvoVM2 {
                         if(op.immediate)
                             mg.push(op.src2);
                         else {
-                            mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava.lang.Integer];"));
+                            mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava/lang/Integer];"));
                             mg.push(op.src2);
                             mg.arrayLoad(Type.INT_TYPE);
                         }
@@ -105,7 +118,7 @@ public abstract class EvoVM2 {
                         mg.invokeVirtual(Type.getType(Operation.class), Method.getMethod("int execute(int,int)"));
 
                         //store trg
-                        mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava.lang.Integer];"));
+                        mg.getField(Type.getType(EvoVM2.class), "regs", Type.getType("[Ljava/lang/Integer];"));
                         mg.push(op.trg);
                         mg.arrayStore(Type.INT_TYPE);
                     }
@@ -119,10 +132,41 @@ public abstract class EvoVM2 {
             }
 
         }, 0);
-
-        //regs = new int[numRegs];
+        try {
+            return (EvoVM2) loadClass(cw.toByteArray()).newInstance();
+        } catch (InstantiationException ex) {
+            Logger.getLogger(EvoVM2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(EvoVM2.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return null;
     }
+
+    private static int ii = 0;
+
+     private static Class loadClass (byte[] b) {
+    //override classDefine (as it is protected) and define the class.
+    Class clazz = null;
+    try {
+      ClassLoader loader = ClassLoader.getSystemClassLoader();
+      Class cls = Class.forName("java.lang.ClassLoader");
+      java.lang.reflect.Method method =
+        cls.getDeclaredMethod("defineClass", new Class[] { String.class, byte[].class, int.class, int.class });
+
+      // protected method invocaton
+      method.setAccessible(true);
+      try {
+        Object[] args = new Object[] { "jgpfun.genetics.lgp.EvoVM2", b, new Integer(0), new Integer(b.length)};
+        clazz = (Class) method.invoke(loader, args);
+      } finally {
+        method.setAccessible(false);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    return clazz;
+  }
 
 
     protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs) {
