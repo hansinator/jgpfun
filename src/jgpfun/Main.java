@@ -26,11 +26,11 @@ public class Main {
     public static void main(String[] args) {
         Settings.load(new File("default.properties"));
         
-        try {
+       /* try {
             EvoVM2.compile(32, Genome.randomGenome(256).program.toArray(new OpCode[0]));
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
         int worldWith = Settings.getInt("worldWidth"), worldHeight = Settings.getInt("worldHeight");
         World2d world = new World2d(worldWith, worldHeight, Settings.getInt("foodCount"));

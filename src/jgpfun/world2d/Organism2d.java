@@ -1,9 +1,10 @@
 package jgpfun.world2d;
 
+import java.io.IOException;
 import jgpfun.genetics.lgp.OpCode;
-import jgpfun.genetics.lgp.EvoVM;
 import jgpfun.life.BaseOrganism;
 import jgpfun.genetics.Genome;
+import jgpfun.genetics.lgp.EvoVM2;
 import jgpfun.util.Settings;
 
 /*
@@ -21,16 +22,17 @@ public class Organism2d extends BaseOrganism {
 
     static final int registerCount = Settings.getInt("registerCount");
 
-    public final EvoVM vm;
+    public final EvoVM2 vm;
 
     public final Body2d[] bodies;
 
     private int food;
 
 
-    public Organism2d(Genome genome) {
+    public Organism2d(Genome genome) throws IOException {
         super(genome);
-        this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
+        //this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
+        this.vm = EvoVM2.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];
