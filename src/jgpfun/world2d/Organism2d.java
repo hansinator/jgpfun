@@ -4,8 +4,8 @@ import java.io.IOException;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.life.BaseOrganism;
 import jgpfun.genetics.Genome;
-import jgpfun.genetics.lgp.EvoCompiler;
 import jgpfun.genetics.lgp.BaseMachine;
+import jgpfun.genetics.lgp.EvoVM;
 import jgpfun.util.Settings;
 
 /*
@@ -32,8 +32,8 @@ public class Organism2d extends BaseOrganism {
 
     public Organism2d(Genome genome) throws IOException {
         super(genome);
-        //this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
-        this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
+        this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
+        //this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
         bodies = new Body2d[1];

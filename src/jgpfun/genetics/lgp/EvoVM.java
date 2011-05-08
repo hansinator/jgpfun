@@ -19,6 +19,7 @@ public class EvoVM extends BaseMachine {
     }
 
 
+    @Override
     public void run() {
         pc = 0;
         while (pc < program.length) {
