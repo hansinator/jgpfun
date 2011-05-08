@@ -9,7 +9,7 @@ import jgpfun.life.PopulationManager;
 import jgpfun.util.Settings;
 import java.io.File;
 import jgpfun.genetics.Genome;
-import jgpfun.genetics.lgp.EvoVM2;
+import jgpfun.genetics.lgp.BaseMachine;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.gui.MainFrame;
 import jgpfun.world2d.World2d;

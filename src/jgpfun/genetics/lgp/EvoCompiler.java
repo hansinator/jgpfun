@@ -19,11 +19,11 @@ import org.objectweb.asm.commons.Method;
  */
 public class EvoCompiler {
 
-    static final String CLASS_NAME = "jgpfun.genetics.lgp.EvoVM2-";
+    static final String CLASS_NAME = CompiledVM.class.getName() + "-";
 
     static final String INTERNAL_NAME = CLASS_NAME.replace('.', '/');
 
-    static final String SUPER_INTERNAL_NAME = "jgpfun.genetics.lgp.EvoVM2".replace('.', '/');
+    static final String SUPER_INTERNAL_NAME = CompiledVM.class.getName().replace('.', '/');
 
     static final Type OP_TYPE = Type.getType(Operation.class);
 
@@ -36,12 +36,15 @@ public class EvoCompiler {
     private static int ii = 0;
 
 
-    public static EvoVM2 compile(final int numRegs, OpCode[] program) throws IOException {
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
-        final OpCode[] prg = EvoVM2.stripStructuralIntronCode(EvoVM2.normalizeProgram(program, numRegs), numRegs);
+    public static BaseMachine compile(final int numRegs, OpCode[] program) throws IOException {
+        final OpCode[] prg = EvoCodeUtils.stripStructuralIntronCode(BaseMachine.normalizeProgram(program, numRegs), numRegs);
 
+        //begin class
+        final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");
+        final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
         cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, INTERNAL_NAME + ii, null, SUPER_INTERNAL_NAME, null);
 
+        //write constructor
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         Method m = Method.getMethod("void <init> ()");
         GeneratorAdapter mg = new GeneratorAdapter(Opcodes.ACC_PUBLIC, m, mv);
@@ -49,25 +52,29 @@ public class EvoCompiler {
         mg.invokeConstructor(Type.getType(Object.class), m);
         mg.loadThis();
         mg.push(numRegs);
-        mg.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
-        mg.visitFieldInsn(Opcodes.PUTFIELD, "L" + INTERNAL_NAME + ii + ";", "regs", "[I");
+        mg.newArray(Type.INT_TYPE);
+        mg.putField(owner, "regs", INT_ARRAY_TYPE);
+        mg.loadThis();
+        mg.push(prg.length);
+        mg.putField(owner, "programSize", Type.INT_TYPE);
         mg.returnValue();
         mg.endMethod();
         mv.visitEnd();
 
+        //write run method
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "run", "()V", null, null);
         mg = new GeneratorAdapter(Opcodes.ACC_PUBLIC, Method.getMethod("void run ()"), mv);
-        final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");
 
         //prepare local variables
         final int regs = mg.newLocal(INT_ARRAY_TYPE);
         final int ops = mg.newLocal(OP_ARRAY_TYPE);
+        final int[] lregs = new int[numRegs];
+        final int[] lops = new int[BaseMachine.ops.length];
         mg.loadThis();
         mg.getField(owner, "regs", INT_ARRAY_TYPE);
         mg.getStatic(owner, "ops", OP_ARRAY_TYPE);
         mg.storeLocal(ops);
         mg.storeLocal(regs);
-        final int[] lregs = new int[numRegs];
         for (int i = 0; i < numRegs; i++) {
             lregs[i] = mg.newLocal(Type.INT_TYPE);
             mg.loadLocal(regs);
@@ -75,9 +82,7 @@ public class EvoCompiler {
             mg.arrayLoad(Type.INT_TYPE);
             mg.storeLocal(lregs[i]);
         }
-
-        final int[] lops = new int[EvoVM2.ops.length];
-        for (int i = 0; i < EvoVM2.ops.length; i++) {
+        for (int i = 0; i < BaseMachine.ops.length; i++) {
             lops[i] = mg.newLocal(OP_TYPE);
             mg.loadLocal(ops);
             mg.push(i);
@@ -107,6 +112,7 @@ public class EvoCompiler {
             mg.storeLocal(lregs[op.trg]);
         }
 
+        //store results to register file
         for (int i = 0; i < numRegs; i++) {
             mg.loadLocal(regs);
             mg.push(i);
@@ -115,18 +121,19 @@ public class EvoCompiler {
 
         }
 
+        //end run method
         mg.returnValue();
         mg.endMethod();
 
+        //end class
         cw.visitEnd();
 
-        //new ClassReader(cw.toByteArray()).accept(new ASMifierClassVisitor(new PrintWriter(System.out)), numRegs);
         try {
-            return (EvoVM2) loadClass(cw.toByteArray(), CLASS_NAME + (ii++)).newInstance();
+            return (BaseMachine) loadClass(cw.toByteArray(), CLASS_NAME + (ii++)).newInstance();
         } catch (InstantiationException ex) {
-            Logger.getLogger(EvoVM2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BaseMachine.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(EvoVM2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BaseMachine.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -156,4 +163,20 @@ public class EvoCompiler {
         return clazz;
     }
 
+
+    private static class CompiledVM extends BaseMachine {
+
+        int programSize;
+
+        @Override
+        public void run() {
+        }
+
+
+        @Override
+        public int getProgramSize() {
+            return programSize;
+        }
+        
+    }
 }

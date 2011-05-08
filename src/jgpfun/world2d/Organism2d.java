@@ -5,7 +5,7 @@ import jgpfun.genetics.lgp.OpCode;
 import jgpfun.life.BaseOrganism;
 import jgpfun.genetics.Genome;
 import jgpfun.genetics.lgp.EvoCompiler;
-import jgpfun.genetics.lgp.EvoVM2;
+import jgpfun.genetics.lgp.BaseMachine;
 import jgpfun.util.Settings;
 
 /*
@@ -23,7 +23,7 @@ public class Organism2d extends BaseOrganism {
 
     static final int registerCount = Settings.getInt("registerCount");
 
-    public final EvoVM2 vm;
+    public final BaseMachine vm;
 
     public final Body2d[] bodies;
 

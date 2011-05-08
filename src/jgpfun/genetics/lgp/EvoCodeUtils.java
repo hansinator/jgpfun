@@ -1,90 +1,19 @@
+/*
+ */
+
 package jgpfun.genetics.lgp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import jgpfun.genetics.lgp.operations.OpAbs;
-import jgpfun.genetics.lgp.operations.OpAdd;
-import jgpfun.genetics.lgp.operations.OpDiv;
-import jgpfun.genetics.lgp.operations.OpMax;
-import jgpfun.genetics.lgp.operations.OpMin;
-import jgpfun.genetics.lgp.operations.OpMod;
-import jgpfun.genetics.lgp.operations.OpMov;
-import jgpfun.genetics.lgp.operations.OpMul;
-import jgpfun.genetics.lgp.operations.OpNeg;
-import jgpfun.genetics.lgp.operations.OpSqrt;
-import jgpfun.genetics.lgp.operations.OpSub;
-import jgpfun.genetics.lgp.operations.Operation;
 import jgpfun.genetics.lgp.operations.UnaryOperation;
 
 /**
  *
- * @author hansinator
+ * @author Hansinator
  */
-public class EvoVM2 {
-
-    static Operation[] ops;
-
-    int pc;
-
-
-    static {
-        //compatible instruction set
-        //ops = new Operation[]{new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod()};
-
-        //extended instruction set
-        ops = new Operation[]{
-                    new OpAdd(),
-                    new OpSub(),
-                    new OpMul(),
-                    new OpDiv(),
-                    new OpMod(),
-                    new OpSqrt(),
-                    new OpNeg(),
-                    new OpMin(),
-                    new OpMax(),
-                    new OpAbs(),
-                    //new OpSin(),
-                    new OpMov(), //new OpInc(),
-                //new OpDec(),
-                // OpBranchLt(),
-                //new OpBranchGt()
-                //new JumpOp(),
-                //new JumpTarg()
-                };
-    }
-
-    private OpCode[] program;
-
-    public int[] regs;
-
-
-    public static OpCode[] normalizeProgram(OpCode[] program, int numRegs) {
-        for (int i = 0; i < program.length; i++) {
-            OpCode curop = program[i];
-
-            curop.src1 = Math.abs(curop.src1) % numRegs;
-            if (!curop.immediate) {
-                curop.src2 = Math.abs(curop.src2) % numRegs;
-            } else {
-                curop.src2 /= 65535;
-            }
-            curop.trg = Math.abs(curop.trg) % numRegs;
-            curop.op = Math.abs(curop.op) % ops.length;
-            curop.operation = ops[curop.op];
-        }
-
-        return program;
-    }
-
-
-    public void run() {
-        
-    }
-    
-    //strip unused code portions
-
+class EvoCodeUtils {
     public static OpCode[] stripStructuralIntronCode(OpCode[] program, int registerCount) {
         Map<Integer, Object> effectiveRegisters = new HashMap<Integer, Object>();
         Boolean[] markers = new Boolean[program.length];
@@ -143,7 +72,7 @@ public class EvoVM2 {
 
             markers[i] = true;
             }
-            
+
             continue;
             }*/
 
@@ -168,7 +97,7 @@ public class EvoVM2 {
                 }
 
                 //add source operand 2, if it is no immediate or unary operation
-                if (!memVal.immediate && ops[memVal.op] instanceof UnaryOperation) {
+                if (!memVal.immediate && memVal.operation instanceof UnaryOperation) {
                     //add source operand 2
                     if (!effectiveRegisters.containsValue(memVal.src2)) {
                         effectiveRegisters.put(memVal.src2, new Object());
@@ -194,10 +123,4 @@ public class EvoVM2 {
 
         return strippedProgram.toArray(new OpCode[strippedProgram.size()]);
     }
-
-
-    public int getProgramSize() {
-        return 0;//program.length;
-    }
-
 }
