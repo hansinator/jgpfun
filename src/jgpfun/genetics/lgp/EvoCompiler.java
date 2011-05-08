@@ -6,11 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jgpfun.genetics.lgp.operations.Operation;
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -23,11 +19,19 @@ import org.objectweb.asm.commons.Method;
  */
 public class EvoCompiler {
 
-    final static String cname = "jgpfun.genetics.lgp.EvoVM2-";
+    static final String CLASS_NAME = "jgpfun.genetics.lgp.EvoVM2-";
 
-    final static String iname = cname.replace('.', '/');
+    static final String INTERNAL_NAME = CLASS_NAME.replace('.', '/');
 
-    final static String oldname = "jgpfun.genetics.lgp.EvoVM2".replace('.', '/');
+    static final String SUPER_INTERNAL_NAME = "jgpfun.genetics.lgp.EvoVM2".replace('.', '/');
+
+    static final Type OP_TYPE = Type.getType(Operation.class);
+
+    static final Type OP_ARRAY_TYPE = Type.getType("[Ljgpfun/genetics/lgp/operations/Operation;");
+
+    static final Type INT_ARRAY_TYPE = Type.getType("[I");
+
+    static final Method EXECUTE_METHOD = Method.getMethod("int execute(int,int)");
 
     private static int ii = 0;
 
@@ -36,7 +40,7 @@ public class EvoCompiler {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
         final OpCode[] prg = EvoVM2.stripStructuralIntronCode(EvoVM2.normalizeProgram(program, numRegs), numRegs);
 
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, iname + ii, null, oldname, null);
+        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, INTERNAL_NAME + ii, null, SUPER_INTERNAL_NAME, null);
 
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         Method m = Method.getMethod("void <init> ()");
@@ -46,38 +50,45 @@ public class EvoCompiler {
         mg.loadThis();
         mg.push(numRegs);
         mg.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
-        mg.visitFieldInsn(Opcodes.PUTFIELD, "L" + iname + ii + ";", "regs", "[I");
+        mg.visitFieldInsn(Opcodes.PUTFIELD, "L" + INTERNAL_NAME + ii + ";", "regs", "[I");
         mg.returnValue();
         mg.endMethod();
         mv.visitEnd();
 
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "run", "()V", null, null);
         mg = new GeneratorAdapter(Opcodes.ACC_PUBLIC, Method.getMethod("void run ()"), mv);
-        final Type owner = Type.getType("L" + iname + ii + ";");
+        final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");
 
         //prepare local variables
-        final int regs = mg.newLocal(Type.getType("[I"));
-        final int ops = mg.newLocal(Type.getType("[Ljgpfun/genetics/lgp/operations/Operation;"));
+        final int regs = mg.newLocal(INT_ARRAY_TYPE);
+        final int ops = mg.newLocal(OP_ARRAY_TYPE);
         mg.loadThis();
-        mg.getField(owner, "regs", Type.getType("[I"));
-        mg.getStatic(owner, "ops", Type.getType("[Ljgpfun/genetics/lgp/operations/Operation;"));
+        mg.getField(owner, "regs", INT_ARRAY_TYPE);
+        mg.getStatic(owner, "ops", OP_ARRAY_TYPE);
         mg.storeLocal(ops);
         mg.storeLocal(regs);
         final int[] lregs = new int[numRegs];
-        for(int i = 0; i < numRegs; i++) {
-            lregs[i] = mg.newLocal(Type.getType("I"));
+        for (int i = 0; i < numRegs; i++) {
+            lregs[i] = mg.newLocal(Type.INT_TYPE);
             mg.loadLocal(regs);
             mg.push(i);
             mg.arrayLoad(Type.INT_TYPE);
             mg.storeLocal(lregs[i]);
         }
 
+        final int[] lops = new int[EvoVM2.ops.length];
+        for (int i = 0; i < EvoVM2.ops.length; i++) {
+            lops[i] = mg.newLocal(OP_TYPE);
+            mg.loadLocal(ops);
+            mg.push(i);
+            mg.arrayLoad(OP_TYPE);
+            mg.storeLocal(lops[i]);
+        }
+
         //compile source to bytecode here
         for (OpCode op : prg) {
-            //get operand
-            mg.loadLocal(ops);
-            mg.push(op.op);
-            mg.arrayLoad(Type.getType(Operation.class));
+            //get operator
+            mg.loadLocal(lops[op.op]);
 
             // get src 2 value
             if (op.immediate) {
@@ -90,13 +101,13 @@ public class EvoCompiler {
             mg.loadLocal(lregs[op.src1]);
 
             //invoke operations
-            mg.invokeInterface(Type.getType(Operation.class), Method.getMethod("int execute(int,int)"));
+            mg.invokeInterface(OP_TYPE, EXECUTE_METHOD);
 
             //store trg
             mg.storeLocal(lregs[op.trg]);
         }
 
-        for(int i = 0; i < numRegs; i++) {
+        for (int i = 0; i < numRegs; i++) {
             mg.loadLocal(regs);
             mg.push(i);
             mg.loadLocal(lregs[i]);
@@ -111,7 +122,7 @@ public class EvoCompiler {
 
         //new ClassReader(cw.toByteArray()).accept(new ASMifierClassVisitor(new PrintWriter(System.out)), numRegs);
         try {
-            return (EvoVM2) loadClass(cw.toByteArray(), cname + (ii++)).newInstance();
+            return (EvoVM2) loadClass(cw.toByteArray(), CLASS_NAME + (ii++)).newInstance();
         } catch (InstantiationException ex) {
             Logger.getLogger(EvoVM2.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {

@@ -1,9 +1,12 @@
 package jgpfun.genetics;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.genetics.lgp.operations.UnaryOperation;
 import jgpfun.world2d.Organism2d;
@@ -192,6 +195,12 @@ public class Genome {
 
 
     public Organism2d synthesize() {
-        return new Organism2d(this);
+        try {
+            return new Organism2d(this);
+        } catch (IOException ex) {
+            Logger.getLogger(Genome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
     }
 }

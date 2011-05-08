@@ -1,5 +1,6 @@
 package jgpfun.testing;
 
+import java.io.IOException;
 import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
@@ -18,7 +19,7 @@ public class OrganismDebug extends Organism2d {
     //public long vmrun, allrun, comp;
 
     
-    public OrganismDebug(Genome genome, World2d world) {
+    public OrganismDebug(Genome genome, World2d world) throws IOException {
         super(genome);
         addToWorld(world);
     }

@@ -1,9 +1,6 @@
 package jgpfun.gui;
 
-import java.awt.Component;
 import java.awt.FontMetrics;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import javax.swing.JTable;
