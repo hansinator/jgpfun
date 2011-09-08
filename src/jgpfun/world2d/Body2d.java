@@ -10,6 +10,8 @@ public class Body2d {
 
     public Food food;
 
+    public double foodDist;
+
     public double dir;
 
     public double x;

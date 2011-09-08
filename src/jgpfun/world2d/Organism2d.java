@@ -6,6 +6,7 @@ import jgpfun.life.BaseOrganism;
 import jgpfun.genetics.Genome;
 import jgpfun.genetics.lgp.BaseMachine;
 import jgpfun.genetics.lgp.EvoVM;
+import jgpfun.life.SensorInput;
 import jgpfun.util.Settings;
 
 /*
@@ -27,6 +28,8 @@ public class Organism2d extends BaseOrganism {
 
     public final Body2d[] bodies;
 
+    private final SensorInput[] inputs;
+
     private int food;
 
 
@@ -39,6 +42,72 @@ public class Organism2d extends BaseOrganism {
         bodies = new Body2d[1];
         for (int i = 0; i < bodies.length; i++) {
             bodies[i] = new Body2d(0.0, 0.0, rnd.nextDouble() * 2 * Math.PI);
+        }
+
+        inputs = new SensorInput[7 * bodies.length];
+        int input = 0;
+        for (final Body2d b : bodies) {
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    //cached cosdir and scale as int are meant to speed this up
+                    //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
+                    return (int) (Math.cos(b.dir) * intScaleFactor);
+                }
+
+            };
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    return (int) (((b.food.x - b.x) / b.foodDist) * intScaleFactor);
+                }
+
+            };
+            ;
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    return (int) (((b.food.y - b.y) / b.foodDist) * intScaleFactor);
+                }
+
+            };
+            ;
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    return (int) (b.foodDist * intScaleFactor);
+                }
+
+            };
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    return Math.round((float) b.foodDist);
+                }
+
+            };
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    return (int) (b.lastSpeed * intScaleFactor);
+                }
+
+            };
+            inputs[input++] = new SensorInput() {
+
+                @Override
+                public int get() {
+                    //wallsense
+                    return b.wallSense.lastSenseVal;
+                }
+
+            };
         }
     }
 
@@ -56,26 +125,18 @@ public class Organism2d extends BaseOrganism {
 
     @Override
     public void live() {
-        double left, right, foodDist;
+        double left, right;
+
+        //calculate food stuff for body (prepare sensors..)
+        for (Body2d b : bodies) {
+            b.food = b.foodFinder.findNearestFood(Math.round((float) b.x), Math.round((float) b.y));
+            b.foodDist = b.foodFinder.foodDist(b.food, Math.round((float) b.x), Math.round((float) b.y));
+        }
 
         //write input registers
         int inreg = 0;
-        for (Body2d b : bodies) {
-            b.food = b.foodFinder.findNearestFood(Math.round((float) b.x), Math.round((float) b.y));
-            foodDist = b.foodFinder.foodDist(b.food, Math.round((float) b.x), Math.round((float) b.y));
-
-            //cached cosdir and scale as int are meant to speed this up
-            //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
-            vm.regs[inreg++] = (int) (Math.cos(b.dir) * intScaleFactor);
-
-            vm.regs[inreg++] = (int) (((b.food.x - b.x) / foodDist) * intScaleFactor);
-            vm.regs[inreg++] = (int) (((b.food.y - b.y) / foodDist) * intScaleFactor);
-            vm.regs[inreg++] = (int) (foodDist * intScaleFactor);
-            vm.regs[inreg++] = Math.round((float) foodDist);
-            vm.regs[inreg++] = (int) (b.lastSpeed * intScaleFactor);
-
-            //wallsense
-            vm.regs[inreg++] = b.wallSense.lastSenseVal;
+        for (SensorInput in : inputs) {
+            vm.regs[inreg++] = in.get();
         }
 
         vm.run();
