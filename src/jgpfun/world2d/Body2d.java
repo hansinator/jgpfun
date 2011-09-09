@@ -37,6 +37,7 @@ public class Body2d {
         inputs[1] = new FoodDirXSense();
         inputs[2] = new FoodDirYSense();
         inputs[3] = new FoodDistSense();
+        //XXX
         inputs[4] = new FoodDistSense2();
         inputs[5] = new SpeedSense();
         inputs[6] = new WallSensorInput();
