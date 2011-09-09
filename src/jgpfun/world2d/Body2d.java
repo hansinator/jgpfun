@@ -1,6 +1,10 @@
 package jgpfun.world2d;
 
+import jgpfun.life.SensorInput;
+
 public class Body2d {
+
+    private final SensorInput[] inputs;
 
     public WallSense wallSense;
 
@@ -27,6 +31,84 @@ public class Body2d {
         this.dir = dir;
 
         this.motor = new TankMotor(this);
+
+        inputs = new SensorInput[7];
+        inputs[0] = new OrientationSense();
+        inputs[1] = new FoodDirXSense();
+        inputs[2] = new FoodDirYSense();
+        inputs[3] = new FoodDistSense();
+        inputs[4] = new FoodDistSense2();
+        inputs[5] = new SpeedSense();
+        inputs[6] = new WallSensorInput();
     }
 
+
+    public SensorInput[] getInputs() {
+        return inputs;
+    }
+
+    private class OrientationSense implements SensorInput {
+
+        @Override
+        public int get() {
+            //could also be sin
+            return (int) (Math.cos(dir) * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class FoodDirXSense implements SensorInput {
+
+        @Override
+        public int get() {
+            return (int) (((food.x - x) / foodDist) * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class FoodDirYSense implements SensorInput {
+
+        @Override
+        public int get() {
+            return (int) (((food.y - y) / foodDist) * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class FoodDistSense implements SensorInput {
+
+        @Override
+        public int get() {
+            return (int) (foodDist * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class FoodDistSense2 implements SensorInput {
+
+        @Override
+        public int get() {
+            return Math.round((float) foodDist);
+        }
+
+    }
+
+    private class SpeedSense implements SensorInput {
+
+        @Override
+        public int get() {
+            return (int) (lastSpeed * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class WallSensorInput implements SensorInput {
+
+        @Override
+        public int get() {
+            //wallsense
+            return wallSense.lastSenseVal;
+        }
+
+    }
 }

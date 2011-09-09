@@ -39,75 +39,14 @@ public class Organism2d extends BaseOrganism {
         //this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         this.food = 0;
 
+        //init bodies and grab inputs
         bodies = new Body2d[1];
+        inputs = new SensorInput[7 * bodies.length];
+        int x = 0;
         for (int i = 0; i < bodies.length; i++) {
             bodies[i] = new Body2d(0.0, 0.0, rnd.nextDouble() * 2 * Math.PI);
-        }
-
-        inputs = new SensorInput[7 * bodies.length];
-        int input = 0;
-        for (final Body2d b : bodies) {
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    //cached cosdir and scale as int are meant to speed this up
-                    //vm.regs[inreg++] = (int) (((PrecisionBody2d) b).cosdir * scale);
-                    return (int) (Math.cos(b.dir) * intScaleFactor);
-                }
-
-            };
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    return (int) (((b.food.x - b.x) / b.foodDist) * intScaleFactor);
-                }
-
-            };
-            ;
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    return (int) (((b.food.y - b.y) / b.foodDist) * intScaleFactor);
-                }
-
-            };
-            ;
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    return (int) (b.foodDist * intScaleFactor);
-                }
-
-            };
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    return Math.round((float) b.foodDist);
-                }
-
-            };
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    return (int) (b.lastSpeed * intScaleFactor);
-                }
-
-            };
-            inputs[input++] = new SensorInput() {
-
-                @Override
-                public int get() {
-                    //wallsense
-                    return b.wallSense.lastSenseVal;
-                }
-
-            };
+            for(SensorInput input : bodies[i].getInputs())
+                inputs[x++] = input;
         }
     }
 
@@ -117,7 +56,7 @@ public class Organism2d extends BaseOrganism {
             bodies[i].x = rnd.nextInt(world.worldWidth);
             bodies[i].y = rnd.nextInt(world.worldHeight);
             bodies[i].foodFinder = world.foodFinder;
-            bodies[i].wallSense = new WallSense(0, 0);
+            bodies[i].wallSense = new WallSense(world.worldWidth, world.worldHeight);
             bodies[i].wallSense.setBody(bodies[i]);
         }
     }
@@ -126,6 +65,7 @@ public class Organism2d extends BaseOrganism {
     @Override
     public void live() {
         double left, right;
+        int reg = 0;
 
         //calculate food stuff for body (prepare sensors..)
         for (Body2d b : bodies) {
@@ -134,9 +74,8 @@ public class Organism2d extends BaseOrganism {
         }
 
         //write input registers
-        int inreg = 0;
         for (SensorInput in : inputs) {
-            vm.regs[inreg++] = in.get();
+            vm.regs[reg++] = in.get();
         }
 
         vm.run();
@@ -144,8 +83,8 @@ public class Organism2d extends BaseOrganism {
         //use output values
         for (Body2d b : bodies) {
             //fetch, limit and scale outputs
-            left = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / intScaleFactor;
-            right = Math.max(0, Math.min(vm.regs[inreg++], 65535)) / intScaleFactor;
+            left = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
+            right = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
 
             //move
             b.motor.move(left, right);
