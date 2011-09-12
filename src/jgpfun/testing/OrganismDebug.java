@@ -4,7 +4,6 @@ import java.io.IOException;
 import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import jgpfun.world2d.Body2d;
-import jgpfun.world2d.PrecisionBody2d;
 import jgpfun.world2d.World2d;
 
 /**
@@ -24,7 +23,7 @@ public class OrganismDebug extends Organism2d {
         addToWorld(world);
     }
 
-
+/*
     //NOTE: this only works with precisionbodys!
     //old experimentally optimized live method from pc version
     @Override
@@ -91,5 +90,5 @@ public class OrganismDebug extends Organism2d {
         //comp = (System.nanoTime() - start);
         //allrun = (System.nanoTime() - start2);
     }
-
+*/
 }

@@ -12,7 +12,6 @@ import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 
-//TODO: add a generations per second/minute output
 /**
  *
  * @author hansinator
