@@ -23,9 +23,9 @@ import jgpfun.util.Settings;
  */
 public class Organism2d extends BaseOrganism {
 
-    static final double intScaleFactor = Settings.getDouble("intScaleFactor");
-
     static final int registerCount = Settings.getInt("registerCount");
+
+    public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
     public final BaseMachine vm;
 
