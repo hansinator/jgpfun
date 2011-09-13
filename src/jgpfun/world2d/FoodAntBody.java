@@ -16,18 +16,19 @@ public class FoodAntBody extends Body2d {
 
     public final Motor2d motor;
 
-    public FoodFinder foodFinder;
-
     public Food food;
 
     public double foodDist;
 
     private final Organism2d organism;
 
+    private final World2d world;
 
-    public FoodAntBody(Organism2d organism) {
+
+    public FoodAntBody(Organism2d organism, World2d world) {
         super(0.0, 0.0, 0.0, new SensorInput[7]);
         this.organism = organism;
+        this.world = world;
 
         //outputs
         this.motor = new TankMotor(this);
@@ -40,13 +41,15 @@ public class FoodAntBody extends Body2d {
         inputs[4] = new FoodDistSense2(); //fix?
         inputs[5] = new SpeedSense();
         inputs[6] = new WallSensorInput();
+
+        wallSense = new WallSense(world.worldWidth, world.worldHeight, this);
     }
 
 
     @Override
     public void prepareInputs() {
-        food = foodFinder.findNearestFood(Math.round((float) x), Math.round((float) y));
-        foodDist = foodFinder.foodDist(food, Math.round((float) x), Math.round((float) y));
+        food = world.findNearestFood(Math.round((float) x), Math.round((float) y));
+        foodDist = World2d.foodDist(food, Math.round((float) x), Math.round((float) y));
     }
 
 

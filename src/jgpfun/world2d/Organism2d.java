@@ -40,29 +40,25 @@ public class Organism2d extends BaseOrganism {
         super(genome);
         this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         //this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
+        
         this.food = 0;
-
-        //init bodies and grab inputs
-        bodies = new FoodAntBody[1];
-        inputs = new SensorInput[7 * bodies.length];
-        int x = 0;
-        for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new FoodAntBody(this);
-            for (SensorInput input : bodies[i].getInputs()) {
-                inputs[x++] = input;
-            }
-        }
+        this.bodies = new FoodAntBody[1];
+        this.inputs = new SensorInput[7 * bodies.length];
     }
 
 
     public void addToWorld(World2d world) {
+        //init bodies and grab inputs
+        int x = 0;
         for (int i = 0; i < bodies.length; i++) {
+            bodies[i] = new FoodAntBody(this, world);
+            for (SensorInput input : bodies[i].getInputs()) {
+                inputs[x++] = input;
+            }
+
             bodies[i].x = rnd.nextInt(world.worldWidth);
             bodies[i].y = rnd.nextInt(world.worldHeight);
             bodies[i].dir = rnd.nextDouble() * 2 * Math.PI;
-            bodies[i].foodFinder = world.foodFinder;
-            bodies[i].wallSense = new WallSense(world.worldWidth, world.worldHeight);
-            bodies[i].wallSense.setBody(bodies[i]);
         }
     }
 
