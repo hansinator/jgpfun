@@ -32,10 +32,12 @@ public class TestOrganismDraw extends JPanel {
     public TestOrganismDraw() throws IOException {
         setPreferredSize(new Dimension(800, 600));
         World2d world = new World2d(800, 600, 23);
+        world.randomFood();
         this.organism = new Organism2d(Genome.randomGenome(256));
         this.organism.addToWorld(world);
         this.organism.bodies[0].x = 400.0;
         this.organism.bodies[0].y = 300.0;
+        this.organism.bodies[0].prepareInputs();
 
         slider = new JSlider(0, 360);
         slider.addChangeListener(new ChangeListener() {

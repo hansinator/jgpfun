@@ -29,7 +29,7 @@ public class Organism2d extends BaseOrganism {
 
     public final BaseMachine vm;
 
-    public final FoodAntBody[] bodies;
+    public final RadarAntBody[] bodies;
 
     private final SensorInput[] inputs;
 
@@ -39,7 +39,7 @@ public class Organism2d extends BaseOrganism {
     public Organism2d(Genome genome) throws IOException {
         super(genome);
         this.food = 0;
-        this.bodies = new FoodAntBody[1];
+        this.bodies = new RadarAntBody[1];
         this.inputs = new SensorInput[7 * bodies.length];
         
         this.vm = new EvoVM(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
@@ -51,7 +51,7 @@ public class Organism2d extends BaseOrganism {
         //init bodies and grab inputs
         int x = 0;
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new FoodAntBody(this, world);
+            bodies[i] = new RadarAntBody(this, world);
             for (SensorInput input : bodies[i].getInputs()) {
                 inputs[x++] = input;
             }
@@ -81,7 +81,7 @@ public class Organism2d extends BaseOrganism {
         vm.run();
 
         //use output values
-        for (FoodAntBody b : bodies) {
+        for (RadarAntBody b : bodies) {
             //fetch, limit and scale outputs
             left = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
             right = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
