@@ -1,5 +1,6 @@
 package jgpfun.world2d;
 
+import jgpfun.world2d.senses.WallSense;
 import java.io.IOException;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.life.BaseOrganism;
@@ -26,7 +27,7 @@ public class Organism2d extends BaseOrganism {
 
     public final BaseMachine vm;
 
-    public final Body2d[] bodies;
+    public final FoodAntBody[] bodies;
 
     private final SensorInput[] inputs;
 
@@ -40,11 +41,11 @@ public class Organism2d extends BaseOrganism {
         this.food = 0;
 
         //init bodies and grab inputs
-        bodies = new Body2d[1];
+        bodies = new FoodAntBody[1];
         inputs = new SensorInput[7 * bodies.length];
         int x = 0;
         for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new Body2d(0.0, 0.0, rnd.nextDouble() * 2 * Math.PI);
+            bodies[i] = new FoodAntBody(this);
             for(SensorInput input : bodies[i].getInputs())
                 inputs[x++] = input;
         }
@@ -55,6 +56,7 @@ public class Organism2d extends BaseOrganism {
         for (int i = 0; i < bodies.length; i++) {
             bodies[i].x = rnd.nextInt(world.worldWidth);
             bodies[i].y = rnd.nextInt(world.worldHeight);
+            bodies[i].dir = rnd.nextDouble() * 2 * Math.PI;
             bodies[i].foodFinder = world.foodFinder;
             bodies[i].wallSense = new WallSense(world.worldWidth, world.worldHeight);
             bodies[i].wallSense.setBody(bodies[i]);
@@ -69,8 +71,7 @@ public class Organism2d extends BaseOrganism {
 
         //calculate food stuff for body (prepare sensors..)
         for (Body2d b : bodies) {
-            b.food = b.foodFinder.findNearestFood(Math.round((float) b.x), Math.round((float) b.y));
-            b.foodDist = b.foodFinder.foodDist(b.food, Math.round((float) b.x), Math.round((float) b.y));
+            b.prepareInputs();
         }
 
         //write input registers
@@ -81,7 +82,7 @@ public class Organism2d extends BaseOrganism {
         vm.run();
 
         //use output values
-        for (Body2d b : bodies) {
+        for (FoodAntBody b : bodies) {
             //fetch, limit and scale outputs
             left = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
             right = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;

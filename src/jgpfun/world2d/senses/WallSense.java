@@ -1,4 +1,6 @@
-package jgpfun.world2d;
+package jgpfun.world2d.senses;
+
+import jgpfun.world2d.Body2d;
 
 /**
  *
@@ -16,7 +18,7 @@ public class WallSense {
         this.worldHeight = worldHeight;
     }
 
-    void setBody(Body2d body) {
+    public void setBody(Body2d body) {
         this.body = body;
     }
 

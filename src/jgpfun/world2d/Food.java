@@ -1,6 +1,7 @@
 package jgpfun.world2d;
 
 import java.awt.Point;
+import java.util.Random;
 
 /**
  *
@@ -8,7 +9,21 @@ import java.awt.Point;
  */
 public class Food extends Point {
 
-    public Food(int x, int y) {
-        super(x,y);
+    private final World2d world;
+
+    private final Random rnd;
+
+
+    public Food(int x, int y, World2d world, Random rnd) {
+        super(x, y);
+        this.world = world;
+        this.rnd = rnd;
     }
+
+
+    public void randomPosition() {
+        x = rnd.nextInt(world.worldWidth);
+        y = rnd.nextInt(world.worldHeight);
+    }
+
 }

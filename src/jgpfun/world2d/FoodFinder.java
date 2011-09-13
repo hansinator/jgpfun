@@ -34,7 +34,7 @@ public class FoodFinder {
         if (indexMinDist > -1) {
             return food.get(indexMinDist);
         } else {
-            return new Food(x, y);
+            return World2d.OUT_OF_RANGE_FOOD;
         }
     }
 }

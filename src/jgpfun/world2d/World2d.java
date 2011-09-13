@@ -14,8 +14,6 @@ import jgpfun.util.Settings;
  */
 public class World2d {
 
-    public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
-
     private final Random rnd;
 
     public final int worldWidth, worldHeight;
@@ -23,6 +21,8 @@ public class World2d {
     public final List<Food> food;
 
     public final FoodFinder foodFinder;
+
+    final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null, new SecureRandom());
 
     private final int foodCount;
 
@@ -58,15 +58,7 @@ public class World2d {
 
             //eat food
             synchronized (worldLock) {
-                if ((food.contains(b.food))
-                        && (b.food.x >= (b.x - foodPickupRadius))
-                        && (b.food.x <= (b.x + foodPickupRadius))
-                        && (b.food.y >= (b.y - foodPickupRadius))
-                        && (b.food.y <= (b.y + foodPickupRadius))) {
-                    organism.incFood();
-                    b.food.x = rnd.nextInt(worldWidth);
-                    b.food.y = rnd.nextInt(worldHeight);
-                }
+                b.postRoundTrigger();
             }
         }
         //System.out.println("Food computation took: " + (System.nanoTime() - start));
@@ -79,12 +71,11 @@ public class World2d {
         if (food.size() != foodCount) {
             food.clear();
             for (int i = 0; i < foodCount; i++) {
-                food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight)));
+                food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
             }
         } else {
             for (Food f : food) {
-                f.x = rnd.nextInt(worldWidth);
-                f.y = rnd.nextInt(worldHeight);
+                f.randomPosition();
             }
         }
     }
