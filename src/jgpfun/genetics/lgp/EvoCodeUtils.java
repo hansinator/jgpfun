@@ -14,6 +14,9 @@ import jgpfun.genetics.lgp.operations.UnaryOperation;
  * @author Hansinator
  */
 class EvoCodeUtils {
+
+    private static final Object dummy = new Object();
+
     public static OpCode[] stripStructuralIntronCode(OpCode[] program, int registerCount) {
         Map<Integer, Object> effectiveRegisters = new HashMap<Integer, Object>();
         Boolean[] markers = new Boolean[program.length];
@@ -23,8 +26,8 @@ class EvoCodeUtils {
         //add the output registers to the effective registers
         //in the current case these are magically number 3 and 4,
         //but this may change, beware!
-        effectiveRegisters.put(3, new Object());
-        effectiveRegisters.put(4, new Object());
+        effectiveRegisters.put(3, dummy);
+        effectiveRegisters.put(4, dummy);
 
         //also add the temp registers... oops!
         //they are necessary to compute temporary values that survive
@@ -32,9 +35,8 @@ class EvoCodeUtils {
         //if we don't include them, they still persist and may have
         //random effects on functional code
         //-> this means if we forget them, we may strip functional code :(
-        //TODO: see how temp registers are treated in the current implementation
         for (int i = 6; i < registerCount; i++) {
-            effectiveRegisters.put(i, new Object());
+            effectiveRegisters.put(i, dummy);
         }
 
         //process the source bottom-up and mark all instructions whose
@@ -93,14 +95,14 @@ class EvoCodeUtils {
 
                 //add source operand 1
                 if (!effectiveRegisters.containsValue(memVal.src1)) {
-                    effectiveRegisters.put(memVal.src1, new Object());
+                    effectiveRegisters.put(memVal.src1, dummy);
                 }
 
                 //add source operand 2, if it is no immediate or unary operation
                 if (!memVal.immediate && memVal.operation instanceof UnaryOperation) {
                     //add source operand 2
                     if (!effectiveRegisters.containsValue(memVal.src2)) {
-                        effectiveRegisters.put(memVal.src2, new Object());
+                        effectiveRegisters.put(memVal.src2, dummy);
                     }
                 }
 

@@ -36,7 +36,8 @@ public abstract class BaseMachine {
                     new OpMax(),
                     new OpAbs(),
                     //new OpSin(),
-                    new OpMov(), //new OpInc(),
+                    new OpMov(), //
+                //new OpInc(),
                 //new OpDec(),
                 // OpBranchLt(),
                 //new OpBranchGt()
