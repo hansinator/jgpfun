@@ -84,7 +84,10 @@ public class RadarAntBody extends Body2d {
         p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); //left wing
 
         g.setColor(Color.darkGray);
-        g.drawLine(x_center, y_center, Math.round((float) (x + RadarSense.beamLength * Math.sin(radarSense.direction))), Math.round((float) (y - RadarSense.beamLength * Math.cos(radarSense.direction))));
+        double rdir, bdir;
+        rdir = radarSense.direction - ((double)Math.round(radarSense.direction / (2 * Math.PI)) * 2 * Math.PI);
+        bdir = dir - ((double)Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
+        g.drawLine(x_center, y_center, Math.round((float) (x + RadarSense.beamLength * Math.sin(rdir + bdir))), Math.round((float) (y - RadarSense.beamLength * Math.cos(rdir + bdir))));
 
         g.setColor(Color.red);
         g.drawPolygon(p);

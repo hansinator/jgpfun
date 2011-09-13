@@ -18,7 +18,9 @@ public class RadarSense implements SensorInput {
 
     public double direction = 0.0;
 
-    public static final double beamLength = 50.0;
+    public static final double beamLength = 200.0;
+
+    public Point target = null;
 
 
     public RadarSense(Body2d body, World2d world) {
@@ -35,11 +37,14 @@ public class RadarSense implements SensorInput {
         y1 = body.y;
 
         //line end
-        x2 = body.x + beamLength * Math.sin(direction);
-        x3 = body.y - beamLength * Math.cos(direction);
+        double rdir, bdir;
+        rdir = direction - ((double)Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
+        bdir = body.dir - ((double)Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
+        x2 = body.x + beamLength * Math.sin(rdir + bdir);
+        y2 = body.y - beamLength * Math.cos(rdir + bdir);
 
         //point on line
-        y2 = Math.floor(p.y);
+        x3 = Math.floor(p.y);
         y3 = Math.floor(p.x);
 
         double m, b;
@@ -58,9 +63,11 @@ public class RadarSense implements SensorInput {
     public int get() {
         for (Food f : world.food) {
             if (pointInLine(f)) {
+                target = f;
                 return Integer.MAX_VALUE;
             }
         }
+        target = null;
         return 0;
     }
 
