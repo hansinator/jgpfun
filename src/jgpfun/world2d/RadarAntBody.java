@@ -24,11 +24,11 @@ public class RadarAntBody extends Body2d {
 
     private final World2d world;
 
-    private final RadarSense radarSense;
+    public final RadarSense radarSense;
 
 
     public RadarAntBody(Organism2d organism, World2d world) {
-        super(0.0, 0.0, 0.0, new SensorInput[7]);
+        super(0.0, 0.0, 0.0, new SensorInput[4]);
         this.organism = organism;
         this.world = world;
 

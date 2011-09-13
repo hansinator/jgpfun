@@ -40,7 +40,7 @@ public class Organism2d extends BaseOrganism {
         super(genome);
         this.food = 0;
         this.bodies = new RadarAntBody[1];
-        this.inputs = new SensorInput[7 * bodies.length];
+        this.inputs = new SensorInput[4 * bodies.length];
         
         this.vm = new EvoVM(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
         //this.vm = EvoCompiler.compile(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
@@ -88,6 +88,9 @@ public class Organism2d extends BaseOrganism {
 
             //move
             b.motor.move(left, right);
+
+            b.radarSense.direction = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
+
 
             //pickup wallsense before coordinates are clipped
             b.wallSense.sense();
