@@ -38,12 +38,12 @@ public class Organism2d extends BaseOrganism {
 
     public Organism2d(Genome genome) throws IOException {
         super(genome);
-        this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
-        //this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
-
         this.food = 0;
         this.bodies = new FoodAntBody[1];
         this.inputs = new SensorInput[7 * bodies.length];
+        
+        this.vm = new EvoVM(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
+        //this.vm = EvoCompiler.compile(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
     }
 
 

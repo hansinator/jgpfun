@@ -24,19 +24,13 @@ class EvoCodeUtils {
         List<OpCode> strippedProgram;
         OpCode memVal;
 
-        //add the output registers to the effective registers
-        //in the current case these are magically number 3 and 4,
-        //but this may change, beware!
-        effectiveRegisters.put(3, dummy);
-        effectiveRegisters.put(4, dummy);
-
-        //also add the temp registers... oops!
-        //they are necessary to compute temporary values that survive
+        //add the output and temporary registers to the effective registers
+        //temporaty registers are necessary to compute temporary values that survive
         //from round to round
-        //if we don't include them, they still persist and may have
-        //random effects on functional code
-        //-> this means if we forget them, we may strip functional code :(
-        for (int i = 6; i < registerCount; i++) {
+        //all registers after the input registers are effective, meaning
+        //all registers that are not output are temp registers
+        //(even though output registers also retain their values...)
+        for (int i = inputRegisterCount; i < registerCount; i++) {
             effectiveRegisters.put(i, dummy);
         }
 

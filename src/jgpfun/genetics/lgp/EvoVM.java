@@ -11,12 +11,12 @@ public class EvoVM extends BaseMachine {
     private final OpCode[] program;
 
 
-    public EvoVM(int numRegs, OpCode[] program) {
+    public EvoVM(int numRegs, int numInputRegs, OpCode[] program) {
         regs = new int[numRegs];
 
         //normalize program and strip strctural intron code portions
-        this.program = EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, 0);
-        //this.program = normalizeProgram(program, numRegs);//
+        this.program = EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs);
+        //this.program = normalizeProgram(program, numRegs);
     }
 
 

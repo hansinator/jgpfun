@@ -36,7 +36,7 @@ public class EvoCompiler {
     private static int ii = 0;
 
 
-    public static BaseMachine compile(final int numRegs, OpCode[] program) throws IOException {
+    public static BaseMachine compile(final int numRegs, int numInputRegs, OpCode[] program) throws IOException {
         final OpCode[] prg = EvoCodeUtils.stripStructuralIntronCode(BaseMachine.normalizeProgram(program, numRegs), numRegs, 0);
 
         //begin class
