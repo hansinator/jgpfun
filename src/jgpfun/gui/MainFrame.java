@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import jgpfun.life.Simulation;
+import org.joda.time.format.PeriodFormat;
 
 /**
  *
@@ -36,8 +35,6 @@ public class MainFrame extends JFrame implements WindowListener {
     private final Simulation simulation;
 
     private volatile boolean running = true;
-
-    public static final DateFormat timeFormat = new SimpleDateFormat("D'd 'H'h 'm'm 's's'");
 
 
     public MainFrame(int width, int height, Simulation simulation) {
@@ -140,13 +137,15 @@ public class MainFrame extends JFrame implements WindowListener {
                 generationsPerMinuteCount++;
 
                 System.out.println("GPM: " + generationsPerMinute);
-                System.out.println("Runtime: " + timeFormat.format(new Date(now - startTime)));
+                
+                System.out.println("Runtime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, now)));
                 startGen = simulation.getGeneration();
                 lastStats = now;
             }
-        }
 
-        System.out.println("\nRuntime: " + timeFormat.format(new Date(System.currentTimeMillis() - startTime)));
+            //org.joda.time.Duration.millis(now - startTime).
+        }
+        System.out.println("\nRuntime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
         System.out.println("Average GPM: " + (generationsPerMinuteAverage / generationsPerMinuteCount));
         System.exit(0);
     }
