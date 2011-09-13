@@ -99,7 +99,7 @@ public class MainFrame extends JFrame implements WindowListener {
 
     private void initClientViews(int width, int height) {
         // to be put elsewhere
-        mainView = new MainView();
+        mainView = new MainView(simulation.world);
         mainView.setPreferredSize(new Dimension(width, height));
 
         setCenterPaneView(mainView);

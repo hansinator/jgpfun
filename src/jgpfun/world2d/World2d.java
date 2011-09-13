@@ -1,12 +1,13 @@
 package jgpfun.world2d;
 
+import java.awt.Graphics;
 import java.awt.Point;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import jgpfun.util.Settings;
+import jgpfun.life.BaseOrganism;
 
 /**
  *
@@ -17,6 +18,8 @@ public class World2d {
     private final Random rnd;
 
     public final int worldWidth, worldHeight;
+
+    public List<BaseOrganism> curOrganisms;
 
     public final List<Food> food;
 
@@ -79,11 +82,26 @@ public class World2d {
             }
         }
     }
-    
 
-    public static abstract class World2dObject extends Point {
+
+    public void draw(Graphics g) {
+
+        for (Food f : food) {
+            f.draw(g);
+        }
+
+        if (curOrganisms != null) {
+            for (BaseOrganism o : curOrganisms) {
+                ((Organism2d) o).draw(g);
+            }
+        }
+
+    }
+
+    static abstract class World2dObject extends Point {
 
         final World2d world;
+
 
         public World2dObject(World2d world, int x, int y) {
             super(x, y);

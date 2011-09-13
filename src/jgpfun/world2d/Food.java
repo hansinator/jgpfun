@@ -1,5 +1,7 @@
 package jgpfun.world2d;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Random;
 
@@ -24,6 +26,12 @@ public class Food extends Point {
     public void randomPosition() {
         x = rnd.nextInt(world.worldWidth);
         y = rnd.nextInt(world.worldHeight);
+    }
+
+
+    public void draw(Graphics g) {
+        g.setColor(Color.green);
+        g.fillOval(x, y, 2, 2);
     }
 
 }

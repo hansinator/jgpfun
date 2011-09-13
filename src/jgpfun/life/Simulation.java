@@ -29,7 +29,7 @@ public class Simulation {
 
     private boolean slowMode;
 
-    private final World2d world;
+    public final World2d world;
 
     private final AbstractPopulationManager populationManager;
 
@@ -81,6 +81,8 @@ public class Simulation {
         for(BaseOrganism organism : populationManager.organisms)
             ((Organism2d)organism).addToWorld(world);
 
+        world.curOrganisms = populationManager.organisms;
+
         synchronized (runLock) {
             for (int i = 0; i < iterations; i++) {
                 if (abort) {
@@ -92,7 +94,7 @@ public class Simulation {
                 if (slowMode || (i % roundsMod) == 0) {
                     time = System.currentTimeMillis() - start;
                     infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen + 1);
-                    view.drawStuff(world.food, populationManager.organisms, time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                    view.drawStuff(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
                     view.repaint();
 
                     if (slowMode) {
@@ -108,10 +110,6 @@ public class Simulation {
             gen++;
 
             int foodCollected = populationManager.newGeneration();
-
-            // scatter organisms in the world
-            for(BaseOrganism organism : populationManager.organisms)
-                ((Organism2d)organism).addToWorld(world);
 
             // simulation statistics
             System.out.println("");

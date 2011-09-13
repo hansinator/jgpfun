@@ -12,11 +12,7 @@ package jgpfun.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.List;
-import jgpfun.life.BaseOrganism;
-import jgpfun.world2d.Food;
-import jgpfun.world2d.Organism2d;
-import jgpfun.world2d.Body2d;
+import jgpfun.world2d.World2d;
 
 /**
  *
@@ -24,13 +20,11 @@ import jgpfun.world2d.Body2d;
  */
 public class MainView extends javax.swing.JPanel {
 
-    List<Food> curFood;
-
-    List<BaseOrganism> curOrganisms;
-
     private int rps;
 
     private int progress;
+
+    private final World2d world;
 
 
     /*
@@ -38,10 +32,9 @@ public class MainView extends javax.swing.JPanel {
      * add setters for things to draw or make a worldmodel including all stuff to draw
      * possibly make object lists for world objects, like bodies and food
      */
-
-
     /** Creates new form MainView */
-    public MainView() {
+    public MainView(World2d world) {
+        this.world = world;
         initComponents();
     }
 
@@ -75,13 +68,7 @@ public class MainView extends javax.swing.JPanel {
         g.setColor(Color.black);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-        if (curFood != null) {
-            drawFood(curFood, g);
-        }
-
-        if (curOrganisms != null) {
-            drawOrganisms(curOrganisms, g);
-        }
+        world.draw(g);
 
         if (rps != 0) {
             g.setColor(Color.yellow);
@@ -95,55 +82,9 @@ public class MainView extends javax.swing.JPanel {
     }
 
 
-    public void drawStuff(List<Food> food, List<BaseOrganism> organisms, int rps, int progress) {
-        this.curFood = food;
-        this.curOrganisms = organisms;
+    public void drawStuff(int rps, int progress) {
         this.rps = rps;
         this.progress = progress;
-    }
-
-
-    private void drawFood(List<Food> food, Graphics g) {
-        g.setColor(Color.green);
-
-        for (Food f : food) {
-            g.fillOval(f.x, f.y, 2, 2);
-        }
-    }
-
-
-    private void drawOrganisms(List<BaseOrganism> organisms, Graphics g) {
-        g.setColor(Color.red);
-
-        for (BaseOrganism o : organisms) {
-            for (Body2d b : ((Organism2d)o).bodies) {
-                double sindir = Math.sin(b.dir);
-                double cosdir = Math.cos(b.dir);
-                int xrot = (int) Math.round(8.0 * sindir);
-                int yrot = (int) Math.round(8.0 * cosdir);
-                int x = Math.round((float)b.x);
-                int y = Math.round((float)b.y);
-
-                g.drawLine(x, y, x + xrot, y - yrot);
-                g.fillOval(x, y, 4, 4);
-
-                //Polygon p = new Polygon();
-                /*
-                //1st try
-                p.addPoint((b.x - xrot), (b.y + yrot));
-                p.addPoint((b.x + xrot), (b.y + yrot));
-                p.addPoint(b.x + xrot, b.y - 6 + yrot);
-
-                //2nd try - looks like a triangle
-                p.addPoint((b.x - 4 + xrot), (b.y + 4 + yrot));
-                p.addPoint((b.x + 4 + xrot), (b.y + 4 + yrot));
-                p.addPoint(b.x + xrot, b.y - 6 + yrot);
-                
-                g.drawPolygon(p);
-                g.fillPolygon(p);*/
-            }
-
-        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
