@@ -10,25 +10,28 @@ import jgpfun.world2d.senses.WallSense;
  */
 public class FoodAntBody extends Body2d {
 
-    public static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
-
     public WallSense wallSense;
 
     public final Motor2d motor;
 
-    public Food food;
-
-    public double foodDist;
+    private static final int foodPickupRadius = Settings.getInt("foodPickupRadius");
 
     private final Organism2d organism;
 
     private final World2d world;
+
+    private Food food;
+
+    private double foodDist;
 
 
     public FoodAntBody(Organism2d organism, World2d world) {
         super(0.0, 0.0, 0.0, new SensorInput[7]);
         this.organism = organism;
         this.world = world;
+
+        //init senses
+        wallSense = new WallSense(world.worldWidth, world.worldHeight, this);
 
         //outputs
         this.motor = new TankMotor(this);
@@ -40,9 +43,7 @@ public class FoodAntBody extends Body2d {
         inputs[3] = new FoodDistSense();
         inputs[4] = new FoodDistSense2(); //fix?
         inputs[5] = new SpeedSense();
-        inputs[6] = new WallSensorInput();
-
-        wallSense = new WallSense(world.worldWidth, world.worldHeight, this);
+        inputs[6] = wallSense;
     }
 
 
@@ -105,16 +106,6 @@ public class FoodAntBody extends Body2d {
         @Override
         public int get() {
             return (int) (lastSpeed * Organism2d.intScaleFactor);
-        }
-
-    }
-
-    private class WallSensorInput implements SensorInput {
-
-        @Override
-        public int get() {
-            //wallsense
-            return wallSense.lastSenseVal;
         }
 
     }

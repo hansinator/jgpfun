@@ -1,18 +1,19 @@
 package jgpfun.world2d.senses;
 
+import jgpfun.life.SensorInput;
 import jgpfun.world2d.Body2d;
 
 /**
  *
  * @author hansinator
  */
-public class WallSense {
+public class WallSense implements SensorInput {
 
     private final int worldWidth, worldHeight;
 
     private final Body2d body;
 
-    public int lastSenseVal = 0;
+    private int lastSenseVal = 0;
 
 
     public WallSense(int worldWidth, int worldHeight, Body2d body) {
@@ -36,6 +37,12 @@ public class WallSense {
             lastSenseVal = 0;
         }
 
+        return lastSenseVal;
+    }
+
+
+    @Override
+    public int get() {
         return lastSenseVal;
     }
 
