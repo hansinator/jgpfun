@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -34,6 +36,8 @@ public class MainFrame extends JFrame implements WindowListener {
     private final Simulation simulation;
 
     private volatile boolean running = true;
+
+    public static final DateFormat timeFormat = new SimpleDateFormat("D'd 'H'h 'm'm 's's'");
 
 
     public MainFrame(int width, int height, Simulation simulation) {
@@ -71,7 +75,7 @@ public class MainFrame extends JFrame implements WindowListener {
 
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        
+
         menuBar.add(new JMenu("File")).add(new JMenuItem("Exit")).addActionListener(new ActionListener() {
 
             @Override
@@ -121,21 +125,29 @@ public class MainFrame extends JFrame implements WindowListener {
         //TODO: thread this and put it somewhere else
         running = true;
         int startGen = 0;
+        long now, generationsPerMinuteAverage = 0, generationsPerMinuteCount = 0;
         long startTime = System.currentTimeMillis();
-        long now = 0;
+        long lastStats = startTime;
         while (running) {
             //FIXME: add events to the simulation, so that a main view can draw upon an event
             simulation.runGeneration(4000, mainView, bottomPane.infoPanel);
 
             //print generations per minute info
             now = System.currentTimeMillis();
-            if((now - startTime) >= 3000) {
-                System.out.println("GPM: " + ((simulation.getGeneration() - startGen) * (60000 / (now - startTime))));
+            if ((now - lastStats) >= 3000) {
+                long generationsPerMinute = (simulation.getGeneration() - startGen) * (60000 / (now - startTime));
+                generationsPerMinuteAverage += generationsPerMinute;
+                generationsPerMinuteCount++;
+
+                System.out.println("GPM: " + generationsPerMinute);
+                System.out.println("Runtime: " + timeFormat.format(new Date(now - startTime)));
                 startGen = simulation.getGeneration();
-                startTime = now;
+                lastStats = now;
             }
         }
 
+        System.out.println("\nRuntime: " + timeFormat.format(new Date(System.currentTimeMillis() - startTime)));
+        System.out.println("Average GPM: " + (generationsPerMinuteAverage / generationsPerMinuteCount));
         System.exit(0);
     }
 
