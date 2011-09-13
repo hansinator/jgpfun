@@ -134,7 +134,7 @@ public class MainFrame extends JFrame implements WindowListener {
             //print generations per minute info
             now = System.currentTimeMillis();
             if ((now - lastStats) >= 3000) {
-                long generationsPerMinute = (simulation.getGeneration() - startGen) * (60000 / (now - startTime));
+                long generationsPerMinute = (simulation.getGeneration() - startGen) * (60000 / (now - lastStats));
                 generationsPerMinuteAverage += generationsPerMinute;
                 generationsPerMinuteCount++;
 
