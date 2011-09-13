@@ -1,4 +1,6 @@
-package jgpfun.world2d;
+package jgpfun.world2d.senses;
+
+import jgpfun.world2d.Body2d;
 
 /**
  *
