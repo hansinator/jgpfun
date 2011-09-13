@@ -144,9 +144,8 @@ public class MainFrame extends JFrame implements WindowListener {
                 startGen = simulation.getGeneration();
                 lastStats = now;
             }
-
-            //org.joda.time.Duration.millis(now - startTime).
         }
+        
         System.out.println("\nRuntime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
         System.out.println("Average GPM: " + ((generationsPerMinuteCount>0)?(generationsPerMinuteAverage / generationsPerMinuteCount):0));
         System.exit(0);
