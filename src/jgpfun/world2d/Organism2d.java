@@ -89,7 +89,7 @@ public class Organism2d extends BaseOrganism {
             //move
             b.motor.move(left, right);
 
-            b.radarSense.direction += Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
+            b.radarSense.direction += (Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor) / 100.0;
 
             //pickup wallsense before coordinates are clipped
             b.wallSense.sense();

@@ -83,11 +83,16 @@ public class RadarAntBody extends Body2d {
         p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); //right wing
         p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); //left wing
 
-        g.setColor(Color.darkGray);
-        double rdir, bdir;
-        rdir = radarSense.direction - ((double)Math.round(radarSense.direction / (2 * Math.PI)) * 2 * Math.PI);
-        bdir = dir - ((double)Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
-        g.drawLine(x_center, y_center, Math.round((float) (x + RadarSense.beamLength * Math.sin(rdir + bdir))), Math.round((float) (y - RadarSense.beamLength * Math.cos(rdir + bdir))));
+        if (radarSense.target == null) {
+            g.setColor(Color.darkGray);
+            double rdir, bdir;
+            rdir = radarSense.direction - ((double) Math.round(radarSense.direction / (2 * Math.PI)) * 2 * Math.PI);
+            bdir = dir - ((double) Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
+            g.drawLine(x_center, y_center, Math.round((float) (x + RadarSense.beamLength * Math.sin(rdir + bdir))), Math.round((float) (y - RadarSense.beamLength * Math.cos(rdir + bdir))));
+        } else {
+            g.setColor(Color.blue);
+            g.drawLine(x_center, y_center, radarSense.target.x, radarSense.target.y);
+        }
 
         g.setColor(Color.red);
         g.drawPolygon(p);
