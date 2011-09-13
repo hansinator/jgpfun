@@ -51,8 +51,8 @@ public class World2d {
             //organism.dy = Math.min(Math.max(organism.dy, 0), worldHeight);
 
             //prevent world wrapping
-            b.x = Math.min(Math.max(b.x, 0), worldWidth);
-            b.y = Math.min(Math.max(b.y, 0), worldHeight);
+            b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
+            b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
 
             //eat food
             synchronized (worldLock) {
