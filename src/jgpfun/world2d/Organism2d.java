@@ -2,7 +2,7 @@ package jgpfun.world2d;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import jgpfun.world2d.senses.WallSense;
+import java.awt.Polygon;
 import java.io.IOException;
 import jgpfun.genetics.lgp.OpCode;
 import jgpfun.life.BaseOrganism;
@@ -40,7 +40,7 @@ public class Organism2d extends BaseOrganism {
         super(genome);
         this.vm = new EvoVM(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
         //this.vm = EvoCompiler.compile(registerCount, genome.program.toArray(new OpCode[genome.program.size()]));
-        
+
         this.food = 0;
         this.bodies = new FoodAntBody[1];
         this.inputs = new SensorInput[7 * bodies.length];
@@ -107,35 +107,9 @@ public class Organism2d extends BaseOrganism {
 
 
     public void draw(Graphics g) {
-        g.setColor(Color.red);
-
         for (Body2d b : bodies) {
-            double sindir = Math.sin(b.dir);
-            double cosdir = Math.cos(b.dir);
-            int xrot = (int) Math.round(8.0 * sindir);
-            int yrot = (int) Math.round(8.0 * cosdir);
-            int x = Math.round((float) b.x);
-            int y = Math.round((float) b.y);
-
-            g.drawLine(x, y, x + xrot, y - yrot);
-            g.fillOval(x, y, 4, 4);
-
-            //Polygon p = new Polygon();
-                /*
-            //1st try
-            p.addPoint((b.x - xrot), (b.y + yrot));
-            p.addPoint((b.x + xrot), (b.y + yrot));
-            p.addPoint(b.x + xrot, b.y - 6 + yrot);
-
-            //2nd try - looks like a triangle
-            p.addPoint((b.x - 4 + xrot), (b.y + 4 + yrot));
-            p.addPoint((b.x + 4 + xrot), (b.y + 4 + yrot));
-            p.addPoint(b.x + xrot, b.y - 6 + yrot);
-
-            g.drawPolygon(p);
-            g.fillPolygon(p);*/
+            b.draw(g);
         }
-
     }
 
 }

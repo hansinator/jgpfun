@@ -1,10 +1,9 @@
 package jgpfun.world2d;
 
+import java.awt.Graphics;
 import jgpfun.life.SensorInput;
 
 public abstract class Body2d {
-
-    protected final SensorInput[] inputs;
 
     public double dir;
 
@@ -12,7 +11,9 @@ public abstract class Body2d {
 
     public double y;
 
-    public double lastSpeed = 0.0;
+    protected final SensorInput[] inputs;
+
+    protected double lastSpeed = 0.0;
 
 
     public Body2d(double x, double y, double dir, SensorInput[] inputs) {
@@ -31,6 +32,8 @@ public abstract class Body2d {
     public abstract void prepareInputs();
 
     public abstract void postRoundTrigger();
+
+    public abstract void draw(Graphics g);
 
     protected class OrientationSense implements SensorInput {
 

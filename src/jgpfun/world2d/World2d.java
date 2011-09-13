@@ -107,17 +107,15 @@ public class World2d {
 
 
     public void draw(Graphics g) {
-
-        for (Food f : food) {
-            f.draw(g);
-        }
-
         if (curOrganisms != null) {
             for (BaseOrganism o : curOrganisms) {
                 ((Organism2d) o).draw(g);
             }
         }
 
+        for (Food f : food) {
+            f.draw(g);
+        }
     }
 
 }

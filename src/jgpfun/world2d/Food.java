@@ -28,7 +28,7 @@ public class Food extends World2dObject {
     @Override
     public void draw(Graphics g) {
         g.setColor(Color.green);
-        g.fillOval(x, y, 2, 2);
+        g.fillOval(x-1, y-1, 3, 3);
     }
 
 }

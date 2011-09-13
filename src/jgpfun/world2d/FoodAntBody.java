@@ -1,5 +1,8 @@
 package jgpfun.world2d;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Polygon;
 import jgpfun.life.SensorInput;
 import jgpfun.util.Settings;
 import jgpfun.world2d.senses.WallSense;
@@ -63,6 +66,36 @@ public class FoodAntBody extends Body2d {
             organism.incFood();
             food.randomPosition();
         }
+    }
+
+
+    @Override
+    public void draw(Graphics g) {
+        double sindir = Math.sin(dir);
+        double cosdir = Math.cos(dir);
+        int x_center = Math.round((float) x);
+        int y_center = Math.round((float) y);
+        int x_len_displace = (int) Math.round(6.0 * sindir);
+        int y_len_displace = (int) Math.round(6.0 * cosdir);
+        int x_width_displace = (int) Math.round(4.0 * sindir);
+        int y_width_displace = (int) Math.round(4.0 * cosdir);
+        int x_bottom = x_center - x_len_displace;
+        int y_bottom = y_center + y_len_displace;
+
+        Polygon p = new Polygon();
+        p.addPoint(x_center + x_len_displace, y_center - y_len_displace); //top of triangle
+        p.addPoint(x_bottom + y_width_displace, y_bottom + x_width_displace); //right wing
+        p.addPoint(x_bottom - y_width_displace, y_bottom - x_width_displace); //left wing
+
+        g.setColor(Color.darkGray);
+        g.drawLine(x_center, y_center, food.x, food.y);
+
+        g.setColor(Color.red);
+        g.drawPolygon(p);
+        g.fillPolygon(p);
+
+        g.setColor(Color.green);
+        g.drawString("" + organism.getFitness(), x_center + 8, y_center + 8);
     }
 
     private class FoodDirXSense implements SensorInput {
