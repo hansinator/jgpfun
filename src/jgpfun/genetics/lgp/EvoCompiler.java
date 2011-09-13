@@ -37,7 +37,7 @@ public class EvoCompiler {
 
 
     public static BaseMachine compile(final int numRegs, OpCode[] program) throws IOException {
-        final OpCode[] prg = EvoCodeUtils.stripStructuralIntronCode(BaseMachine.normalizeProgram(program, numRegs), numRegs);
+        final OpCode[] prg = EvoCodeUtils.stripStructuralIntronCode(BaseMachine.normalizeProgram(program, numRegs), numRegs, 0);
 
         //begin class
         final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");

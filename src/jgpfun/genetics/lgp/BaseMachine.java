@@ -56,11 +56,7 @@ public abstract class BaseMachine {
             OpCode curop = program[i];
 
             curop.src1 = Math.abs(curop.src1) % numRegs;
-            if (!curop.immediate) {
-                curop.src2 = Math.abs(curop.src2) % numRegs;
-            } else {
-                curop.src2 /= 65535;
-            }
+            curop.src2 = curop.immediate ? (curop.src2 / 65535) : (Math.abs(curop.src2) % numRegs);
             curop.trg = Math.abs(curop.trg) % numRegs;
             curop.op = Math.abs(curop.op) % ops.length;
             curop.operation = ops[curop.op];

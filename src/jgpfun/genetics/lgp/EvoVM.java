@@ -15,7 +15,7 @@ public class EvoVM extends BaseMachine {
         regs = new int[numRegs];
 
         //normalize program and strip strctural intron code portions
-        this.program = EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs);
+        this.program = EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, 0);
         //this.program = normalizeProgram(program, numRegs);//
     }
 

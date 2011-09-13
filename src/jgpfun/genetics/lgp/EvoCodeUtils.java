@@ -1,12 +1,12 @@
 /*
  */
-
 package jgpfun.genetics.lgp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import jgpfun.genetics.lgp.operations.NoSourceOperation;
 import jgpfun.genetics.lgp.operations.UnaryOperation;
 
 /**
@@ -17,7 +17,8 @@ class EvoCodeUtils {
 
     private static final Object dummy = new Object();
 
-    public static OpCode[] stripStructuralIntronCode(OpCode[] program, int registerCount) {
+
+    public static OpCode[] stripStructuralIntronCode(OpCode[] program, int registerCount, int inputRegisterCount) {
         Map<Integer, Object> effectiveRegisters = new HashMap<Integer, Object>();
         Boolean[] markers = new Boolean[program.length];
         List<OpCode> strippedProgram;
@@ -84,14 +85,11 @@ class EvoCodeUtils {
                 //and add the source operands
                 effectiveRegisters.remove(memVal.trg);
 
-                //special treatment for no source operations - we don't have one yet
-                /*
-                //mark rnd as effective and continue
-                if (instructionSet[opVal] == Instructions.OpRnd)
-                {
-                markers[i] = true;
-                continue;
-                }*/
+                //special treatment for no source operations
+                if (memVal.operation instanceof NoSourceOperation) {
+                    markers[i] = true;
+                    continue;
+                }
 
                 //add source operand 1
                 if (!effectiveRegisters.containsValue(memVal.src1)) {
@@ -99,7 +97,7 @@ class EvoCodeUtils {
                 }
 
                 //add source operand 2, if it is no immediate or unary operation
-                if (!memVal.immediate && memVal.operation instanceof UnaryOperation) {
+                if (!(memVal.immediate || memVal.operation instanceof UnaryOperation)) {
                     //add source operand 2
                     if (!effectiveRegisters.containsValue(memVal.src2)) {
                         effectiveRegisters.put(memVal.src2, dummy);
@@ -125,4 +123,5 @@ class EvoCodeUtils {
 
         return strippedProgram.toArray(new OpCode[strippedProgram.size()]);
     }
+
 }
