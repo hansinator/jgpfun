@@ -43,10 +43,12 @@ public class RadarSense implements SensorInput {
         b = y1 - m * x1;
 
         double y = m * x3 + b;
-        if (Math.round(y) == Math.round(y3)) {
-            return true;
-        }
-        return false;
+        
+        //point is near (better, as a longer radar skips pixels at the outer end when moving)
+        return Math.abs(y-y3) < 3.0;
+
+        //real match
+        //return Math.round(y) == Math.round(y3);
     }
 
 
@@ -65,7 +67,7 @@ public class RadarSense implements SensorInput {
         y2 = Math.floor(body.y - beamLength * Math.cos(rdir + bdir));
 
         for (Food f : world.food) {
-            if (pointInLine(x1, y1, x2, y2, f) && (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength) && (Math.abs(x1 + 2.0 * Math.sin(rdir+bdir) - f.x) < Math.abs(x1 - f.x))) {
+            if (pointInLine(x1, y1, x2, y2, f) && (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength) && (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x))) {
                 target = f;
                 return Integer.MAX_VALUE;
             }

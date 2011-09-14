@@ -79,8 +79,8 @@ public class TestRadarSense extends JPanel {
 
         x1 = 10;
         y1 = 10;
-        x2 = 2001;
-        y2 = 2000;
+        x2 = 200;
+        y2 = 200;
         x3 = 15;
         y3 = 15;
         x3 = Math.floor(x3);
@@ -89,6 +89,21 @@ public class TestRadarSense extends JPanel {
 
         System.out.println(((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)) == 0);
         System.out.println((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
+
+        double m, b;
+        m = (y2 - y1) / (x2 - x1);
+        b = y1 - m * x1;
+
+        double y = m * x3 + b;
+
+        if (Math.abs(y - y3) < 10.0) {
+            System.out.println(y);
+            System.out.println(y3);
+            System.out.println(y-y3);
+            System.out.println("");
+        }
+        System.out.println(y);
+        System.out.println(y3);
     }
 
 }
