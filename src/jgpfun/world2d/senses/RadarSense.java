@@ -30,22 +30,16 @@ public class RadarSense implements SensorInput {
 
 
     public boolean pointInLine(double x1, double y1, double x2, double y2, Point p) {
-        double x3, y3;
+        double x3, y3, m, b, y;
 
-        //point on line
-        x3 = Math.floor(p.x);
-        y3 = Math.floor(p.y);
-
-        //return ((x2 - x1)*(y3 - y1) - (y2 - y1)*(x3 - x1)) > 0;
-
-        double m, b;
+        x3 = (double)p.x;
+        y3 = (double)p.y;
         m = (y2 - y1) / (x2 - x1);
         b = y1 - m * x1;
+        y = m * x3 + b;
 
-        double y = m * x3 + b;
-        
         //point is near (better, as a longer radar skips pixels at the outer end when moving)
-        return Math.abs(y-y3) < 3.0;
+        return Math.abs(y - y3) < 3.0;
 
         //real match
         //return Math.round(y) == Math.round(y3);
