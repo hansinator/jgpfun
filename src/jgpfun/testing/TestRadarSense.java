@@ -22,7 +22,7 @@ import jgpfun.world2d.World2d;
  *
  * @author Hansinator
  */
-public class TestOrganismDraw extends JPanel {
+public class TestRadarSense extends JPanel {
 
     private final Organism2d organism;
 
@@ -31,7 +31,7 @@ public class TestOrganismDraw extends JPanel {
     private final World2d world;
 
 
-    public TestOrganismDraw() throws IOException {
+    public TestRadarSense() throws IOException {
         setPreferredSize(new Dimension(800, 600));
         world = new World2d(800, 600, 23);
         world.randomFood();
@@ -60,22 +60,35 @@ public class TestOrganismDraw extends JPanel {
         super.paint(g);
         g.setColor(Color.black);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
-        organism.draw(g);
-        world.draw(g);
+        /*organism.draw(g);
         g.setColor(Color.yellow);
-        g.drawString("Dir: " + String.format("%.2f", organism.bodies[0].dir), 10, 15);
+        g.drawString("Dir: " + String.format("%.2f", organism.bodies[0].dir), 10, 15);*/
     }
-
+    
 
     public static void main(String[] args) throws IOException {
-        Settings.load(new File("default.properties"));
+        /*Settings.load(new File("default.properties"));
         JFrame frame = new JFrame("test");
-        TestOrganismDraw testOrganismDraw = new TestOrganismDraw();
+        TestRadarSense testOrganismDraw = new TestRadarSense();
         frame.setLayout(new BorderLayout());
         frame.add(testOrganismDraw, BorderLayout.CENTER);
         frame.add(testOrganismDraw.slider, BorderLayout.PAGE_END);
         frame.pack();
-        frame.setVisible(true);
+        frame.setVisible(true);*/
+        double x1, x2, x3, y1, y2, y3;
+
+        x1 = 10;
+        y1 = 10;
+        x2 = 20;
+        y2 = 20;
+        x3 = 15;
+        y3 = 15;
+        x3 = Math.floor(x3);
+        y3 = Math.floor(y3);
+
+
+        System.out.println(((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)) == 0);
+        System.out.println((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
     }
 
 }

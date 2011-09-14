@@ -29,30 +29,21 @@ public class RadarSense implements SensorInput {
     }
 
 
-    public boolean pointInLine(Point p) {
-        double x1, x2, x3, y1, y2, y3;
-
-        //line start
-        x1 = body.x;
-        y1 = body.y;
-
-        //line end
-        double rdir, bdir;
-        rdir = direction - ((double)Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-        bdir = body.dir - ((double)Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
-        x2 = body.x + beamLength * Math.sin(rdir + bdir);
-        y2 = body.y - beamLength * Math.cos(rdir + bdir);
+    public boolean pointInLine(double x1, double y1, double x2, double y2, Point p) {
+        double x3, y3;
 
         //point on line
-        x3 = Math.floor(p.y);
-        y3 = Math.floor(p.x);
+        x3 = Math.floor(p.x);
+        y3 = Math.floor(p.y);
+
+        //return ((x2 - x1)*(y3 - y1) - (y2 - y1)*(x3 - x1)) > 0;
 
         double m, b;
         m = (y2 - y1) / (x2 - x1);
         b = y1 - m * x1;
 
         double y = m * x3 + b;
-        if (y == y3) {
+        if (Math.round(y) == Math.round(y3)) {
             return true;
         }
         return false;
@@ -61,8 +52,16 @@ public class RadarSense implements SensorInput {
 
     @Override
     public int get() {
+        double x2, y2, rdir, bdir;
+
+        //line end
+        rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
+        bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
+        x2 = body.x + beamLength * Math.sin(rdir + bdir);
+        y2 = body.y - beamLength * Math.cos(rdir + bdir);
+
         for (Food f : world.food) {
-            if (pointInLine(f)) {
+            if (pointInLine(body.x, body.y, x2, y2, f)) {
                 target = f;
                 return Integer.MAX_VALUE;
             }

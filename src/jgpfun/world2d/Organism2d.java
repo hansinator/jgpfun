@@ -35,6 +35,8 @@ public class Organism2d extends BaseOrganism {
 
     private int food;
 
+    double radcache;
+
 
     public Organism2d(Genome genome) throws IOException {
         super(genome);
@@ -69,8 +71,9 @@ public class Organism2d extends BaseOrganism {
         int reg = 0;
 
         //calculate food stuff for body (prepare sensors..)
-        for (Body2d b : bodies) {
+        for (RadarAntBody b : bodies) {
             b.prepareInputs();
+            b.radarSense.direction = radcache;
         }
 
         //write input registers
@@ -89,7 +92,7 @@ public class Organism2d extends BaseOrganism {
             //move
             b.motor.move(left, right);
 
-            b.radarSense.direction += (Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor) / 100.0;
+            radcache += (Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor) / 100.0;
 
             //pickup wallsense before coordinates are clipped
             b.wallSense.sense();
