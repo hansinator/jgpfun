@@ -42,7 +42,7 @@ public class Organism2d extends BaseOrganism {
         super(genome);
         this.food = 0;
         this.bodies = new RadarAntBody[1];
-        this.inputs = new SensorInput[4 * bodies.length];
+        this.inputs = new SensorInput[5 * bodies.length];
         
         this.vm = new EvoVM(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
         //this.vm = EvoCompiler.compile(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));

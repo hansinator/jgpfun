@@ -28,7 +28,7 @@ public class RadarAntBody extends Body2d {
 
 
     public RadarAntBody(Organism2d organism, World2d world) {
-        super(0.0, 0.0, 0.0, new SensorInput[4]);
+        super(0.0, 0.0, 0.0, new SensorInput[5]);
         this.organism = organism;
         this.world = world;
 
@@ -42,8 +42,9 @@ public class RadarAntBody extends Body2d {
         //inputs
         inputs[0] = new OrientationSense();
         inputs[1] = radarSense;
-        inputs[2] = new SpeedSense();
-        inputs[3] = wallSense;
+        inputs[2] = new RadarSenseDirection();
+        inputs[3] = new SpeedSense();
+        inputs[4] = wallSense;
     }
 
 
@@ -109,6 +110,15 @@ public class RadarAntBody extends Body2d {
         @Override
         public int get() {
             return (int) (lastSpeed * Organism2d.intScaleFactor);
+        }
+
+    }
+
+    private class RadarSenseDirection implements SensorInput {
+
+        @Override
+        public int get() {
+            return (int) (radarSense.direction * Organism2d.intScaleFactor);
         }
 
     }

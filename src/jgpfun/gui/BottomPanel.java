@@ -3,6 +3,7 @@ package jgpfun.gui;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import jgpfun.life.Simulation;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -12,7 +13,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.Range;
 import org.jfree.data.RangeType;
-import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 /**
@@ -105,11 +105,11 @@ public class BottomPanel extends JPanel {
          * Configure this panel
          */
 
+        JSplitPane graphPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, foodChartPanel, progSizeChartPanel);
         setPreferredSize(new Dimension(0, 200));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(groupPanel);
-        add(foodChartPanel);
-        add(progSizeChartPanel);
+        add(graphPane);
     }
 
 }
