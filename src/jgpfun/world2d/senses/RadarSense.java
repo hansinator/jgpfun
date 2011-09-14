@@ -52,16 +52,20 @@ public class RadarSense implements SensorInput {
 
     @Override
     public int get() {
-        double x2, y2, rdir, bdir;
+        double x1, y1, x2, y2, rdir, bdir;
+
+        //line start
+        x1 = Math.floor(body.x);
+        y1 = Math.floor(body.y);
 
         //line end
         rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
         bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
-        x2 = body.x + beamLength * Math.sin(rdir + bdir);
-        y2 = body.y - beamLength * Math.cos(rdir + bdir);
+        x2 = Math.floor(body.x + beamLength * Math.sin(rdir + bdir));
+        y2 = Math.floor(body.y - beamLength * Math.cos(rdir + bdir));
 
         for (Food f : world.food) {
-            if (pointInLine(body.x, body.y, x2, y2, f)) {
+            if (pointInLine(x1, y1, x2, y2, f) && (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength) && (Math.abs(x1 + 2.0 * Math.sin(rdir+bdir) - f.x) < Math.abs(x1 - f.x))) {
                 target = f;
                 return Integer.MAX_VALUE;
             }

@@ -79,8 +79,8 @@ public class TestRadarSense extends JPanel {
 
         x1 = 10;
         y1 = 10;
-        x2 = 20;
-        y2 = 20;
+        x2 = 2001;
+        y2 = 2000;
         x3 = 15;
         y3 = 15;
         x3 = Math.floor(x3);
