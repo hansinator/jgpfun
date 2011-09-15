@@ -27,19 +27,19 @@ public class WallSense implements SensorInput {
     public int sense() {
         double dir = body.dir, temp = 0.0;
         //clip to 2*PI range
-        dir = dir - ((double)Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
+        dir = dir - ((double) Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
 
-        if ((body.x < 0) || (body.x >= worldWidth))
-        {
+        if ((body.x < 0) || (body.x >= worldWidth)) {
             //TODO: fix abs stuff
             temp = Math.min(Math.abs(2 * Math.PI - dir), Math.abs(Math.PI - dir));
+            if ((body.y < 0) || (body.y >= worldHeight)) {
+                temp = Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir)));
+            }
+        } else if ((body.y < 0) || (body.y >= worldHeight)) {
+            temp = Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir));
         }
 
-        if ((body.y < 0) || (body.y >= worldHeight)) {
-            temp = Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir)));
-        }
-
-        lastSenseVal = Math.round((float)temp * (float)Organism2d.intScaleFactor);
+        lastSenseVal = (int) Math.round(temp * Organism2d.intScaleFactor);
         return lastSenseVal;
     }
 
