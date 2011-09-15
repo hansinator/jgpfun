@@ -44,7 +44,6 @@ public class World2d {
     public void moveOrganismInWorld(Organism2d organism, Object worldLock) {
         //TODO: have a more compex world, add a barrier in the middle of the screen
         //TODO: take into account ant size, so it can't hide outside of the screen
-        //start = System.nanoTime();
         for (Body2d b : organism.bodies) {
             //prevent world wrapping
             //organism.dx = Math.min(Math.max(organism.dx, 0), worldWidth);
@@ -59,13 +58,10 @@ public class World2d {
                 b.postRoundTrigger();
             }
         }
-        //System.out.println("Food computation took: " + (System.nanoTime() - start));
     }
 
 
     public final void randomFood() {
-        //FIXME: this seems to interfere with drawing, at least i'm getting an occasional concurrent list modification from within the food painting method
-        //TEMP FIX - this might be faster than creating tons of food object every round
         if (food.size() != foodCount) {
             food.clear();
             for (int i = 0; i < foodCount; i++) {
