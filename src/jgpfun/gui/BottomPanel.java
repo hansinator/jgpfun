@@ -106,6 +106,7 @@ public class BottomPanel extends JPanel {
          */
 
         JSplitPane graphPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, foodChartPanel, progSizeChartPanel);
+        graphPane.setResizeWeight(0.5);
         setPreferredSize(new Dimension(0, 200));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(groupPanel);
