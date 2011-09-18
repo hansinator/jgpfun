@@ -12,6 +12,9 @@ package jgpfun.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import jgpfun.world2d.World2d;
 
 /**
@@ -33,9 +36,41 @@ public class MainView extends javax.swing.JPanel {
      * possibly make object lists for world objects, like bodies and food
      */
     /** Creates new form MainView */
-    public MainView(World2d world) {
+    public MainView(final World2d world) {
         this.world = world;
         initComponents();
+
+        addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Point p = e.getPoint();
+                world.clickEvent(p.x, p.y);
+                //fixme: only repaint if necessary
+                repaint();
+            }
+
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+        });
     }
 
 

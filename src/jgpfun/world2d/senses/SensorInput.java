@@ -1,5 +1,5 @@
 
-package jgpfun.life;
+package jgpfun.world2d.senses;
 
 /**
  *

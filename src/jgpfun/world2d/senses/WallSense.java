@@ -1,6 +1,5 @@
 package jgpfun.world2d.senses;
 
-import jgpfun.life.SensorInput;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.Organism2d;
 

@@ -3,7 +3,7 @@ package jgpfun.world2d;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import jgpfun.life.SensorInput;
+import jgpfun.world2d.senses.SensorInput;
 import jgpfun.util.Settings;
 import jgpfun.world2d.senses.RadarSense;
 import jgpfun.world2d.senses.WallSense;
@@ -97,7 +97,7 @@ public class RadarAntBody extends Body2d {
             }
         }
 
-        g.setColor(Color.red);
+        g.setColor(tagged ? Color.magenta : Color.red);
         g.drawPolygon(p);
         g.fillPolygon(p);
 

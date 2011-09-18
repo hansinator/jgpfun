@@ -9,7 +9,7 @@ import jgpfun.life.BaseOrganism;
 import jgpfun.genetics.Genome;
 import jgpfun.genetics.lgp.BaseMachine;
 import jgpfun.genetics.lgp.EvoVM;
-import jgpfun.life.SensorInput;
+import jgpfun.world2d.senses.SensorInput;
 import jgpfun.util.Settings;
 
 /*

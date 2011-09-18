@@ -3,7 +3,7 @@ package jgpfun.world2d;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import jgpfun.life.SensorInput;
+import jgpfun.world2d.senses.SensorInput;
 import jgpfun.util.Settings;
 import jgpfun.world2d.senses.WallSense;
 

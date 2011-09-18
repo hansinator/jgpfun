@@ -38,11 +38,14 @@ public abstract class AbstractPopulationManager {
 
     protected final CrossoverOperator crossover;
 
+    protected final GenealogyTree genealogyTree;
 
-    public AbstractPopulationManager( int popSize, int progSize) {
+
+    public AbstractPopulationManager(int popSize, int progSize) {
         this.progSize = progSize;
         this.popSize = popSize;
-        
+
+        genealogyTree = new GenealogyTree();
         crossover = new OffsetTwoPointCrossover(progSize / 8);
         organisms = new ArrayList<BaseOrganism>(popSize);
         rnd = new SecureRandom();
@@ -51,10 +54,13 @@ public abstract class AbstractPopulationManager {
     }
 
 
-    public void reset() {
+    public final void reset() {
+        genealogyTree.clear();
         organisms.clear();
         for (int i = 0; i < popSize; i++) {
-            organisms.add(Genome.randomGenome(progSize).synthesize());
+            Genome g = Genome.randomGenome(progSize);
+            organisms.add(g.synthesize());
+            genealogyTree.put(g);
         }
     }
 

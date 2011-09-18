@@ -102,6 +102,22 @@ public class World2d {
     }
 
 
+    public void clickEvent(int x, int y) {
+        //see if we hit an ant body
+        if (curOrganisms != null) {
+            for (BaseOrganism o : curOrganisms) {
+                for (Body2d b : ((Organism2d) o).bodies) {
+                    if (Math.abs(b.x - x) < 10.0 && Math.abs(b.y - y) < 10.0) {
+                        //tag it
+                        b.tagged = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
     public void draw(Graphics g) {
         if (curOrganisms != null) {
             for (BaseOrganism o : curOrganisms) {

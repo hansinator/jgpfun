@@ -1,7 +1,6 @@
 package jgpfun.world2d.senses;
 
 import java.awt.Point;
-import jgpfun.life.SensorInput;
 import jgpfun.world2d.Body2d;
 import jgpfun.world2d.Food;
 import jgpfun.world2d.World2d;

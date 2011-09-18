@@ -15,10 +15,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import jgpfun.life.Simulation;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.PeriodFormat;
 
 /**
  *
@@ -35,8 +31,6 @@ public class MainFrame extends JFrame implements WindowListener {
     public final BottomPanel bottomPane;
 
     private final Simulation simulation;
-
-    private volatile boolean running = true;
 
 
     public MainFrame(int width, int height, Simulation simulation) {
@@ -116,44 +110,15 @@ public class MainFrame extends JFrame implements WindowListener {
 
     public void startSimulation() {
         System.out.println("MainView size: " + mainView.getWidth() + "x" + mainView.getHeight());
-        System.out.println("Start time: " + DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
-
         //TODO: to be put somewhere else
         addWindowListener(this);
-
-        //TODO: thread this and put it somewhere else
-        running = true;
-        int startGen = 0;
-        long now, generationsPerMinuteAverage = 0, generationsPerMinuteCount = 0;
-        long startTime = System.currentTimeMillis();
-        long lastStats = startTime;
-        while (running) {
-            //FIXME: add events to the simulation, so that a main view can draw upon an event
-            simulation.runGeneration(4000, mainView, bottomPane.infoPanel);
-
-            //print generations per minute info
-            now = System.currentTimeMillis();
-            if ((now - lastStats) >= 3000) {
-                long generationsPerMinute = (simulation.getGeneration() - startGen) * (60000 / (now - lastStats));
-                generationsPerMinuteAverage += generationsPerMinute;
-                generationsPerMinuteCount++;
-
-                System.out.println("GPM: " + generationsPerMinute);
-                
-                System.out.println("Runtime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, now)));
-                startGen = simulation.getGeneration();
-                lastStats = now;
-            }
-        }
-        
-        System.out.println("\nRuntime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
-        System.out.println("Average GPM: " + ((generationsPerMinuteCount>0)?(generationsPerMinuteAverage / generationsPerMinuteCount):0));
+        simulation.start(mainView, bottomPane.infoPanel);
         System.exit(0);
     }
 
 
     public void stopSimulation() {
-        running = false;
+        simulation.stop();
         simulation.reset();
     }
 

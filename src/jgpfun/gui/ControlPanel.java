@@ -56,6 +56,7 @@ public class ControlPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 paused = !paused;
                 pauseButton.setText(paused ? "Resume" : "Pause");
+                simulation.setPaused(paused);
             }
 
         });

@@ -11,6 +11,10 @@ import jgpfun.gui.InfoPanel;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import jgpfun.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.PeriodFormat;
 
 /**
  *
@@ -27,7 +31,9 @@ public class Simulation {
 
     private int gen = 0;
 
-    private boolean slowMode;
+    private boolean slowMode = false;
+
+    private volatile boolean paused = false;
 
     public final World2d world;
 
@@ -40,6 +46,8 @@ public class Simulation {
     public final XYSeries progSizeChartData = new XYSeries("prg size");
 
     public final XYSeries realProgSizeChartData = new XYSeries("real prg size");
+
+    private volatile boolean running = true;
 
     private volatile boolean abort = false;
 
@@ -73,18 +81,65 @@ public class Simulation {
     }
 
 
+    //TODO: thread this or stuff
+    public void start(MainView mainView, InfoPanel infoPanel) {
+        int startGen = 0;
+        long now, generationsPerMinuteAverage = 0, generationsPerMinuteCount = 0;
+        running = true;
+        abort = false;
+        paused = false;
+
+        System.out.println("Start time: " + DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
+
+        long startTime = System.currentTimeMillis();
+        long lastStats = startTime;
+        while (running) {
+            //FIXME: add events to the simulation, so that a main view can draw upon an event
+            runGeneration(4000, mainView, infoPanel);
+
+            //print generations per minute info
+            now = System.currentTimeMillis();
+            if ((now - lastStats) >= 3000) {
+                long generationsPerMinute = (gen - startGen) * (60000 / (now - lastStats));
+                generationsPerMinuteAverage += generationsPerMinute;
+                generationsPerMinuteCount++;
+
+                System.out.println("GPM: " + generationsPerMinute);
+
+                System.out.println("Runtime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, now)));
+                startGen = gen;
+                lastStats = now;
+            }
+        }
+
+        System.out.println("\nEnd time: " + DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
+        System.out.println("Runtime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
+        System.out.println("Average GPM: " + ((generationsPerMinuteCount > 0) ? (generationsPerMinuteAverage / generationsPerMinuteCount) : 0));
+    }
+
+
+    public void stop() {
+        running = false;
+    }
+
+
     public void runGeneration(int iterations, MainView view, InfoPanel infoPanel) {
         long start = System.currentTimeMillis();
         long time;
 
         // scatter organisms in the world
-        for(BaseOrganism organism : populationManager.organisms)
-            ((Organism2d)organism).addToWorld(world);
+        for (BaseOrganism organism : populationManager.organisms) {
+            ((Organism2d) organism).addToWorld(world);
+        }
 
         world.curOrganisms = populationManager.organisms;
 
         synchronized (runLock) {
             for (int i = 0; i < iterations; i++) {
+                while (paused) {
+                    Thread.yield();
+                }
+
                 if (abort) {
                     break;
                 }
@@ -168,7 +223,7 @@ public class Simulation {
                     }*/
 
                     //move organism in world to see if it had hit some food or something like that
-                    world.moveOrganismInWorld((Organism2d)organism, lock);
+                    world.moveOrganismInWorld((Organism2d) organism, lock);
 
                     //start = System.nanoTime();
                     cb.countDown();
@@ -210,6 +265,16 @@ public class Simulation {
 
     public int getGeneration() {
         return gen;
+    }
+
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+
+    public boolean isPausede() {
+        return paused;
     }
 
 }

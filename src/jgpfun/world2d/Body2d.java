@@ -1,9 +1,13 @@
 package jgpfun.world2d;
 
 import java.awt.Graphics;
-import jgpfun.life.SensorInput;
+import jgpfun.world2d.senses.SensorInput;
 
 public abstract class Body2d {
+
+    protected final SensorInput[] inputs;
+
+    protected double lastSpeed = 0.0;
 
     public double dir;
 
@@ -11,9 +15,7 @@ public abstract class Body2d {
 
     public double y;
 
-    protected final SensorInput[] inputs;
-
-    protected double lastSpeed = 0.0;
+    public volatile boolean tagged = false;
 
 
     public Body2d(double x, double y, double dir, SensorInput[] inputs) {
@@ -31,7 +33,9 @@ public abstract class Body2d {
 
     public abstract void prepareInputs();
 
+
     public abstract void postRoundTrigger();
+
 
     public abstract void draw(Graphics g);
 

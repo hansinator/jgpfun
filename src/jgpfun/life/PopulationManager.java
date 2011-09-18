@@ -3,6 +3,7 @@ package jgpfun.life;
 import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import org.jfree.data.xy.XYSeries;
@@ -14,6 +15,7 @@ import org.jfree.data.xy.XYSeries;
 public class PopulationManager extends AbstractPopulationManager {
 
     private int totalFit;
+
 
     public PopulationManager(int popSize, int progSize) {
         super(popSize, progSize);
@@ -30,7 +32,7 @@ public class PopulationManager extends AbstractPopulationManager {
         avgProgSize /= organisms.size();
 
         for (BaseOrganism o : organisms) {
-            avgRealProgSize += ((Organism2d)o).vm.getProgramSize();
+            avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
         }
         avgRealProgSize /= organisms.size();
 
@@ -43,7 +45,8 @@ public class PopulationManager extends AbstractPopulationManager {
     @Override
     public int newGeneration() {
         double mutador;
-        Genome parent1, parent2;
+        Genome child1, child2;
+        BaseOrganism parent1, parent2;
         totalFit = calculateFitness();
         List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
 
@@ -52,23 +55,29 @@ public class PopulationManager extends AbstractPopulationManager {
             //select two source genomes and clone them
             //note: you must copy/clone the genomes before modifying them,
             //as the genome is passed by reference
-            parent1 = selector.select(organisms).getGenome().clone();
-            parent2 = selector.select(organisms).getGenome().clone();
+            parent1 = selector.select(organisms);
+            parent2 = selector.select(organisms);
+            child1 = parent1.getGenome().clone();
+            child2 = parent2.getGenome().clone();
 
             //mutate or crossover with a user defined chance
             //mutador = rnd.nextDouble();
             //if (mutador > crossoverRate) {
             //mutate genomes
-            parent1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            parent2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            child1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            child2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
             /* else {
             //perform crossover
             crossover.cross(parent1, parent2, rnd);
             }*/
 
             //create new ants from the modified genomes and save them
-            newAnts.add(parent1.synthesize());
-            newAnts.add(parent2.synthesize());
+            newAnts.add(child1.synthesize());
+            newAnts.add(child2.synthesize());
+
+            //add to genealogy tree
+            genealogyTree.put(parent1.getGenome(), child1, parent1.getFitness());
+            genealogyTree.put(parent1.getGenome(), child2, parent2.getFitness());
         }
 
         //replace and leave the other to GC
