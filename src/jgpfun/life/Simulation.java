@@ -22,6 +22,9 @@ import org.joda.time.format.PeriodFormat;
  */
 public class Simulation {
 
+    //todo: have world object automatically add themselves to a legend that can be drawn onto the screen (bottom?)
+    //todo: in a later simulation creation dialogue, have categories for "simple" stuff (bodiss, sesses) and more custom stuff.. a bit like the clonk menu?!
+
     //(it is questionable if this must be included in propertiers... it's fine if it's hardcoded for a while or two!)
     private int roundsMod = 800;
 
