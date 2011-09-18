@@ -25,6 +25,9 @@ public class Simulation {
     //(it is questionable if this must be included in propertiers... it's fine if it's hardcoded for a while or two!)
     private int roundsMod = 800;
 
+    //(it is questionable if this must be included in propertiers... it's fine if it's hardcoded for a while or two!)
+    private int fpsMax = 70;
+
     private final ThreadPoolExecutor pool;
 
     private final Object lock = new Object();
@@ -52,6 +55,8 @@ public class Simulation {
     private volatile boolean abort = false;
 
     private final Object runLock = new Object();
+
+    public static final int ROUNDS_PER_GENERATION = 4000;
 
 
     public Simulation(World2d world, AbstractPopulationManager populationManager) {
@@ -95,7 +100,7 @@ public class Simulation {
         long lastStats = startTime;
         while (running) {
             //FIXME: add events to the simulation, so that a main view can draw upon an event
-            runGeneration(4000, mainView, infoPanel);
+            runGeneration(ROUNDS_PER_GENERATION, mainView, infoPanel);
 
             //print generations per minute info
             now = System.currentTimeMillis();
@@ -124,9 +129,6 @@ public class Simulation {
 
 
     public void runGeneration(int iterations, MainView view, InfoPanel infoPanel) {
-        long start = System.currentTimeMillis();
-        long time;
-
         // scatter organisms in the world
         for (BaseOrganism organism : populationManager.organisms) {
             ((Organism2d) organism).addToWorld(world);
@@ -135,6 +137,9 @@ public class Simulation {
         world.curOrganisms = populationManager.organisms;
 
         synchronized (runLock) {
+            long start = System.currentTimeMillis();
+            int lastStatRound = 0;
+
             for (int i = 0; i < iterations; i++) {
                 while (paused) {
                     Thread.yield();
@@ -147,16 +152,23 @@ public class Simulation {
                 step();
 
                 if (slowMode || (i % roundsMod) == 0) {
-                    time = System.currentTimeMillis() - start;
-                    infoPanel.updateInfo(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations, gen + 1);
-                    view.drawStuff(time > 0 ? (int) ((i * 1000) / time) : 1, (i * 100) / iterations);
+                    final long time = System.currentTimeMillis() - start;
+                    start = System.currentTimeMillis();
+                    final int rps = time > 0 ? (int) (((i - lastStatRound) * 1000) / time) : 1;
+                    final int progress = (i * 100) / iterations;
+                    lastStatRound = i;
+
+                    infoPanel.updateInfo(rps, progress, gen + 1);
+                    view.drawStuff(rps, progress);
                     view.repaint();
 
                     if (slowMode) {
-                        try {
-                            Thread.sleep(15);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                        if (time < (1000 / fpsMax)) {
+                            try {
+                                Thread.sleep((1000 / fpsMax) - time);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(PopulationManager.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
                 }
@@ -259,7 +271,17 @@ public class Simulation {
 
 
     public void setRoundsMod(int roundsMod) {
-        this.roundsMod = roundsMod;
+        this.roundsMod = roundsMod == 0 ? 1 : roundsMod;
+    }
+
+
+    public int getFps() {
+        return fpsMax;
+    }
+
+
+    public void setFps(int fpsMax) {
+        this.fpsMax = fpsMax == 0 ? 1 : fpsMax;
     }
 
 

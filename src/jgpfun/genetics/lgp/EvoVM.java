@@ -24,13 +24,14 @@ public class EvoVM extends BaseMachine {
     public void run() {
         pc = 0;
         while (pc < program.length) {
-            execute(pc++);
+            OpCode curop = program[pc++];
+            regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
         }
     }
 
 
     public void execute(int pc) {
-        OpCode curop = program[pc];
+        
 
         /*if (op instanceof BranchOperation) {
         if(op.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2])) != 1) {
@@ -45,7 +46,7 @@ public class EvoVM extends BaseMachine {
         //do nothing*/
         //} else {
         //execute the operation
-        regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
+        
         //}
     }
 

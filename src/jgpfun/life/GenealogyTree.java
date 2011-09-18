@@ -17,6 +17,10 @@ public class GenealogyTree {
     private final ArrayList<Node> roots;
 
 
+    //TODO: include functionality to pit two or more ants against each other
+    //TODO: add mini-world-sim for single ant (or multiple? see above) with simple controls for testing organisms
+
+
     public GenealogyTree() {
         nodes = new HashMap<Genome, Node>();
         roots = new ArrayList<Node>();

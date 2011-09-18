@@ -34,16 +34,36 @@ public class ControlPanel extends JPanel {
 
         });
 
-        final JSlider speedSlider = new JSlider(1, 4000);
-        speedSlider.setMaximumSize(new Dimension(200, 20));
+        final JSlider speedSlider = new JSlider(0, Simulation.ROUNDS_PER_GENERATION);
+        speedSlider.setMajorTickSpacing(Simulation.ROUNDS_PER_GENERATION / 2);
+        speedSlider.setMinorTickSpacing(Simulation.ROUNDS_PER_GENERATION / 8);
+        speedSlider.setPaintLabels(true);
+        speedSlider.setPaintTicks(true);
         speedSlider.setValue(simulation.getRoundsMod());
+        speedSlider.setMaximumSize(new Dimension(200, 40));
         speedSlider.addChangeListener(new ChangeListener() {
-
 
             @Override
             public void stateChanged(ChangeEvent e) {
                 simulation.setRoundsMod(speedSlider.getValue());
             }
+
+        });
+
+        final JSlider fpsSlider = new JSlider(0, 100);
+        fpsSlider.setMajorTickSpacing(50);
+        fpsSlider.setMinorTickSpacing(25);
+        fpsSlider.setPaintLabels(true);
+        fpsSlider.setPaintTicks(true);
+        fpsSlider.setValue(70);
+        fpsSlider.setMaximumSize(new Dimension(200, 40));
+        fpsSlider.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                simulation.setFps(fpsSlider.getValue());
+            }
+
         });
 
         final JButton pauseButton = new JButton("Pause");
@@ -70,6 +90,7 @@ public class ControlPanel extends JPanel {
 
         add(speedSwitch);
         add(speedSlider);
+        add(fpsSlider);
         add(pauseButton);
     }
 
