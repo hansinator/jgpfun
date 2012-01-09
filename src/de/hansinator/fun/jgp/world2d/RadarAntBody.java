@@ -93,7 +93,7 @@ public class RadarAntBody extends Body2d {
         } else {
             if (radarSense.target != null) {
                 g.setColor(Color.blue);
-                g.drawLine(x_center, y_center, radarSense.target.x, radarSense.target.y);
+                g.drawLine(x_center, y_center, (int)Math.round(radarSense.target.getX()), (int)Math.round(radarSense.target.getY()));
             }
         }
 

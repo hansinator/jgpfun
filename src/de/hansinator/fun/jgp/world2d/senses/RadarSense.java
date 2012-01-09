@@ -4,6 +4,7 @@ import java.awt.Point;
 import de.hansinator.fun.jgp.world2d.Body2d;
 import de.hansinator.fun.jgp.world2d.Food;
 import de.hansinator.fun.jgp.world2d.World2d;
+import java.awt.geom.Point2D;
 
 /**
  *
@@ -19,7 +20,7 @@ public class RadarSense implements SensorInput {
 
     public static final double beamLength = 200.0;
 
-    public Point target = null;
+    public Point2D target = null;
 
 
     public RadarSense(Body2d body, World2d world) {
@@ -28,11 +29,11 @@ public class RadarSense implements SensorInput {
     }
 
 
-    public boolean pointInLine(double x1, double y1, double x2, double y2, Point p) {
+    public boolean pointInLine(double x1, double y1, double x2, double y2, Point2D p) {
         double x3, y3, m, b, y;
 
-        x3 = (double)p.x;
-        y3 = (double)p.y;
+        x3 = (double)p.getX();
+        y3 = (double)p.getY();
         m = (y2 - y1) / (x2 - x1);
         b = y1 - m * x1;
         y = m * x3 + b;

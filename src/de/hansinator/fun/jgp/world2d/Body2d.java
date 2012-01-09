@@ -3,7 +3,7 @@ package de.hansinator.fun.jgp.world2d;
 import java.awt.Graphics;
 import de.hansinator.fun.jgp.world2d.senses.SensorInput;
 
-public abstract class Body2d {
+public abstract class Body2d extends World2dObject {
 
     protected final SensorInput[] inputs;
 
@@ -11,16 +11,12 @@ public abstract class Body2d {
 
     public double dir;
 
-    public double x;
-
-    public double y;
-
     public volatile boolean tagged = false;
 
 
     public Body2d(double x, double y, double dir, SensorInput[] inputs) {
-        this.x = x;
-        this.y = y;
+        //TODO: fix null pointer
+        super(null, x, y);
         this.dir = dir;
         this.inputs = inputs;
     }

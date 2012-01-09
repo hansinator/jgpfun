@@ -88,7 +88,7 @@ public class FoodAntBody extends Body2d {
         p.addPoint(Math.round((float)(x_bottom - y_width_displace)), Math.round((float)(y_bottom - x_width_displace))); //left wing
 
         g.setColor(Color.darkGray);
-        g.drawLine(x_center, y_center, food.x, food.y);
+        g.drawLine(x_center, y_center, (int)Math.round(food.x), (int)Math.round(food.y));
 
         g.setColor(Color.red);
         g.drawPolygon(p);
