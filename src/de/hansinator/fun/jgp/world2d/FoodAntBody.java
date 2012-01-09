@@ -53,7 +53,7 @@ public class FoodAntBody extends Body2d {
     @Override
     public void prepareInputs() {
         food = world.findNearestFood(Math.round((float) x), Math.round((float) y));
-        foodDist = World2d.foodDist(food, Math.round((float) x), Math.round((float) y));
+        foodDist = World2dObject.distance(food, Math.round((float) x), Math.round((float) y));
     }
 
 
