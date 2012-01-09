@@ -33,6 +33,7 @@ public abstract class Body2d extends World2dObject {
     public abstract void postRoundTrigger();
 
 
+    @Override
     public abstract void draw(Graphics g);
 
     protected class OrientationSense implements SensorInput {
