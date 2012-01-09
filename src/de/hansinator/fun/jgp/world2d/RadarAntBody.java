@@ -55,7 +55,7 @@ public class RadarAntBody extends Body2d {
 
     @Override
     public void postRoundTrigger() {
-        Food food = world.findNearestFood(Math.round((float) x), Math.round((float) y));
+        Food food = world.findNearestFood(this);
         if ((food.x >= (x - foodPickupRadius))
                 && (food.x <= (x + foodPickupRadius))
                 && (food.y >= (y - foodPickupRadius))

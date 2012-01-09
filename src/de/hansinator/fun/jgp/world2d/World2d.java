@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import de.hansinator.fun.jgp.life.BaseOrganism;
+import java.awt.Point;
 
 /**
  *
@@ -75,12 +76,12 @@ public class World2d {
     }
 
 
-    public Food findNearestFood(int x, int y) {
+    public Food findNearestFood(Point.Double p) {
         double minDist = 1000000;
         double curDist;
         int indexMinDist = -1;
         for (int i = 0; i < food.size(); i++) {
-            curDist = World2dObject.distance(food.get(i), x, y);
+            curDist = World2dObject.distance(food.get(i), p);
             //limit visible range to 200
             //if (curDist > 200)
             //continue;
