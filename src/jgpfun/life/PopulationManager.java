@@ -3,7 +3,6 @@ package jgpfun.life;
 import jgpfun.genetics.Genome;
 import jgpfun.world2d.Organism2d;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import jgpfun.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import org.jfree.data.xy.XYSeries;
@@ -44,7 +43,6 @@ public class PopulationManager extends AbstractPopulationManager {
 
     @Override
     public int newGeneration() {
-        double mutador;
         Genome child1, child2;
         BaseOrganism parent1, parent2;
         totalFit = calculateFitness();
@@ -61,15 +59,14 @@ public class PopulationManager extends AbstractPopulationManager {
             child2 = parent2.getGenome().clone();
 
             //mutate or crossover with a user defined chance
-            //mutador = rnd.nextDouble();
-            //if (mutador > crossoverRate) {
-            //mutate genomes
-            child1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            child2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
-            /* else {
-            //perform crossover
-            crossover.cross(parent1, parent2, rnd);
-            }*/
+            if (rnd.nextDouble() > crossoverRate) {
+                //mutate genomes
+                child1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+                child2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+            } else {
+                //perform crossover
+                crossover.cross(child1.program, child2.program, rnd);
+            }
 
             //create new ants from the modified genomes and save them
             newAnts.add(child1.synthesize());
