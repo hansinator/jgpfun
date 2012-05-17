@@ -140,7 +140,7 @@ public class Simulation {
         world.curOrganisms = populationManager.organisms;
 
         synchronized (runLock) {
-            long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
             int lastStatRound = 0;
 
             for (int i = 0; i < iterations; i++) {
@@ -156,7 +156,6 @@ public class Simulation {
 
                 if (slowMode || (i % roundsMod) == 0) {
                     final long time = System.currentTimeMillis() - start;
-                    start = System.currentTimeMillis();
                     final int rps = time > 0 ? (int) (((i - lastStatRound) * 1000) / time) : 1;
                     final int progress = (i * 100) / iterations;
                     lastStatRound = i;
@@ -178,8 +177,7 @@ public class Simulation {
             }
 
             gen++;
-
-            int foodCollected = populationManager.newGeneration();
+            final int foodCollected = populationManager.newGeneration();
 
             // simulation statistics
             System.out.println("");
@@ -203,46 +201,14 @@ public class Simulation {
 
                 @Override
                 public void run() {
-                    //long start = System.nanoTime();
-                    //int oldx, oldy;
-
                     //find closest food
-
-                    /*int x = 0, y = 0;
-                    if(slowMode) {
-                    x = organism.x;
-                    y = organism.y;
-                    }*/
-
-                    //System.out.println("Find food took: " + (System.nanoTime() - start));
-                    //start = System.nanoTime();
-
                     try {
                         organism.live();
                     } catch (Exception ex) {
                         Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-                    /*long live = (System.nanoTime() - start);
-                    System.out.println("VM Run took: " + organism.vmrun);
-                    System.out.println("Movement computation took: " + organism.comp);
-                    System.out.println("All Run took: " + organism.allrun);
-                    System.out.println("Live took: " + live);
-                     */
-
-                    /*if(slowMode) {
-                    x = Math.abs(organism.x - x);
-                    y = Math.abs(organism.y - y);
-
-                    System.out.println("x " + x + "y " + y);
-                    }*/
-
-                    //move organism in world to see if it had hit some food or something like that
-                    world.moveOrganismInWorld((Organism2d) organism, lock);
-
-                    //start = System.nanoTime();
                     cb.countDown();
-                    //System.out.println("Latch took: " + (System.nanoTime() - start));
                 }
 
             };
@@ -255,6 +221,10 @@ public class Simulation {
         } catch (InterruptedException ex) {
             Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //move organism in world to see if it had hit some food or something like that
+        for(final BaseOrganism o : populationManager.organisms)
+        	world.moveOrganismInWorld((Organism2d)o);
     }
 
 

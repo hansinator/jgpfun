@@ -42,7 +42,7 @@ public class World2d {
     }
 
 
-    public void moveOrganismInWorld(Organism2d organism, Object worldLock) {
+    public void moveOrganismInWorld(Organism2d organism/*, Object worldLock*/) {
         //TODO: have a more compex world, add a barrier in the middle of the screen
         //TODO: take into account ant size, so it can't hide outside of the screen
         for (Body2d b : organism.bodies) {
@@ -55,9 +55,9 @@ public class World2d {
             b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
 
             //eat food
-            synchronized (worldLock) {
+            //synchronized (worldLock) {
                 b.postRoundTrigger();
-            }
+            //}
         }
     }
 
