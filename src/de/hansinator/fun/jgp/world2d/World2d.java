@@ -47,10 +47,6 @@ public class World2d {
         //TODO: take into account ant size, so it can't hide outside of the screen
         for (Body2d b : organism.bodies) {
             //prevent world wrapping
-            //organism.dx = Math.min(Math.max(organism.dx, 0), worldWidth);
-            //organism.dy = Math.min(Math.max(organism.dy, 0), worldHeight);
-
-            //prevent world wrapping
             b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
             b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
 
