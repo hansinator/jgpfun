@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
@@ -28,7 +29,7 @@ public class MainView extends javax.swing.JPanel {
 
     private int progress;
 
-    private final World2d world;
+    private final World world;
 
 
     /*
@@ -37,7 +38,7 @@ public class MainView extends javax.swing.JPanel {
      * possibly make object lists for world objects, like bodies and food
      */
     /** Creates new form MainView */
-    public MainView(final World2d world) {
+    public MainView(final World world) {
         this.world = world;
         initComponents();
 

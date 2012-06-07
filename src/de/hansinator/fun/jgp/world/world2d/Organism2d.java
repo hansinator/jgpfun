@@ -9,6 +9,7 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
+import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 
@@ -29,9 +30,11 @@ public class Organism2d extends BaseOrganism {
 
     public final BaseMachine vm;
 
-    public final RadarAntBody[] bodies;
+    public final Body2d[] bodies;
 
     private final SensorInput[] inputs;
+    
+    private final ActorOutput[] outputs;
 
     private int food;
 
@@ -40,7 +43,8 @@ public class Organism2d extends BaseOrganism {
         super(genome);
         this.food = 0;
         this.bodies = new RadarAntBody[1];
-        this.inputs = new SensorInput[5 * bodies.length];
+        this.inputs = new SensorInput[RadarAntBody.getNumInputs() * bodies.length];
+        this.outputs = new ActorOutput[RadarAntBody.getNumOutputs() * bodies.length];
         
         this.vm = new EvoVM(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
         //this.vm = EvoCompiler.compile(registerCount, this.inputs.length, genome.program.toArray(new OpCode[genome.program.size()]));
@@ -48,13 +52,23 @@ public class Organism2d extends BaseOrganism {
 
 
     public void addToWorld(World2d world) {
+    	int i = 0, o = 0;
+    	
         //init bodies and grab inputs
-        int x = 0;
-        for (int i = 0; i < bodies.length; i++) {
-            bodies[i] = new RadarAntBody(this, world);
-            for (SensorInput input : bodies[i].getInputs()) {
-                inputs[x++] = input;
+        for (int x = 0; x < bodies.length; x++) {
+        	//create body
+            bodies[x] = new RadarAntBody(this, world);
+            
+            //collect inputs
+            for (SensorInput in : bodies[x].getInputs()) {
+                inputs[i++] = in;
             }
+            
+            //collect outputs
+            for (ActorOutput out : bodies[x].getOutputs()) {
+                outputs[o++] = out;
+            }
+
 
             bodies[i].x = rnd.nextInt(world.worldWidth);
             bodies[i].y = rnd.nextInt(world.worldHeight);
@@ -65,11 +79,10 @@ public class Organism2d extends BaseOrganism {
 
     @Override
     public void live() {
-        double left, right;
         int reg = 0;
 
         //calculate food stuff for body (prepare sensors..)
-        for (RadarAntBody b : bodies) {
+        for (Body2d b : bodies) {
             b.prepareInputs();
         }
 
@@ -80,20 +93,14 @@ public class Organism2d extends BaseOrganism {
 
         vm.run();
 
-        //use output values
-        for (RadarAntBody b : bodies) {
-            //fetch, limit and scale outputs
-            left = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
-            right = Math.max(0, Math.min(vm.regs[reg++], 65535)) / intScaleFactor;
-
-            //move
-            b.motor.move(left, right);
-
-            //update radar sense
-            b.radarSense.direction += (Math.max(-65535, Math.min(vm.regs[reg++], 65535)) / intScaleFactor) / 100.0;
-
-            //pickup wallsense before coordinates are clipped
-            b.wallSense.sense();
+        //write output values
+        for (ActorOutput out : outputs) {
+            out.set(vm.regs[reg++]);
+        }
+        
+        //apply outputs (move motor etc)
+        for (Body2d b : bodies) {
+            b.applyOutputs();
         }
     }
 

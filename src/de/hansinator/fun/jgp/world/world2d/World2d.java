@@ -36,7 +36,7 @@ public class World2d implements World {
 
         food = new ArrayList<Food>(foodCount);
         objects = new ArrayList<World2dObject>();
-        randomFood();
+        resetState();
 
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
@@ -61,7 +61,7 @@ public class World2d implements World {
     }
 
 
-    public final void randomFood() {
+    public final void resetState() {
         if (food.size() != foodCount) {
             food.clear();
             for (int i = 0; i < foodCount; i++) {
@@ -125,4 +125,12 @@ public class World2d implements World {
         }
     }
 
+    public void setOrganisms(List<BaseOrganism> organisms)
+    {
+    	//take new organisms and inform them about being here
+    	curOrganisms = organisms;
+        for (BaseOrganism organism : curOrganisms) {
+            ((Organism2d) organism).addToWorld(this);
+        }
+    }
 }

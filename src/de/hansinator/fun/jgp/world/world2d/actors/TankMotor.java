@@ -1,6 +1,7 @@
-package de.hansinator.fun.jgp.world.world2d;
+package de.hansinator.fun.jgp.world.world2d.actors;
 
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 public class TankMotor implements Motor2d {
 

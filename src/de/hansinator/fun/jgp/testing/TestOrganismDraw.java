@@ -34,7 +34,7 @@ public class TestOrganismDraw extends JPanel {
     public TestOrganismDraw() throws IOException {
         setPreferredSize(new Dimension(640, 480));
         world = new World2d(800, 600, 23);
-        world.randomFood();
+        world.resetState();
         this.organism = new Organism2d(Genome.randomGenome(256));
         this.organism.addToWorld(world);
         this.organism.bodies[0].x = 320.0;

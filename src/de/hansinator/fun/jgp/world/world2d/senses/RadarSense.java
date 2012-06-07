@@ -1,18 +1,18 @@
 package de.hansinator.fun.jgp.world.world2d.senses;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-
-import java.awt.geom.Point2D;
+import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
 /**
  *
  * @author Hansinator
  */
-public class RadarSense implements SensorInput {
+public class RadarSense implements SensorInput, ActorOutput {
 
     private final Body2d body;
 
@@ -71,5 +71,11 @@ public class RadarSense implements SensorInput {
         target = null;
         return 0;
     }
+
+
+	@Override
+	public void set(int value) {
+		direction += (Math.max(-65535, Math.min(value, 65535)) / Organism2d.intScaleFactor) / 100.0;
+	}
 
 }

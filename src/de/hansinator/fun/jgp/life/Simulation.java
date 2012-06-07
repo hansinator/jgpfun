@@ -1,20 +1,21 @@
 package de.hansinator.fun.jgp.life;
 
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.gui.MainView;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.hansinator.fun.jgp.gui.InfoPanel;
-import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+
 import org.jfree.data.xy.XYSeries;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
+
+import de.hansinator.fun.jgp.gui.InfoPanel;
+import de.hansinator.fun.jgp.gui.MainView;
+import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import de.hansinator.fun.jgp.world.World;
 
 /**
  *
@@ -41,7 +42,7 @@ public class Simulation {
 
     private volatile boolean paused = false;
 
-    public final World2d world;
+    public final World world;
 
     private final AbstractPopulationManager populationManager;
 
@@ -62,7 +63,7 @@ public class Simulation {
     public static final int ROUNDS_PER_GENERATION = 4000;
 
 
-    public Simulation(World2d world, AbstractPopulationManager populationManager) {
+    public Simulation(World world, AbstractPopulationManager populationManager) {
         this.world = world;
         this.populationManager = populationManager;
 
@@ -78,7 +79,7 @@ public class Simulation {
         abort = true;
         synchronized (runLock) {
             populationManager.reset();
-            world.randomFood();
+            world.resetState();
         }
         gen = 0;
         foodChartData.clear();
@@ -132,12 +133,8 @@ public class Simulation {
 
 
     public void runGeneration(int iterations, MainView view, InfoPanel infoPanel) {
-        // scatter organisms in the world
-        for (BaseOrganism organism : populationManager.organisms) {
-            ((Organism2d) organism).addToWorld(world);
-        }
-
-        world.curOrganisms = populationManager.organisms;
+    	//add organisms to world
+        world.setOrganisms(populationManager.organisms);
 
         synchronized (runLock) {
             final long start = System.currentTimeMillis();
@@ -188,14 +185,19 @@ public class Simulation {
             populationManager.printStats(statisticsHistory, foodCollected, gen, progSizeChartData, realProgSizeChartData);
             foodChartData.add(gen, foodCollected);
 
-            world.randomFood();
+            // reset world state for next round
+            world.resetState();
         }
     }
 
 
+    /**
+     * Single step the world.
+     */
     private void step() {
         final CountDownLatch cb = new CountDownLatch(populationManager.organisms.size());
 
+        //run organisms
         for (final BaseOrganism organism : populationManager.organisms) {
             Runnable r = new Runnable() {
 
@@ -222,7 +224,7 @@ public class Simulation {
             Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        //move organisms in world
+        //run world
         world.animate();
     }
 
