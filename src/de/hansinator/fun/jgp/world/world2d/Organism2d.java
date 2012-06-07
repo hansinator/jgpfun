@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world2d;
+package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,7 +9,7 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
-import de.hansinator.fun.jgp.world2d.senses.SensorInput;
+import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 
 /*

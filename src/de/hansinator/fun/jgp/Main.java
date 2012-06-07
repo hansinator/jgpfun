@@ -6,7 +6,7 @@ import de.hansinator.fun.jgp.life.PopulationManager;
 import de.hansinator.fun.jgp.util.Settings;
 import java.io.File;
 import de.hansinator.fun.jgp.gui.MainFrame;
-import de.hansinator.fun.jgp.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  *

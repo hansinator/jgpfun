@@ -1,6 +1,6 @@
 package de.hansinator.fun.jgp.genetics.lgp.operations;
 
-import de.hansinator.fun.jgp.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
  *

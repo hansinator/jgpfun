@@ -1,9 +1,11 @@
-package de.hansinator.fun.jgp.world2d.senses;
+package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.awt.Point;
-import de.hansinator.fun.jgp.world2d.Body2d;
-import de.hansinator.fun.jgp.world2d.Food;
-import de.hansinator.fun.jgp.world2d.World2d;
+
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Food;
+import de.hansinator.fun.jgp.world.world2d.World2d;
+
 import java.awt.geom.Point2D;
 
 /**

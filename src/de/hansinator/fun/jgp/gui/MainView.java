@@ -15,7 +15,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import de.hansinator.fun.jgp.world2d.World2d;
+
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  *

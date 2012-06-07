@@ -1,6 +1,7 @@
 package de.hansinator.fun.jgp.life;
 
-import de.hansinator.fun.jgp.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.gui.MainView;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -9,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.world2d.World2d;
 import org.jfree.data.xy.XYSeries;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -222,9 +222,8 @@ public class Simulation {
             Logger.getLogger(PoolingPopulationManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        //move organism in world to see if it had hit some food or something like that
-        for(final BaseOrganism o : populationManager.organisms)
-        	world.moveOrganismInWorld((Organism2d)o);
+        //move organisms in world
+        world.animate();
     }
 
 

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
 import de.hansinator.fun.jgp.genetics.lgp.operations.UnaryOperation;
-import de.hansinator.fun.jgp.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
  *

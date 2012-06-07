@@ -12,7 +12,7 @@ import de.hansinator.fun.jgp.genetics.lgp.operations.OpNeg;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
-import de.hansinator.fun.jgp.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
  *

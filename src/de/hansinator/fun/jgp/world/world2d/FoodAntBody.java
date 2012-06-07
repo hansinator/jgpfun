@@ -1,11 +1,12 @@
-package de.hansinator.fun.jgp.world2d;
+package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import de.hansinator.fun.jgp.world2d.senses.SensorInput;
+
+import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
+import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world2d.senses.WallSense;
 
 /**
  *

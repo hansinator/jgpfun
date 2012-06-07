@@ -1,7 +1,8 @@
-package de.hansinator.fun.jgp.world2d;
+package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Graphics;
-import de.hansinator.fun.jgp.world2d.senses.SensorInput;
+
+import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 
 public abstract class Body2d extends World2dObject {
 

@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world2d;
+package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Graphics;
 import java.security.SecureRandom;
@@ -6,13 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.world.World;
+
 import java.awt.Point;
 
 /**
  *
  * @author hansinator
  */
-public class World2d {
+public class World2d implements World {
 
     private final Random rnd;
 
@@ -42,19 +44,20 @@ public class World2d {
     }
 
 
-    public void moveOrganismInWorld(Organism2d organism/*, Object worldLock*/) {
+    public void animate(/*Object worldLock*/) {
         //TODO: have a more compex world, add a barrier in the middle of the screen
         //TODO: take into account ant size, so it can't hide outside of the screen
-        for (Body2d b : organism.bodies) {
-            //prevent world wrapping
-            b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
-            b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
-
-            //eat food
-            //synchronized (worldLock) {
-                b.postRoundTrigger();
-            //}
-        }
+    	for(final BaseOrganism o : curOrganisms)
+    		for (final Body2d b : ((Organism2d)o).bodies) {
+	            //prevent world wrapping
+	            b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
+	            b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
+	
+	            //eat food
+	            //synchronized (worldLock) {
+	                b.postRoundTrigger();
+	            //}
+	        }
     }
 
 

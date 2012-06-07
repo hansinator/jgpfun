@@ -2,9 +2,9 @@ package de.hansinator.fun.jgp.testing;
 
 import java.io.IOException;
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.world2d.Organism2d;
-import de.hansinator.fun.jgp.world2d.Body2d;
-import de.hansinator.fun.jgp.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  *

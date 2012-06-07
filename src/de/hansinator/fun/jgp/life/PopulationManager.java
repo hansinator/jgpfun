@@ -1,7 +1,8 @@
 package de.hansinator.fun.jgp.life;
 
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
+
 import java.util.ArrayList;
 import java.util.List;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;

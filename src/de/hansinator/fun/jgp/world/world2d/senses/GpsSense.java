@@ -1,6 +1,6 @@
-package de.hansinator.fun.jgp.world2d.senses;
+package de.hansinator.fun.jgp.world.world2d.senses;
 
-import de.hansinator.fun.jgp.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 /**
  *
