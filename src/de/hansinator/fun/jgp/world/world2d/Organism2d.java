@@ -42,7 +42,7 @@ public class Organism2d extends BaseOrganism {
     public Organism2d(Genome genome) throws IOException {
         super(genome);
         this.food = 0;
-        this.bodies = new RadarAntBody[1];
+        this.bodies = new Body2d[1];
         this.inputs = new SensorInput[RadarAntBody.getNumInputs() * bodies.length];
         this.outputs = new ActorOutput[RadarAntBody.getNumOutputs() * bodies.length];
         
