@@ -1,17 +1,17 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Polygon;
 import java.io.IOException;
-import de.hansinator.fun.jgp.genetics.lgp.OpCode;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import java.util.concurrent.CountDownLatch;
+
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
+import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
-import de.hansinator.fun.jgp.util.Settings;
 
 /*
  * TODO: Create a loopback sense that represents the differential (ableitung)
@@ -70,12 +70,12 @@ public class Organism2d extends BaseOrganism {
             }
 
 
-            bodies[i].x = rnd.nextInt(world.worldWidth);
-            bodies[i].y = rnd.nextInt(world.worldHeight);
-            bodies[i].dir = rnd.nextDouble() * 2 * Math.PI;
+            bodies[x].x = rnd.nextInt(world.worldWidth);
+            bodies[x].y = rnd.nextInt(world.worldHeight);
+            bodies[x].dir = rnd.nextDouble() * 2 * Math.PI;
         }
     }
-
+    
 
     @Override
     public void live() {

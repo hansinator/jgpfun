@@ -12,5 +12,5 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
  */
 public interface SelectionStrategy {
 
-    public BaseOrganism select(List<BaseOrganism> organisms);
+    public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness);
 }

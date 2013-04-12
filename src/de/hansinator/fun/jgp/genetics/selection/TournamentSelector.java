@@ -24,7 +24,7 @@ public class TournamentSelector implements SelectionStrategy {
 
 
     @Override
-    public BaseOrganism select(List<BaseOrganism> organisms) {
+    public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness) {
         int maxFit = -1;
         int size;
         BaseOrganism fittest = null;

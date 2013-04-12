@@ -20,10 +20,13 @@ public class InfoPanel extends JPanel {
     private final JLabel labelGeneration;
 
 
-    public void updateInfo(Integer rps, Integer progress, Integer generation) {
+    public void updateInfo(Integer rps, Integer progress) {
         labelRPS.setText(rps.toString());
         labelProgress.setText(progress.toString());
-        labelGeneration.setText(generation.toString());
+    }
+    
+    public void updateInfo(Integer generation) {
+    	labelGeneration.setText(generation.toString());
     }
 
 

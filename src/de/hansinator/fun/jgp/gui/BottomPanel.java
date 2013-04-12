@@ -1,10 +1,11 @@
 package de.hansinator.fun.jgp.gui;
 
 import java.awt.Dimension;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import de.hansinator.fun.jgp.life.Simulation;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -15,6 +16,8 @@ import org.jfree.data.Range;
 import org.jfree.data.RangeType;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import de.hansinator.fun.jgp.simulation.Simulator;
+
 /**
  *
  * @author hansinator
@@ -24,12 +27,12 @@ public class BottomPanel extends JPanel {
     public final InfoPanel infoPanel = new InfoPanel();
 
 
-    public BottomPanel(Simulation simulation) {
+    public BottomPanel(Simulator simulator) {
         /*
          * Food chart
          */
 
-        XYSeriesCollection xyDataset = new XYSeriesCollection(simulation.foodChartData);
+        XYSeriesCollection xyDataset = new XYSeriesCollection(simulator.fitnessChartData);
         JFreeChart foodChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL, false, false, false);
         XYPlot xyPlot = foodChart.getXYPlot();
 
@@ -60,8 +63,8 @@ public class BottomPanel extends JPanel {
          * Prog size chart
          */
 
-        xyDataset = new XYSeriesCollection(simulation.progSizeChartData);
-        xyDataset.addSeries(simulation.realProgSizeChartData);
+        xyDataset = new XYSeriesCollection(simulator.genomeSizeChartData);
+        xyDataset.addSeries(simulator.realGenomeSizeChartData);
         JFreeChart progSizeChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL, false, false, false);
         xyPlot = progSizeChart.getXYPlot();
 
@@ -98,7 +101,7 @@ public class BottomPanel extends JPanel {
         groupPanel.setAlignmentX(LEFT_ALIGNMENT);
         groupPanel.setPreferredSize(new Dimension(132, 200));
         groupPanel.add(infoPanel);
-        groupPanel.add(new ControlPanel(simulation));
+        groupPanel.add(new ControlPanel(simulator));
 
 
         /*

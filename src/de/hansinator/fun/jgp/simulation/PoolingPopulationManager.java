@@ -1,22 +1,21 @@
-package de.hansinator.fun.jgp.life;
-
-import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
+package de.hansinator.fun.jgp.simulation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
-import de.hansinator.fun.jgp.genetics.crossover.TwoPointCrossover;
-import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+
 import org.jfree.data.xy.XYSeries;
+
+import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
  *
  * @author hansinator
  */
-public class PoolingPopulationManager extends AbstractPopulationManager {
+public class PoolingPopulationManager {
 
     public static final int maxPoolSize = 26;
 
@@ -35,7 +34,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     }
 
 
-    @Override
     public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation, XYSeries progSizeChartData, XYSeries realProgSizeChartData) {
         int avgProgSize = 0, avgRealProgSize = 0;
 
@@ -102,7 +100,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     }
 
 
-    @Override
     public int newGeneration() {
         double mutador;
         Genome parent1, parent2;
@@ -170,7 +167,6 @@ public class PoolingPopulationManager extends AbstractPopulationManager {
     }
 
 
-    @Override
     public int getCurrentPopulationFitness() {
         return totalFit;
     }

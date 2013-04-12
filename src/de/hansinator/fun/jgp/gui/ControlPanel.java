@@ -11,7 +11,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
-import de.hansinator.fun.jgp.life.Simulation;
+
+import de.hansinator.fun.jgp.simulation.Simulation;
+import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
  *
@@ -19,7 +21,7 @@ import de.hansinator.fun.jgp.life.Simulation;
  */
 public class ControlPanel extends JPanel {
 
-    public ControlPanel(final Simulation simulation) {
+    public ControlPanel(final Simulator simulator) {
         JCheckBox speedSwitch = new JCheckBox("Fast mode", true);
         speedSwitch.addActionListener(new ActionListener() {
 
@@ -29,7 +31,7 @@ public class ControlPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 slowMode = !slowMode;
-                simulation.setSlowMode(slowMode);
+                simulator.getSimulation().setSlowMode(slowMode);
             }
 
         });
@@ -39,13 +41,13 @@ public class ControlPanel extends JPanel {
         speedSlider.setMinorTickSpacing(Simulation.ROUNDS_PER_GENERATION / 8);
         speedSlider.setPaintLabels(true);
         speedSlider.setPaintTicks(true);
-        speedSlider.setValue(simulation.getRoundsMod());
+        speedSlider.setValue(simulator.getSimulation().getRoundsMod());
         speedSlider.setMaximumSize(new Dimension(200, 40));
         speedSlider.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                simulation.setRoundsMod(speedSlider.getValue());
+            	simulator.getSimulation().setRoundsMod(speedSlider.getValue());
             }
 
         });
@@ -61,7 +63,7 @@ public class ControlPanel extends JPanel {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                simulation.setFps(fpsSlider.getValue());
+            	simulator.getSimulation().setFps(fpsSlider.getValue());
             }
 
         });
@@ -76,7 +78,7 @@ public class ControlPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 paused = !paused;
                 pauseButton.setText(paused ? "Resume" : "Pause");
-                simulation.setPaused(paused);
+                simulator.getSimulation().setPaused(paused);
             }
 
         });

@@ -8,13 +8,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import de.hansinator.fun.jgp.life.Simulation;
+
+import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
  *
@@ -30,18 +32,18 @@ public class MainFrame extends JFrame implements WindowListener {
 
     public final BottomPanel bottomPane;
 
-    private final Simulation simulation;
+    private final Simulator simulator;
 
 
-    public MainFrame(int width, int height, Simulation simulation) {
+    public MainFrame(int width, int height, Simulator simulator) {
         super("BAH! Bonn!!1!11!!!");
-        this.simulation = simulation;
+        this.simulator = simulator;
 
         // create all direct clients
         centerPane = new JScrollPane();
         sidePaneLeft = new JPanel();
-        sidePaneRight = new StatisticsHistoryPanel(simulation.statisticsHistory);
-        bottomPane = new BottomPanel(simulation);
+        sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
+        bottomPane = new BottomPanel(simulator);
 
         // set default center pane size properties
         centerPane.setPreferredSize(new Dimension(800, 600));
@@ -83,7 +85,7 @@ public class MainFrame extends JFrame implements WindowListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                simulation.reset();
+                simulator.restart(mainView, bottomPane.infoPanel);
             }
 
         });
@@ -96,7 +98,7 @@ public class MainFrame extends JFrame implements WindowListener {
 
     private void initClientViews(int width, int height) {
         // to be put elsewhere
-        mainView = new MainView(simulation.world);
+        mainView = new MainView(simulator.getSimulation().world);
         mainView.setPreferredSize(new Dimension(width, height));
 
         setCenterPaneView(mainView);
@@ -112,14 +114,12 @@ public class MainFrame extends JFrame implements WindowListener {
         System.out.println("MainView size: " + mainView.getWidth() + "x" + mainView.getHeight());
         //TODO: to be put somewhere else
         addWindowListener(this);
-        simulation.start(mainView, bottomPane.infoPanel);
-        System.exit(0);
+        simulator.start(mainView, bottomPane.infoPanel);
     }
 
 
     public void stopSimulation() {
-        simulation.stop();
-        simulation.reset();
+        simulator.stop();
     }
 
 
