@@ -20,28 +20,23 @@ public class RadarAntBody extends Body2d {
 
 	public final WallSense wallSense;
 
-	public final Motor2d motor;
+	public final TankMotor motor;
 
 	private static final int foodPickupRadius = Settings
 			.getInt("foodPickupRadius");
-
-	private final Organism2d organism;
 
 	private final World2d world;
 
 	public final RadarSense radarSense;
 
-	// cache motor outputs
-	private int left, right;
-
 	private static int NUM_INPUTS = 5;
 
-	private static int NUM_OUTPUTS = 2;
+	private static int NUM_OUTPUTS = 3;
+	
 
 	public RadarAntBody(Organism2d organism, World2d world) {
-		super(0.0, 0.0, 0.0, new SensorInput[NUM_INPUTS],
+		super(organism, 0.0, 0.0, 0.0, new SensorInput[NUM_INPUTS],
 				new ActorOutput[NUM_OUTPUTS]);
-		this.organism = organism;
 		this.world = world;
 
 		// init senses
@@ -51,26 +46,15 @@ public class RadarAntBody extends Body2d {
 		// inputs
 		inputs[0] = new OrientationSense();
 		inputs[1] = radarSense;
-		inputs[2] = new RadarSenseDirection();
+		inputs[2] = radarSense.senseDirection;
 		inputs[3] = new SpeedSense();
 		inputs[4] = wallSense;
 
 		// outputs
 		motor = new TankMotor(this);
-		outputs[0] = new ActorOutput() {
-
-			@Override
-			public void set(int value) {
-				left = value;
-			}
-		};
-		outputs[1] = new ActorOutput() {
-
-			@Override
-			public void set(int value) {
-				right = value;
-			}
-		};
+        outputs[0] = motor.actorLeft;
+		outputs[1] = motor.actorRight;
+		outputs[2] = radarSense;
 	}
 
 	@Override
@@ -80,10 +64,8 @@ public class RadarAntBody extends Body2d {
 	@Override
 	public void applyOutputs() {
 		// limit, scale and set motor outputs
-		motor.move(Math.max(0, Math.min(left, 65535))
-				/ Organism2d.intScaleFactor,
-				Math.max(0, Math.min(right, 65535)) / Organism2d.intScaleFactor);
-
+		motor.move();
+		
 		// pickup wallsense before coordinates are clipped
 		wallSense.sense();
 	}
@@ -102,25 +84,8 @@ public class RadarAntBody extends Body2d {
 
 	@Override
 	public void draw(Graphics g) {
-		final double sindir = Math.sin(dir);
-		final double cosdir = Math.cos(dir);
-		final double x_len_displace = 6.0 * sindir;
-		final double y_len_displace = 6.0 * cosdir;
-		final double x_width_displace = 4.0 * sindir;
-		final double y_width_displace = 4.0 * cosdir;
-		final double x_bottom = x - x_len_displace;
-		final double y_bottom = y + y_len_displace;
 		final int x_center = Math.round((float) x);
 		final int y_center = Math.round((float) y);
-
-		Polygon p = new Polygon();
-		p.addPoint(Math.round((float) (x + x_len_displace)),
-				Math.round((float) (y - y_len_displace))); // top of triangle
-		p.addPoint(Math.round((float) (x_bottom + y_width_displace)),
-				Math.round((float) (y_bottom + x_width_displace))); // right
-																	// wing
-		p.addPoint(Math.round((float) (x_bottom - y_width_displace)),
-				Math.round((float) (y_bottom - x_width_displace))); // left wing
 
 		if (radarSense.target == null) {
 			g.setColor(Color.darkGray);
@@ -145,22 +110,8 @@ public class RadarAntBody extends Body2d {
 						(int) Math.round(radarSense.target.getY()));
 			}
 		}
-
-		g.setColor(tagged ? Color.magenta : Color.red);
-		g.drawPolygon(p);
-		g.fillPolygon(p);
-
-		g.setColor(Color.green);
-		g.drawString("" + organism.getFitness(), x_center + 8, y_center + 8);
-	}
-
-	private class RadarSenseDirection implements SensorInput {
-
-		@Override
-		public int get() {
-			return (int) (radarSense.direction * Organism2d.intScaleFactor);
-		}
-
+		
+		super.draw(g);
 	}
 
 	public static int getNumOutputs() {

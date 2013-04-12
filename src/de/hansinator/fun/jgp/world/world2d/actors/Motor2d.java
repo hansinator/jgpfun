@@ -7,5 +7,5 @@ package de.hansinator.fun.jgp.world.world2d.actors;
  */
 public interface Motor2d {
 
-    public void move(double left, double right);
+    public void move();
 }

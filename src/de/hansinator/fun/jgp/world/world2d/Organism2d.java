@@ -38,7 +38,9 @@ public class Organism2d extends BaseOrganism {
 
     private int food;
 
-
+    /*
+     * TODO: make organism/body composition genome-defined
+     */
     public Organism2d(Genome genome) throws IOException {
         super(genome);
         this.food = 0;

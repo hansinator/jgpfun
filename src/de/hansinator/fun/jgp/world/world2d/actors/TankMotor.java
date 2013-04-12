@@ -2,6 +2,7 @@ package de.hansinator.fun.jgp.world.world2d.actors;
 
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 public class TankMotor implements Motor2d {
 
@@ -10,6 +11,9 @@ public class TankMotor implements Motor2d {
     public static final double maxSpeed = Settings.getDouble("maxSpeed");
 
     private final Body2d body;
+    
+    //cache motor outputs
+    private double left, right;
 
 
     public TankMotor(Body2d body) {
@@ -19,11 +23,12 @@ public class TankMotor implements Motor2d {
 
     //compute movement here
     @Override
-    public void move(double left, double right) {
+    public void move() {
         double speed;
 
         //find the direction
         body.dir += (right - left) * (maxSteerForce / 100.0);
+        body.dir -= 2*Math.PI*(body.dir < 0.0?Math.ceil(body.dir/(2*Math.PI)):(Math.floor(body.dir/(2*Math.PI))));
         //max speed is just a tweaking parameter; don't get confused by it
         //try varying it in simulation
         speed = (right + left) / 2.0;
@@ -32,4 +37,20 @@ public class TankMotor implements Motor2d {
         body.y -= Math.cos(body.dir) * maxSpeed * speed / 10.0;
     }
 
+    
+    public final ActorOutput actorLeft = new ActorOutput() {
+
+		@Override
+		public void set(int value) {
+			left = Math.max(0, Math.min(value, 65535))/ Organism2d.intScaleFactor;
+		}
+	};
+	
+	public final ActorOutput actorRight = new ActorOutput() {
+
+		@Override
+		public void set(int value) {
+			right = Math.max(0, Math.min(value, 65535)) / Organism2d.intScaleFactor;
+		}
+	};
 }

@@ -75,7 +75,15 @@ public class RadarSense implements SensorInput, ActorOutput {
 
 	@Override
 	public void set(int value) {
-		direction += (Math.max(-65535, Math.min(value, 65535)) / Organism2d.intScaleFactor) / 100.0;
+		direction += (Math.max(-65535, Math.min(value, 65535)) / Organism2d.intScaleFactor) / 10.0;
+		direction -= 2*Math.PI*(direction < 0.0?Math.ceil(direction/(2*Math.PI)):(Math.floor(direction/(2*Math.PI))));
 	}
-
+	
+	public final SensorInput senseDirection = new SensorInput() {
+		
+		@Override
+		public int get() {
+			return (int) (direction * Organism2d.intScaleFactor);
+		}
+	};
 }
