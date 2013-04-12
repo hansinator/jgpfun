@@ -1,136 +1,136 @@
 package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.world.World;
 
-import java.awt.Point;
-
 /**
- *
+ * 
  * @author hansinator
  */
-public class World2d implements World {
+public class World2d implements World
+{
 
-    private final Random rnd;
+	private final Random rnd;
 
-    public final int worldWidth, worldHeight;
+	public final int worldWidth, worldHeight;
 
-    public List<BaseOrganism> curOrganisms;
+	public List<BaseOrganism> curOrganisms;
 
-    public final List<Food> food;
+	public final List<Food> food;
 
-    final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null, new SecureRandom());
+	final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null, new SecureRandom());
 
-    private final int foodCount;
+	private final int foodCount;
 
-    private final List<World2dObject> objects;
+	private final List<World2dObject> objects;
 
+	public World2d(int worldWidth, int worldHeight, int foodCount)
+	{
+		rnd = new SecureRandom();
 
-    public World2d(int worldWidth, int worldHeight, int foodCount) {
-        rnd = new SecureRandom();
+		food = new ArrayList<Food>(foodCount);
+		objects = new ArrayList<World2dObject>();
+		resetState();
 
-        food = new ArrayList<Food>(foodCount);
-        objects = new ArrayList<World2dObject>();
-        resetState();
+		this.worldWidth = worldWidth;
+		this.worldHeight = worldHeight;
+		this.foodCount = foodCount;
+	}
 
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-        this.foodCount = foodCount;
-    }
+	@Override
+	public void animate(/* Object worldLock */)
+	{
+		// TODO: have a more compex world, add a barrier in the middle of the
+		// screen
+		// TODO: take into account ant size, so it can't hide outside of the
+		// screen
+		for (final BaseOrganism o : curOrganisms)
+			for (final Body2d b : ((Organism2d) o).bodies)
+			{
+				// prevent world wrapping
+				b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
+				b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
 
+				// eat food
+				// synchronized (worldLock) {
+				b.postRoundTrigger();
+				// }
+			}
+	}
 
-    public void animate(/*Object worldLock*/) {
-        //TODO: have a more compex world, add a barrier in the middle of the screen
-        //TODO: take into account ant size, so it can't hide outside of the screen
-    	for(final BaseOrganism o : curOrganisms)
-    		for (final Body2d b : ((Organism2d)o).bodies) {
-	            //prevent world wrapping
-	            b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
-	            b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
-	
-	            //eat food
-	            //synchronized (worldLock) {
-	                b.postRoundTrigger();
-	            //}
-	        }
-    }
+	@Override
+	public final void resetState()
+	{
+		if (food.size() != foodCount)
+		{
+			food.clear();
+			for (int i = 0; i < foodCount; i++)
+				food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
+		} else for (Food f : food)
+			f.randomPosition();
+	}
 
+	public Food findNearestFood(Point.Double p)
+	{
+		double minDist = 1000000;
+		double curDist;
+		int indexMinDist = -1;
+		for (int i = 0; i < food.size(); i++)
+		{
+			curDist = World2dObject.distance(food.get(i), p);
+			// limit visible range to 200
+			// if (curDist > 200)
+			// continue;
+			if (curDist < minDist)
+			{
+				minDist = curDist;
+				indexMinDist = i;
+			}
+		}
+		if (indexMinDist > -1)
+			return food.get(indexMinDist);
+		else return World2d.OUT_OF_RANGE_FOOD;
+	}
 
-    public final void resetState() {
-        if (food.size() != foodCount) {
-            food.clear();
-            for (int i = 0; i < foodCount; i++) {
-                food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
-            }
-        } else {
-            for (Food f : food) {
-                f.randomPosition();
-            }
-        }
-    }
+	@Override
+	public void clickEvent(int x, int y)
+	{
+		// see if we hit an ant body
+		if (curOrganisms != null)
+			for (BaseOrganism o : curOrganisms)
+				for (Body2d b : ((Organism2d) o).bodies)
+					if (Math.abs(b.x - x) < 10.0 && Math.abs(b.y - y) < 10.0)
+					{
+						// tag it
+						b.tagged = true;
+						return;
+					}
+	}
 
+	@Override
+	public void draw(Graphics g)
+	{
+		if (curOrganisms != null)
+			for (BaseOrganism o : curOrganisms)
+				((Organism2d) o).draw(g);
 
-    public Food findNearestFood(Point.Double p) {
-        double minDist = 1000000;
-        double curDist;
-        int indexMinDist = -1;
-        for (int i = 0; i < food.size(); i++) {
-            curDist = World2dObject.distance(food.get(i), p);
-            //limit visible range to 200
-            //if (curDist > 200)
-            //continue;
-            if (curDist < minDist) {
-                minDist = curDist;
-                indexMinDist = i;
-            }
-        }
-        if (indexMinDist > -1) {
-            return food.get(indexMinDist);
-        } else {
-            return World2d.OUT_OF_RANGE_FOOD;
-        }
-    }
+		for (Food f : food)
+			f.draw(g);
+	}
 
-
-    public void clickEvent(int x, int y) {
-        //see if we hit an ant body
-        if (curOrganisms != null) {
-            for (BaseOrganism o : curOrganisms) {
-                for (Body2d b : ((Organism2d) o).bodies) {
-                    if (Math.abs(b.x - x) < 10.0 && Math.abs(b.y - y) < 10.0) {
-                        //tag it
-                        b.tagged = true;
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-
-    public void draw(Graphics g) {
-        if (curOrganisms != null) {
-            for (BaseOrganism o : curOrganisms) {
-                ((Organism2d) o).draw(g);
-            }
-        }
-
-        for (Food f : food) {
-            f.draw(g);
-        }
-    }
-
-    public void setOrganisms(List<BaseOrganism> organisms)
-    {
-    	//take new organisms and inform them about being here
-    	curOrganisms = organisms;
-        for (BaseOrganism organism : curOrganisms) {
-            ((Organism2d) organism).addToWorld(this);
-        }
-    }
+	@Override
+	public void setOrganisms(List<BaseOrganism> organisms)
+	{
+		// take new organisms and inform them about being here
+		curOrganisms = organisms;
+		for (BaseOrganism organism : curOrganisms)
+			((Organism2d) organism).addToWorld(this);
+	}
 }

@@ -3,6 +3,7 @@ package de.hansinator.fun.jgp.gui;
 import java.awt.FontMetrics;
 import java.util.ArrayList;
 import java.util.Enumeration;
+
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -10,112 +11,121 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
 /**
- *
+ * 
  * @author hansinator
  */
-public class StatisticsHistoryTable extends JTable {
+public class StatisticsHistoryTable extends JTable
+{
 
-    public StatisticsHistoryTable(StatisticsHistoryModel model) {
-        super(model);
-        setColumnSelectionAllowed(false);
-        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	public StatisticsHistoryTable(StatisticsHistoryModel model)
+	{
+		super(model);
+		setColumnSelectionAllowed(false);
+		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        FontMetrics fm = getFontMetrics(getFont());
-        for (Enumeration<TableColumn> cols = columnModel.getColumns(); cols.hasMoreElements();) {
-            final TableColumn col = cols.nextElement();
-            col.setPreferredWidth(SwingUtilities.computeStringWidth(fm, col.getHeaderValue().toString()) + 10);
-        }
-    }
+		FontMetrics fm = getFontMetrics(getFont());
+		for (Enumeration<TableColumn> cols = columnModel.getColumns(); cols.hasMoreElements();)
+		{
+			final TableColumn col = cols.nextElement();
+			col.setPreferredWidth(SwingUtilities.computeStringWidth(fm, col.getHeaderValue().toString()) + 10);
+		}
+	}
 
-    private static class StatisticsHistoryEntry {
+	private static class StatisticsHistoryEntry
+	{
 
-        private final int generation;
+		private final int generation;
 
-        private final int totalFood, averageFood;
+		private final int totalFood, averageFood;
 
-        private final int averageProgramSize, averageRealProgramSize;
+		private final int averageProgramSize, averageRealProgramSize;
 
+		private StatisticsHistoryEntry(int generation, int totalFood, int averageFood, int averageProgramSize,
+				int averageRealProgramSize)
+		{
+			this.generation = generation;
+			this.totalFood = totalFood;
+			this.averageFood = averageFood;
+			this.averageProgramSize = averageProgramSize;
+			this.averageRealProgramSize = averageRealProgramSize;
+		}
 
-        private StatisticsHistoryEntry(int generation, int totalFood, int averageFood, int averageProgramSize, int averageRealProgramSize) {
-            this.generation = generation;
-            this.totalFood = totalFood;
-            this.averageFood = averageFood;
-            this.averageProgramSize = averageProgramSize;
-            this.averageRealProgramSize = averageRealProgramSize;
-        }
+		private int getValueAt(int columnIndex)
+		{
+			switch (columnIndex)
+			{
+				case 0:
+					return generation;
+				case 1:
+					return totalFood;
+				case 2:
+					return averageFood;
+				case 3:
+					return averageProgramSize;
+				case 4:
+					return averageRealProgramSize;
+				default:
+					throw new ArrayIndexOutOfBoundsException(columnIndex);
+			}
+		}
 
+	}
 
-        private int getValueAt(int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    return generation;
-                case 1:
-                    return totalFood;
-                case 2:
-                    return averageFood;
-                case 3:
-                    return averageProgramSize;
-                case 4:
-                    return averageRealProgramSize;
-                default:
-                    throw new ArrayIndexOutOfBoundsException(columnIndex);
-            }
-        }
+	/*
+	 * TODO: let this use a ringbuffer that is tuned to table height or
+	 * something
+	 */
+	public static class StatisticsHistoryModel extends AbstractTableModel
+	{
 
-    }
+		private final ArrayList<StatisticsHistoryEntry> list = new ArrayList<StatisticsHistoryEntry>();
 
+		private String[] columnNames = { "Gen", "Food", "Avg Food", "Avg Prg", "Avg Real Prg" };
 
-    /*
-     * TODO: let this use a ringbuffer that is tuned to table height or something
-     */
-    public static class StatisticsHistoryModel extends AbstractTableModel {
+		public void appendEntry(int generation, int totalFood, int averageFood, int averageProgramSize,
+				int averageRealProgramSize)
+		{
+			list.add(new StatisticsHistoryEntry(generation, totalFood, averageFood, averageProgramSize,
+					averageRealProgramSize));
+			fireTableRowsInserted(0, 1);
+		}
 
-        private final ArrayList<StatisticsHistoryEntry> list = new ArrayList<StatisticsHistoryEntry>();
+		public void clear()
+		{
+			int size = list.size();
+			list.clear();
+			fireTableRowsDeleted(0, size);
+		}
 
-        private String[] columnNames = {"Gen", "Food", "Avg Food", "Avg Prg", "Avg Real Prg"};
+		@Override
+		public int getRowCount()
+		{
+			return list.size();
+		}
 
+		@Override
+		public int getColumnCount()
+		{
+			return columnNames.length;
+		}
 
-        public void appendEntry(int generation, int totalFood, int averageFood, int averageProgramSize, int averageRealProgramSize) {
-            list.add(new StatisticsHistoryEntry(generation, totalFood, averageFood, averageProgramSize, averageRealProgramSize));
-            fireTableRowsInserted(0, 1);
-        }
+		@Override
+		public Class<?> getColumnClass(int columnIndex)
+		{
+			return Integer.class;
+		}
 
+		@Override
+		public String getColumnName(int column)
+		{
+			return columnNames[column];
+		}
 
-        public void clear() {
-            int size = list.size();
-            list.clear();
-            fireTableRowsDeleted(0, size);
-        }
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex)
+		{
+			return list.get(list.size() - 1 - rowIndex).getValueAt(columnIndex);
+		}
 
-
-        @Override
-        public int getRowCount() {
-            return list.size();
-        }
-
-
-        @Override
-        public int getColumnCount() {
-            return columnNames.length;
-        }
-
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return Integer.class;
-        }
-
-
-        @Override
-        public String getColumnName(int column) {
-            return columnNames[column];
-        }
-
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            return list.get(list.size() - 1 - rowIndex).getValueAt(columnIndex);
-        }
-
-    }
+	}
 }

@@ -1,206 +1,182 @@
 package de.hansinator.fun.jgp.genetics;
 
-import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
 import de.hansinator.fun.jgp.genetics.lgp.operations.UnaryOperation;
+import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
- *
+ * 
  * @author Hansinator
  */
-public class Genome {
+public abstract class Genome
+{
 
-    public final List<OpCode> program;
+	static final int registerCount = Settings.getInt("registerCount");
 
-    protected static final Random rnd = new SecureRandom();
+	public final List<OpCode> program;
 
+	protected static final Random rnd = new SecureRandom();
 
-    public Genome(List<OpCode> program) {
-        this.program = program;
-    }
+	public Genome(List<OpCode> program)
+	{
+		this.program = program;
+	}
 
+	@Override
+	public abstract Genome clone();
 
-    public static Genome randomGenome(int progSize) {
-        int size = rnd.nextInt(progSize - 200) + 201;
-        List<OpCode> program = new ArrayList<OpCode>(size);
+	public int size()
+	{
+		return program.size();
+	}
 
-        for (int i = 0; i < size; i++) {
-            program.add(OpCode.randomOpCode(rnd));
-        }
+	// make random changes to random locations in the genome
+	public void mutate(int mutCount, int progSize, Random rnd)
+	{
+		// determine amount of mutations, minimum 1
+		// int mutCount = maxMutations;
+		// int mutCount = randomR.Next(maxMutations) + 1;
 
-        return new Genome(program);
-    }
+		for (int i = 0; i < mutCount; i++)
+			mutateProgramSpace(program, progSize, rnd);
+	}
 
+	private final static int maxRegisterValDelta = 16;
 
-    @Override
-    public Genome clone() {
-        List<OpCode> p = new ArrayList<OpCode>(program.size());
+	private final static int maxConstantValDelta = 16384;
 
-        for (OpCode oc : program) {
-            p.add(oc.clone());
-        }
+	// final int maxConstantValDelta = Integer.maxValue / 2;
 
-        return new Genome(p);
-    }
+	private void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd)
+	{
+		// define chances for what mutation could happen in some sort of
+		// percentage
+		int mutateIns = 22, mutateRem = 18, mutateRep = 20, mutateVal = 20;
+		int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
+		// chances sum represents 100%, i.e. the sum of all possible chances
+		int chancesSum;
+		// the choice of mutation
+		int mutationChoice;
+		// choose random location
+		int loc = rnd.nextInt(program.size());
+		// precalculate a random value, but exclude zero
+		// zero is no valid constant, as it tends to create semantic introns
+		// (like a = a + 0 or b = n * 0 and so on)
+		int val = rnd.nextInt();
+		// while (val == 0)
+		// {
+		// val = rnd.Next(Int32.MinValue, Int32.MaxValue);
+		// }
 
+		OpCode instr = program.get(loc);
 
-    public int size() {
-        return program.size();
-    }
-    
-    
-    //make random changes to random locations in the genome
-    public void mutate(int mutCount, int progSize, Random rnd) {
-        //determine amount of mutations, minimum 1
-        //int mutCount = maxMutations;
-        //int mutCount = randomR.Next(maxMutations) + 1;
+		// now see what to do
+		// either delete an opcode, add a new or mutate an existing one
 
-        for (int i = 0; i < mutCount; i++) {
-            mutateProgramSpace(program, progSize, rnd);
-        }
-    }
+		// first determine which mutations are possible and add up all the
+		// chances
+		// if we have the max possible opcodes, we can't add a new one
+		if (program.size() >= progSize)
+			mutateIns = 0;
 
+		// if we have only 4 opcodes left, don't delete more
+		if (program.size() < 5)
+		{
+			mutateRem = 0;
+			mutateIns = 100; // TEST: when prog is too small, mutation tends to
+								// vary the same loc multiple times...
+		}
 
-    private final static int maxRegisterValDelta = 16;
+		// if this is a unary op, don't touch src2 - it'll be noneffective
+		if (instr instanceof UnaryOperation)
+			mutateSrc2 = 0;
 
-    private final static int maxConstantValDelta = 16384;
-    //final int maxConstantValDelta = Integer.maxValue / 2;
+		// replacement is always possible..
+		// add all up
+		chancesSum = mutateRep + mutateIns + mutateRem + mutateVal + mutateSrc2 + mutateTrg + mutateOp + mutateFlags;
 
-    private void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd) {
-        //define chances for what mutation could happen in some sort of percentage
-        int mutateIns = 22, mutateRem = 18, mutateRep = 20, mutateVal = 20;
-        int mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
-        //chances sum represents 100%, i.e. the sum of all possible chances
-        int chancesSum;
-        //the choice of mutation
-        int mutationChoice;
-        //choose random location
-        int loc = rnd.nextInt(program.size());
-        //precalculate a random value, but exclude zero
-        //zero is no valid constant, as it tends to create semantic introns
-        //(like a = a + 0 or b = n * 0 and so on)
-        int val = rnd.nextInt();
-        //while (val == 0)
-        //{
-        //    val = rnd.Next(Int32.MinValue, Int32.MaxValue);
-        //}
+		// choose mutation
+		mutationChoice = rnd.nextInt(chancesSum);
 
-        OpCode instr = program.get(loc);
+		// see which one has been chosen
+		// mutate ins
+		if (mutationChoice < mutateIns)
+			// insert a random instruction at a random location
+			program.add(loc, OpCode.randomOpCode(rnd));
+		else if (mutationChoice < (mutateIns + mutateRem))
+			// remove a random instruction
+			program.remove(loc);
+		else if (mutationChoice < (mutateIns + mutateRem + mutateRep))
+			// replace a random instruction
+			program.set(loc, OpCode.randomOpCode(rnd));
+		else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal))
+		{
+			// modify the src1 register number by a random value
+			val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+			instr.src1 = (instr.src1 + val);
 
-        //now see what to do
-        //either delete an opcode, add a new or mutate an existing one
+			// save modified instruction
+			program.set(loc, instr);
+		} // mutate src2
+		else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2))
+		{
+			// if immediate, modify the constant value by random value
+			if (instr.immediate)
+			{
+				val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
+				instr.src2 += val;
+			} // else modify the src2 register number by a random value
+			else
+			{
+				val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+				instr.src2 += val;
+			}
 
-        //first determine which mutations are possible and add up all the chances
-        //if we have the max possible opcodes, we can't add a new one
-        if (program.size() >= progSize) {
-            mutateIns = 0;
-        }
+			// save modified instruction
+			program.set(loc, instr);
+		} // mutate trg
+		else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg))
+		{
+			// modify trg field by random value
+			// (the scale of the value might be ridiculous...)
+			// do
+			// {
+			val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+			// modify and normalize
+			instr.trg = (instr.trg + val);
+			// }
+			// don't write input registers
+			// while (!((instr.trg == 4) || (instr.trg == 5)));
 
-        //if we have only 4 opcodes left, don't delete more
-        if (program.size() < 5) {
-            mutateRem = 0;
-            mutateIns = 100; //TEST: when prog is too small, mutation tends to vary the same loc multiple times...
-        }
+			// save modified instruction
+			program.set(loc, instr);
+		} // mutate op
+		else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg + mutateOp))
+		{
+			// replace opcode field by random value
+			instr.op = rnd.nextInt();
 
-        //if this is a unary op, don't touch src2 - it'll be noneffective
-        if (instr instanceof UnaryOperation) {
-            mutateSrc2 = 0;
-        }
+			// save modified instruction
+			program.set(loc, instr);
+		} // mutate opflags
+		else
+		{
+			// set new random opflags
+			instr.immediate = rnd.nextBoolean();
 
-        //replacement is always possible..
-        //add all up
-        chancesSum = mutateRep + mutateIns + mutateRem + mutateVal + mutateSrc2
-                + mutateTrg + mutateOp + mutateFlags;
+			// save modified instruction
+			program.set(loc, instr);
+		}
+	}
 
-        //choose mutation
-        mutationChoice = rnd.nextInt(chancesSum);
+	public abstract Body2d synthesizeBody(Organism2d organism, World2d world);
 
-        //see which one has been chosen
-        //mutate ins
-        if (mutationChoice < mutateIns) {
-            //insert a random instruction at a random location
-            program.add(loc, OpCode.randomOpCode(rnd));
-        } //mutate rem
-        else if (mutationChoice < (mutateIns + mutateRem)) {
-            //remove a random instruction
-            program.remove(loc);
-        } //mutate rep
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep)) {
-            //replace a random instruction
-            program.set(loc, OpCode.randomOpCode(rnd));
-        } //mutate src1 or immediate value
-        else if (mutationChoice
-                < (mutateIns + mutateRem + mutateRep + mutateVal)) {
-            //modify the src1 register number by a random value
-            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-            instr.src1 = (instr.src1 + val);
-
-            //save modified instruction
-            program.set(loc, instr);
-        } //mutate src2
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
-                + mutateSrc2)) {
-            //if immediate, modify the constant value by random value
-            if (instr.immediate) {
-                val = rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
-                instr.src2 += val;
-            } //else modify the src2 register number by a random value
-            else {
-                val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-                instr.src2 += val;
-            }
-
-            //save modified instruction
-            program.set(loc, instr);
-        } //mutate trg
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
-                + mutateSrc2 + mutateTrg)) {
-            //modify trg field by random value
-            //(the scale of the value might be ridiculous...)
-            //do
-            //{
-            val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-            //modify and normalize
-            instr.trg = (instr.trg + val);
-            //}
-            //don't write input registers
-            //while (!((instr.trg == 4) || (instr.trg == 5)));
-
-            //save modified instruction
-            program.set(loc, instr);
-        } //mutate op
-        else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal
-                + mutateSrc2 + mutateTrg + mutateOp)) {
-            //replace opcode field by random value
-            instr.op = rnd.nextInt();
-
-            //save modified instruction
-            program.set(loc, instr);
-        } //mutate opflags
-        else {
-            //set new random opflags
-            instr.immediate = rnd.nextBoolean();
-
-            //save modified instruction
-            program.set(loc, instr);
-        }
-    }
-
-
-    public Organism2d synthesize() {
-        try {
-            return new Organism2d(this);
-        } catch (IOException ex) {
-            Logger.getLogger(Genome.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return null;
-    }
+	public abstract Organism2d synthesize();
 }

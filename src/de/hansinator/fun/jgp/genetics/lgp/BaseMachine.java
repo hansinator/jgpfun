@@ -15,61 +15,54 @@ import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
- *
+ * 
  * @author hansinator
  */
-public abstract class BaseMachine {
+public abstract class BaseMachine
+{
 
-    static {
-        //compatible instruction set
-        //ops = new Operation[]{new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod()};
+	static
+	{
+		// compatible instruction set
+		// ops = new Operation[]{new OpAdd(), new OpSub(), new OpMul(), new
+		// OpDiv(), new OpMod()};
 
-        //extended instruction set
-        ops = new Operation[]{
-                    new OpAdd(),
-                    new OpSub(),
-                    new OpMul(),
-                    new OpDiv(),
-                    new OpMod(),
-                    new OpSqrt(),
-                    new OpNeg(),
-                    new OpMin(),
-                    new OpMax(),
-                    new OpAbs(),
-                    //new OpSin(),
-                    new OpMov(), //
-                //new OpInc(),
-                //new OpDec(),
-                // OpBranchLt(),
-                //new OpBranchGt()
-                //new JumpOp(),
-                //new JumpTarg()
-                };
-    }
+		// extended instruction set
+		ops = new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(), new OpSqrt(),
+				new OpNeg(), new OpMin(), new OpMax(), new OpAbs(),
+				// new OpSin(),
+				new OpMov(), //
+				// new OpInc(),
+				// new OpDec(),
+				// new OpBranchLt(), new OpBranchGt()
+		// new JumpOp(),
+		// new JumpTarg()
+		};
+	}
 
-    static Operation[] ops;
+	static Operation[] ops;
 
-    public int[] regs;
+	public int[] regs;
 
+	protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
+	{
+		for (int i = 0; i < program.length; i++)
+		{
+			OpCode curop = program[i];
 
-    protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs) {
-        for (int i = 0; i < program.length; i++) {
-            OpCode curop = program[i];
+			curop.src1 = Math.abs(curop.src1) % numRegs;
+			curop.src2 = curop.immediate ? (curop.src2 / (int) Organism2d.intScaleFactor)
+					: (Math.abs(curop.src2) % numRegs);
+			curop.trg = Math.abs(curop.trg) % numRegs;
+			curop.op = Math.abs(curop.op) % ops.length;
+			curop.operation = ops[curop.op];
+		}
 
-            curop.src1 = Math.abs(curop.src1) % numRegs;
-            curop.src2 = curop.immediate ? (curop.src2 / (int)Organism2d.intScaleFactor) : (Math.abs(curop.src2) % numRegs);
-            curop.trg = Math.abs(curop.trg) % numRegs;
-            curop.op = Math.abs(curop.op) % ops.length;
-            curop.operation = ops[curop.op];
-        }
+		return program;
+	}
 
-        return program;
-    }
+	public abstract void run();
 
-
-    public abstract void run();
-
-
-    public abstract int getProgramSize();
+	public abstract int getProgramSize();
 
 }

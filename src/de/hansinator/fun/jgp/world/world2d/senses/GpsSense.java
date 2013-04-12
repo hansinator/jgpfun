@@ -1,25 +1,64 @@
 package de.hansinator.fun.jgp.world.world2d.senses;
 
 import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Body2d.Part;
+import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
 /**
- *
+ * 
  * @author hansinator
  */
-public class GpsSense {
+public class GpsSense implements Part
+{
 
-    private final Body2d body;
+	private final Body2d body;
 
+	public final SensorInput senseX = new SensorInput()
+	{
 
-    public GpsSense(Body2d body) {
-        this.body = body;
-    }
+		@Override
+		public int get()
+		{
+			return Math.round((float) body.x);
+		}
+	};
 
-    public double getX() {
-        return body.x;
-    }
+	public final SensorInput senseY = new SensorInput()
+	{
 
-    public double getY() {
-        return body.y;
-    }
+		@Override
+		public int get()
+		{
+			return Math.round((float) body.y);
+		}
+	};
+
+	SensorInput[] inputs = { senseX, senseY };
+
+	public GpsSense(Body2d body)
+	{
+		this.body = body;
+	}
+
+	@Override
+	public SensorInput[] getInputs()
+	{
+		return inputs;
+	}
+
+	@Override
+	public ActorOutput[] getOutputs()
+	{
+		return ActorOutput.emptyActorOutputArray;
+	}
+
+	@Override
+	public void prepareInputs()
+	{
+	}
+
+	@Override
+	public void processOutputs()
+	{
+	}
 }

@@ -13,7 +13,8 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
  * 
  * @author Hansinator
  */
-public class RouletteWheelSelector implements SelectionStrategy {
+public class RouletteWheelSelector implements SelectionStrategy
+{
 
 	final Random rnd = new SecureRandom();
 
@@ -21,15 +22,14 @@ public class RouletteWheelSelector implements SelectionStrategy {
 	 * fitness proportionate selection
 	 */
 	@Override
-	public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness) {
+	public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness)
+	{
 		int stopPoint = 0;
 		int fitnessSoFar = 0;
 
-		if (totalFitness > 0) {
+		if (totalFitness > 0)
 			stopPoint = rnd.nextInt(totalFitness);
-		} else {
-			return organisms.get(rnd.nextInt(organisms.size()));
-		}
+		else return organisms.get(rnd.nextInt(organisms.size()));
 
 		/*
 		 * Shuffle the organism list to make roulettewheel work better. In case
@@ -40,12 +40,12 @@ public class RouletteWheelSelector implements SelectionStrategy {
 		 */
 		Collections.shuffle(organisms);
 
-		for (int i = 0; i < organisms.size(); i++) {
+		for (int i = 0; i < organisms.size(); i++)
+		{
 			fitnessSoFar += organisms.get(i).getFitness();
 			// this way zero fitness ants are omitted
-			if (fitnessSoFar > stopPoint) {
+			if (fitnessSoFar > stopPoint)
 				return organisms.get(i);
-			}
 		}
 
 		return organisms.get(rnd.nextInt(organisms.size()));

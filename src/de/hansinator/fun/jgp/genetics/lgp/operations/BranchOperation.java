@@ -7,9 +7,10 @@ package de.hansinator.fun.jgp.genetics.lgp.operations;
 
 /**
  * Just a tagging interface.
- *
+ * 
  * @author Administrator
  */
-public interface BranchOperation {
+public interface BranchOperation
+{
 
 }

@@ -19,144 +19,149 @@ import javax.swing.JScrollPane;
 import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
- *
+ * 
  * @author hansinator
  */
-public class MainFrame extends JFrame implements WindowListener {
+public class MainFrame extends JFrame implements WindowListener
+{
 
-    private MainView mainView;
+	private MainView mainView;
 
-    private final JScrollPane centerPane;
+	private final JScrollPane centerPane;
 
-    public final JPanel sidePaneLeft, sidePaneRight;
+	public final JPanel sidePaneLeft, sidePaneRight;
 
-    public final BottomPanel bottomPane;
+	public final BottomPanel bottomPane;
 
-    private final Simulator simulator;
+	private final Simulator simulator;
 
+	public MainFrame(int width, int height, Simulator simulator)
+	{
+		super("BAH! Bonn!!1!11!!!");
+		this.simulator = simulator;
 
-    public MainFrame(int width, int height, Simulator simulator) {
-        super("BAH! Bonn!!1!11!!!");
-        this.simulator = simulator;
+		// create all direct clients
+		centerPane = new JScrollPane();
+		sidePaneLeft = new JPanel();
+		sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
+		bottomPane = new BottomPanel(simulator);
 
-        // create all direct clients
-        centerPane = new JScrollPane();
-        sidePaneLeft = new JPanel();
-        sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
-        bottomPane = new BottomPanel(simulator);
+		// set default center pane size properties
+		centerPane.setPreferredSize(new Dimension(800, 600));
 
-        // set default center pane size properties
-        centerPane.setPreferredSize(new Dimension(800, 600));
+		// init application specific content
+		initClientViews(width, height);
 
-        // init application specific content
-        initClientViews(width, height);
+		// add the menu bar
+		setJMenuBar(createMenuBar());
 
-        // add the menu bar
-        setJMenuBar(createMenuBar());
+		// setup and add all stuff to the content pane
+		Container contentPane = getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		contentPane.add(centerPane, BorderLayout.CENTER);
+		contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
+		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
+		contentPane.add(bottomPane, BorderLayout.PAGE_END);
 
-        // setup and add all stuff to the content pane
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(centerPane, BorderLayout.CENTER);
-        contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
-        contentPane.add(sidePaneRight, BorderLayout.LINE_END);
-        contentPane.add(bottomPane, BorderLayout.PAGE_END);
+		// get ready for action
+		pack();
+		setVisible(true);
+	}
 
-        // get ready for action
-        pack();
-        setVisible(true);
-    }
+	private JMenuBar createMenuBar()
+	{
+		JMenuBar menuBar = new JMenuBar();
 
+		menuBar.add(new JMenu("File")).add(new JMenuItem("Exit")).addActionListener(new ActionListener()
+		{
 
-    private JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				stopSimulation();
+			}
 
-        menuBar.add(new JMenu("File")).add(new JMenuItem("Exit")).addActionListener(new ActionListener() {
+		});
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                stopSimulation();
-            }
+		JMenu simulationMenu = new JMenu("Simulation");
+		simulationMenu.add(new JMenuItem("Reset")).addActionListener(new ActionListener()
+		{
 
-        });
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				simulator.restart(mainView, bottomPane.infoPanel);
+			}
 
-        JMenu simulationMenu = new JMenu("Simulation");
-        simulationMenu.add(new JMenuItem("Reset")).addActionListener(new ActionListener() {
+		});
+		simulationMenu.add(new JMenuItem("Preferences"));
+		menuBar.add(simulationMenu);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                simulator.restart(mainView, bottomPane.infoPanel);
-            }
+		return menuBar;
+	}
 
-        });
-        simulationMenu.add(new JMenuItem("Preferences"));
-        menuBar.add(simulationMenu);
+	private void initClientViews(int width, int height)
+	{
+		// to be put elsewhere
+		mainView = new MainView(simulator.getSimulation().world);
+		mainView.setPreferredSize(new Dimension(width, height));
 
-        return menuBar;
-    }
+		setCenterPaneView(mainView);
+	}
 
+	public void setCenterPaneView(Component view)
+	{
+		centerPane.setViewportView(view);
+	}
 
-    private void initClientViews(int width, int height) {
-        // to be put elsewhere
-        mainView = new MainView(simulator.getSimulation().world);
-        mainView.setPreferredSize(new Dimension(width, height));
+	public void startSimulation()
+	{
+		System.out.println("MainView size: " + mainView.getWidth() + "x" + mainView.getHeight());
+		// TODO: to be put somewhere else
+		addWindowListener(this);
+		simulator.start(mainView, bottomPane.infoPanel);
+	}
 
-        setCenterPaneView(mainView);
-    }
+	public void stopSimulation()
+	{
+		simulator.stop();
+	}
 
+	@Override
+	public void windowOpened(WindowEvent e)
+	{
+	}
 
-    public void setCenterPaneView(Component view) {
-        centerPane.setViewportView(view);
-    }
+	@Override
+	public void windowClosing(WindowEvent e)
+	{
+		stopSimulation();
+	}
 
+	@Override
+	public void windowClosed(WindowEvent e)
+	{
+		stopSimulation();
+	}
 
-    public void startSimulation() {
-        System.out.println("MainView size: " + mainView.getWidth() + "x" + mainView.getHeight());
-        //TODO: to be put somewhere else
-        addWindowListener(this);
-        simulator.start(mainView, bottomPane.infoPanel);
-    }
+	@Override
+	public void windowIconified(WindowEvent e)
+	{
+	}
 
+	@Override
+	public void windowDeiconified(WindowEvent e)
+	{
+	}
 
-    public void stopSimulation() {
-        simulator.stop();
-    }
+	@Override
+	public void windowActivated(WindowEvent e)
+	{
+	}
 
-
-    @Override
-    public void windowOpened(WindowEvent e) {
-    }
-
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-        stopSimulation();
-    }
-
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-        stopSimulation();
-    }
-
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-    }
-
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-    }
-
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
+	@Override
+	public void windowDeactivated(WindowEvent e)
+	{
+	}
 
 }
