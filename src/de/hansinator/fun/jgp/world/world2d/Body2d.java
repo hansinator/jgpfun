@@ -77,6 +77,8 @@ public abstract class Body2d extends World2dObject
 
 	public abstract void postRoundTrigger();
 
+	public abstract void collision(World2dObject object);
+
 	@Override
 	public void draw(Graphics g)
 	{
@@ -88,8 +90,8 @@ public abstract class Body2d extends World2dObject
 		final double y_width_displace = 4.0 * cosdir;
 		final double x_bottom = x - x_len_displace;
 		final double y_bottom = y + y_len_displace;
-		
-		for(DrawablePart part : drawableParts)
+
+		for (DrawablePart part : drawableParts)
 			part.draw(g);
 
 		Polygon p = new Polygon();

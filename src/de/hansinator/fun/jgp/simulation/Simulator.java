@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.simulation;
 
 import java.io.File;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,12 +11,9 @@ import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
-import de.hansinator.fun.jgp.genetics.FoodAntGenome;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
-import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
-import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
@@ -42,15 +38,17 @@ public class Simulator
 
 	public static final int maxMutations = Settings.getInt("maxMutations");
 
-	private final Simulation simulation;
+	private final WorldSimulation simulation;
 
 	protected List<BaseOrganism> organisms;
 
-	private final SelectionStrategy selector = new TournamentSelector(3);
+	private final SelectionStrategy selector;
 
 	private final CrossoverOperator crossover;
 
 	private final GenealogyTree genealogyTree;
+	
+	private final Scenario scenario;
 
 	private final Random rnd;
 
@@ -64,23 +62,22 @@ public class Simulator
 
 	private final Object runLock = new Object();
 
-	private final int progSize;
-
 	private final int popSize;
 
 	private int evaluationCount;
 
 	private volatile boolean running;
 
-	public Simulator(Simulation sim)
+	public Simulator(Scenario scenario)
 	{
-		simulation = sim;
-		progSize = Settings.getInt("progSize");
+		this.scenario = scenario;
+		simulation = scenario.getSimulation();
 		popSize = Settings.getInt("popSize");
 		organisms = new ArrayList<BaseOrganism>(popSize);
 		genealogyTree = new GenealogyTree();
-		crossover = new OffsetTwoPointCrossover(progSize / 8);
-		rnd = new SecureRandom();
+		selector = scenario.getSelectionStrategy();
+		crossover = scenario.getCrossoverOperator();
+		rnd = Settings.newRandomSource();
 
 		fitnessChartData.setMaximumItemCount(500);
 		genomeSizeChartData.setMaximumItemCount(500);
@@ -117,7 +114,7 @@ public class Simulator
 		int lastEvaluationCount = 0, totalFitness;
 
 		// setup simulation
-		simulation.initialize(mainView, infoPanel);
+		simulation.initialize();
 		System.out.println("Start time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
 
@@ -128,7 +125,7 @@ public class Simulator
 			while (running)
 			{
 				// evaluate organisms
-				organisms = simulation.evaluate(this, organisms);
+				organisms = simulation.evaluate(this, organisms, mainView, infoPanel);
 				totalFitness = calculateTotalFitness(organisms);
 				evaluationCount++;
 
@@ -199,7 +196,7 @@ public class Simulator
 
 			for (int i = 0; i < popSize; i++)
 			{
-				Genome g = FoodAntGenome.randomGenome(progSize);
+				Genome g = scenario.randomGenome();
 				organisms.add(g.synthesize());
 				genealogyTree.put(g);
 			}
@@ -226,8 +223,8 @@ public class Simulator
 			// mutate or crossover with a user defined chance
 			// if (rnd.nextDouble() > crossoverRate) {
 			// mutate genomes
-			child1.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
-			child2.mutate(rnd.nextInt(maxMutations) + 1, progSize, rnd);
+			child1.mutate(rnd.nextInt(maxMutations) + 1, rnd);
+			child2.mutate(rnd.nextInt(maxMutations) + 1, rnd);
 			/*
 			 * } else { //perform crossover crossover.cross(child1.program,
 			 * child2.program, rnd); }
@@ -239,7 +236,7 @@ public class Simulator
 
 			// add to genealogy tree
 			genealogyTree.put(parent1.getGenome(), child1, parent1.getFitness());
-			genealogyTree.put(parent1.getGenome(), child2, parent2.getFitness());
+			genealogyTree.put(parent2.getGenome(), child2, parent2.getFitness());
 		}
 
 		return newAnts;
@@ -274,7 +271,7 @@ public class Simulator
 		realGenomeSizeChartData.add(generation, avgRealProgSize);
 	}
 
-	public Simulation getSimulation()
+	public WorldSimulation getSimulation()
 	{
 		return simulation;
 	}
@@ -285,7 +282,7 @@ public class Simulator
 	 */
 	public static void main(String[] args)
 	{
-		Simulator sim = new Simulator(new Simulation());
+		Simulator sim = new Simulator(new FindingFoodScenario());
 		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), sim).startSimulation();
 	}
 }

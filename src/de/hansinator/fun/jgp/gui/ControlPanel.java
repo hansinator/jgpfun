@@ -13,7 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
-import de.hansinator.fun.jgp.simulation.Simulation;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
@@ -40,9 +40,9 @@ public class ControlPanel extends JPanel
 
 		});
 
-		final JSlider speedSlider = new JSlider(0, Simulation.ROUNDS_PER_GENERATION);
-		speedSlider.setMajorTickSpacing(Simulation.ROUNDS_PER_GENERATION / 2);
-		speedSlider.setMinorTickSpacing(Simulation.ROUNDS_PER_GENERATION / 8);
+		final JSlider speedSlider = new JSlider(0, WorldSimulation.ROUNDS_PER_GENERATION);
+		speedSlider.setMajorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 2);
+		speedSlider.setMinorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 8);
 		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
 		speedSlider.setValue(simulator.getSimulation().getRoundsMod());

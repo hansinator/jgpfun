@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.util.Settings;
 
 /**
  * 
@@ -16,7 +17,7 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 public class RouletteWheelSelector implements SelectionStrategy
 {
 
-	final Random rnd = new SecureRandom();
+	final Random rnd = Settings.newRandomSource();
 
 	/**
 	 * fitness proportionate selection

@@ -1,9 +1,9 @@
 package de.hansinator.fun.jgp.world.world2d.senses;
 
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Body2d.Part;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
 /**
@@ -21,10 +21,10 @@ public class WallSense implements SensorInput, Part
 
 	private int lastSenseVal = 0;
 
-	public WallSense(Body2d body, World2d world)
+	public WallSense(Body2d body, World world)
 	{
-		this.worldWidth = Math.floor(world.worldWidth);
-		this.worldHeight = Math.floor(world.worldHeight);
+		this.worldWidth = Math.floor(world.getWidth());
+		this.worldHeight = Math.floor(world.getHeight());
 		this.body = body;
 	}
 

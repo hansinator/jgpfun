@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  * A convenience singleton container for properties. This is to be replaced by a
@@ -29,6 +30,10 @@ public final class Settings
 
 	private Settings()
 	{
+	}
+	
+	public static Random newRandomSource() {
+		return new Random();
 	}
 
 	public static String getString(String key)

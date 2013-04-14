@@ -1,12 +1,12 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import java.awt.Graphics;
 import java.io.IOException;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 
@@ -48,7 +48,7 @@ public class Organism2d extends BaseOrganism
 		this.outputs = new ActorOutput[numOutputs];
 	}
 
-	public void addToWorld(World2d world)
+	public void addToWorld(World world)
 	{
 		int i = 0, o = 0;
 
@@ -66,8 +66,8 @@ public class Organism2d extends BaseOrganism
 			for (ActorOutput out : bodies[x].getOutputs())
 				outputs[o++] = out;
 
-			bodies[x].x = rnd.nextInt(world.worldWidth);
-			bodies[x].y = rnd.nextInt(world.worldHeight);
+			bodies[x].x = rnd.nextInt(world.getWidth());
+			bodies[x].y = rnd.nextInt(world.getHeight());
 			bodies[x].dir = rnd.nextDouble() * 2 * Math.PI;
 		}
 	}
@@ -105,12 +105,6 @@ public class Organism2d extends BaseOrganism
 	public void incFood()
 	{
 		food++;
-	}
-
-	public void draw(Graphics g)
-	{
-		for (Body2d b : bodies)
-			b.draw(g);
 	}
 
 }

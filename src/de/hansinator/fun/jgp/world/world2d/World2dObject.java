@@ -3,12 +3,14 @@ package de.hansinator.fun.jgp.world.world2d;
 import java.awt.Graphics;
 import java.awt.Point;
 
+import de.hansinator.fun.jgp.world.World;
+
 public abstract class World2dObject extends Point.Double
 {
 
-	protected final World2d world;
+	protected final World world;
 
-	public World2dObject(World2d world, double x, double y)
+	public World2dObject(World world, double x, double y)
 	{
 		super(x, y);
 		this.world = world;

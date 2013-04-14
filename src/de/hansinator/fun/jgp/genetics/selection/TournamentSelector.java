@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.util.Settings;
 
 /**
  * 
@@ -15,7 +16,7 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 public class TournamentSelector implements SelectionStrategy
 {
 
-	Random rnd = new SecureRandom();
+	Random rnd = Settings.newRandomSource();
 
 	final int tournamentSize;
 

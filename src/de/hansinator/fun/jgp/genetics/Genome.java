@@ -1,15 +1,15 @@
 package de.hansinator.fun.jgp.genetics;
 
-import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
 import de.hansinator.fun.jgp.genetics.lgp.operations.UnaryOperation;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
@@ -22,11 +22,24 @@ public abstract class Genome
 
 	public final List<OpCode> program;
 
-	protected static final Random rnd = new SecureRandom();
+	protected static final Random rnd = Settings.newRandomSource();
+	
+	protected final int maxLength;
 
-	public Genome(List<OpCode> program)
+	public Genome(List<OpCode> program, int maxLength)
 	{
 		this.program = program;
+		this.maxLength = maxLength;
+	}
+
+	public Genome(int maxLength)
+	{
+		this.maxLength = maxLength;
+		int size = rnd.nextInt(maxLength - 200) + 201;
+		program = new ArrayList<OpCode>(size);
+
+		for (int i = 0; i < size; i++)
+			program.add(OpCode.randomOpCode(rnd));
 	}
 
 	@Override
@@ -38,14 +51,14 @@ public abstract class Genome
 	}
 
 	// make random changes to random locations in the genome
-	public void mutate(int mutCount, int progSize, Random rnd)
+	public void mutate(int mutCount, Random rnd)
 	{
 		// determine amount of mutations, minimum 1
 		// int mutCount = maxMutations;
 		// int mutCount = randomR.Next(maxMutations) + 1;
 
 		for (int i = 0; i < mutCount; i++)
-			mutateProgramSpace(program, progSize, rnd);
+			mutateProgramSpace(program, rnd);
 	}
 
 	private final static int maxRegisterValDelta = 16;
@@ -54,7 +67,7 @@ public abstract class Genome
 
 	// final int maxConstantValDelta = Integer.maxValue / 2;
 
-	private void mutateProgramSpace(List<OpCode> program, int progSize, Random rnd)
+	private void mutateProgramSpace(List<OpCode> program, Random rnd)
 	{
 		// define chances for what mutation could happen in some sort of
 		// percentage
@@ -83,7 +96,7 @@ public abstract class Genome
 		// first determine which mutations are possible and add up all the
 		// chances
 		// if we have the max possible opcodes, we can't add a new one
-		if (program.size() >= progSize)
+		if (program.size() >= maxLength)
 			mutateIns = 0;
 
 		// if we have only 4 opcodes left, don't delete more
@@ -145,15 +158,8 @@ public abstract class Genome
 		else if (mutationChoice < (mutateIns + mutateRem + mutateRep + mutateVal + mutateSrc2 + mutateTrg))
 		{
 			// modify trg field by random value
-			// (the scale of the value might be ridiculous...)
-			// do
-			// {
 			val = rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
-			// modify and normalize
 			instr.trg = (instr.trg + val);
-			// }
-			// don't write input registers
-			// while (!((instr.trg == 4) || (instr.trg == 5)));
 
 			// save modified instruction
 			program.set(loc, instr);
@@ -176,7 +182,7 @@ public abstract class Genome
 		}
 	}
 
-	public abstract Body2d synthesizeBody(Organism2d organism, World2d world);
+	public abstract Body2d synthesizeBody(Organism2d organism, World world);
 
 	public abstract Organism2d synthesize();
 }

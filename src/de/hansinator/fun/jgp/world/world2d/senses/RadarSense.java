@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
 import de.hansinator.fun.jgp.world.world2d.Food;
@@ -20,7 +21,7 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 
 	private final Body2d body;
 
-	private final World2d world;
+	private final World world;
 
 	public double direction = 0.0;
 
@@ -42,7 +43,7 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 
 	ActorOutput[] outputs = { this };
 
-	public RadarSense(Body2d body, World2d world)
+	public RadarSense(Body2d body, World world)
 	{
 		this.body = body;
 		this.world = world;
@@ -81,7 +82,7 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 		x2 = Math.floor(body.x + beamLength * Math.sin(rdir + bdir));
 		y2 = Math.floor(body.y - beamLength * Math.cos(rdir + bdir));
 
-		for (Food f : world.food)
+		for (Food f : ((World2d)world).food)
 			if (pointInLine(x1, y1, x2, y2, f)
 					&& (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength)
 					&& (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x)))

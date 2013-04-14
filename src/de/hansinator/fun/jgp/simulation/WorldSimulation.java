@@ -10,15 +10,13 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.BaseOrganism;
-import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
  * @author hansinator
  */
-public class Simulation
+public class WorldSimulation
 {
 
 	// todo: have world object automatically add themselves to a legend that can
@@ -49,23 +47,17 @@ public class Simulation
 
 	public static final int ROUNDS_PER_GENERATION = 4000;
 
-	private MainView mainView;
-
-	private InfoPanel infoPanel;
-
-	public Simulation()
+	public WorldSimulation(World world)
 	{
-		world = new World2d(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), Settings.getInt("foodCount"));
+		this.world = world;
 		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
 		pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
-	public void initialize(MainView mainView, InfoPanel infoPanel)
+	public void initialize()
 	{
 		synchronized (runLock)
 		{
-			this.mainView = mainView;
-			this.infoPanel = infoPanel;
 			world.resetState();
 			running = true;
 			paused = false;
@@ -79,7 +71,7 @@ public class Simulation
 	 * re-think generation runtime stat calculation to be better suited for
 	 * re-entrance
 	 */
-	public List<BaseOrganism> evaluate(Simulator simulator, List<BaseOrganism> organisms)
+	public List<BaseOrganism> evaluate(Simulator simulator, List<BaseOrganism> organisms, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
@@ -119,7 +111,7 @@ public class Simulation
 							Thread.sleep((1000 / fpsMax) - time);
 						} catch (InterruptedException ex)
 						{
-							Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+							Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
 						}
 				}
 			}
@@ -163,7 +155,7 @@ public class Simulation
 			cb.await();
 		} catch (InterruptedException ex)
 		{
-			Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		// run world
@@ -205,7 +197,7 @@ public class Simulation
 		this.paused = paused;
 	}
 
-	public boolean isPausede()
+	public boolean isPaused()
 	{
 		return paused;
 	}

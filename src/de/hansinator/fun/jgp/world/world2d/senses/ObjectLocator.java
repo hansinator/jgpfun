@@ -3,11 +3,10 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
@@ -21,9 +20,9 @@ import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 public class ObjectLocator implements DrawablePart
 {
 
-	private final Body2d body;
-
-	private final World2d world;
+	private final World world;
+	
+	private final World2dObject origin;
 
 	public Food target;
 
@@ -35,7 +34,7 @@ public class ObjectLocator implements DrawablePart
 		@Override
 		public int get()
 		{
-			return (int) (((target.x - body.x) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.x - origin.x) / objDist) * Organism2d.intScaleFactor);
 		}
 
 	};
@@ -46,7 +45,7 @@ public class ObjectLocator implements DrawablePart
 		@Override
 		public int get()
 		{
-			return (int) (((target.y - body.y) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.y - origin.y) / objDist) * Organism2d.intScaleFactor);
 		}
 
 	};
@@ -80,16 +79,16 @@ public class ObjectLocator implements DrawablePart
 																			// both2
 																			// fix??
 
-	public ObjectLocator(Body2d body, World2d world)
+	public ObjectLocator(World world, World2dObject origin)
 	{
-		this.body = body;
 		this.world = world;
+		this.origin = origin;
 	}
 
 	public void locate()
 	{
-		target = world.findNearestFood(body);
-		objDist = World2dObject.distance(target, Math.round((float) body.x), Math.round((float) body.y));
+		target = world.findNearestFood(origin);
+		objDist = World2dObject.distance(target, Math.round((float) origin.x), Math.round((float) origin.y));
 	}
 
 	@Override
@@ -121,7 +120,7 @@ public class ObjectLocator implements DrawablePart
 		if (target != null)
 		{
 			g.setColor(Color.darkGray);
-			g.drawLine(Math.round((float) body.x), Math.round((float) body.y), (int) Math.round(target.x),
+			g.drawLine(Math.round((float) origin.x), Math.round((float) origin.y), (int) Math.round(target.x),
 					(int) Math.round(target.y));
 		}
 	}

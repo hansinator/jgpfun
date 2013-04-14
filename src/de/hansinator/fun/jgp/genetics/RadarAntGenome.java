@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.FoodAntBody;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
@@ -24,9 +24,14 @@ public class RadarAntGenome extends Genome
 
 	private static int NUM_OUTPUTS = 3;
 
-	public RadarAntGenome(List<OpCode> program)
+	public RadarAntGenome(List<OpCode> program, int maxLength)
 	{
-		super(program);
+		super(program, maxLength);
+	}
+
+	public RadarAntGenome(int maxLength)
+	{
+		super(maxLength);
 	}
 
 	@Override
@@ -37,11 +42,11 @@ public class RadarAntGenome extends Genome
 		for (OpCode oc : program)
 			p.add(oc.clone());
 
-		return new RadarAntGenome(p);
+		return new RadarAntGenome(p, maxLength);
 	}
 
 	@Override
-	public Body2d synthesizeBody(Organism2d organism, World2d world)
+	public Body2d synthesizeBody(Organism2d organism, World world)
 	{
 		// create body without builtin locator usage and add parts
 		Body2d body = new FoodAntBody(organism, world, NUM_INPUTS, NUM_OUTPUTS, false);
@@ -70,16 +75,5 @@ public class RadarAntGenome extends Genome
 		}
 
 		return null;
-	}
-
-	public static Genome randomGenome(int progSize)
-	{
-		int size = rnd.nextInt(progSize - 200) + 201;
-		List<OpCode> program = new ArrayList<OpCode>(size);
-
-		for (int i = 0; i < size; i++)
-			program.add(OpCode.randomOpCode(rnd));
-
-		return new RadarAntGenome(program);
 	}
 }

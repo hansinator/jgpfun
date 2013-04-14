@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.FoodAntBody;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
@@ -23,9 +23,14 @@ public class FoodAntGenome extends Genome
 
 	private static int NUM_OUTPUTS = 2;
 
-	public FoodAntGenome(List<OpCode> program)
+	public FoodAntGenome(List<OpCode> program, int maxLength)
 	{
-		super(program);
+		super(program, maxLength);
+	}
+	
+	public FoodAntGenome(int maxLength)
+	{
+		super(maxLength);
 	}
 
 	@Override
@@ -36,11 +41,11 @@ public class FoodAntGenome extends Genome
 		for (OpCode oc : program)
 			p.add(oc.clone());
 
-		return new FoodAntGenome(p);
+		return new FoodAntGenome(p, maxLength);
 	}
 
 	@Override
-	public Body2d synthesizeBody(Organism2d organism, World2d world)
+	public Body2d synthesizeBody(Organism2d organism, World world)
 	{
 		// create body and add parts
 		FoodAntBody body = new FoodAntBody(organism, world, NUM_INPUTS, NUM_OUTPUTS, true);
@@ -70,16 +75,5 @@ public class FoodAntGenome extends Genome
 		}
 
 		return null;
-	}
-
-	public static Genome randomGenome(int progSize)
-	{
-		int size = rnd.nextInt(progSize - 200) + 201;
-		List<OpCode> program = new ArrayList<OpCode>(size);
-
-		for (int i = 0; i < size; i++)
-			program.add(OpCode.randomOpCode(rnd));
-
-		return new FoodAntGenome(program);
 	}
 }

@@ -71,10 +71,7 @@ public class StatisticsHistoryTable extends JTable
 
 	}
 
-	/*
-	 * TODO: let this use a ringbuffer that is tuned to table height or
-	 * something
-	 */
+
 	public static class StatisticsHistoryModel extends AbstractTableModel
 	{
 
