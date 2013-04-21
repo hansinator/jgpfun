@@ -6,7 +6,7 @@ package de.hansinator.fun.jgp.genetics.lgp;
  */
 public class EvoVM extends BaseMachine
 {
-	
+
 	private int pc;
 
 	private final OpCode[] program;
@@ -15,22 +15,21 @@ public class EvoVM extends BaseMachine
 	{
 		regs = new int[numRegs];
 
-		// normalize program and strip strctural intron code portions
-		this.program = EvoCodeUtils
-				.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs);
+		// normalize program and strip structural intron code portions
+		this.program = EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs);
 		// this.program = normalizeProgram(program, numRegs);
 	}
 
 	@Override
 	public void run()
 	{
-        pc = 0;
+		pc = 0;
 		while (pc < program.length)
 		{
 			OpCode curop = program[pc++];
-            regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
-        }
-    }
+			regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
+		}
+	}
 
 
 	@Override

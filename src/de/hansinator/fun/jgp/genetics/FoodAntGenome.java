@@ -16,14 +16,11 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 public class FoodAntGenome extends Genome
 {
 
-	private static int NUM_INPUTS = 7;
-	
-
 	public FoodAntGenome(List<OpCode> program, int maxLength)
 	{
 		super(program, maxLength);
 	}
-	
+
 	public FoodAntGenome(int maxLength)
 	{
 		super(maxLength);
@@ -43,17 +40,9 @@ public class FoodAntGenome extends Genome
 	@Override
 	public Organism2d synthesize()
 	{
-		final int numBodies = 1;
-		final int numInputs = NUM_INPUTS * numBodies;
-		
-		// create brain
-		BaseMachine brain = new EvoVM(registerCount, numInputs, program.toArray(new OpCode[program.size()]));
-		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
-		// program.toArray(new OpCode[program.size()]));
-		
 		// create organism
-		Organism2d organism = new Organism2d(this, brain);
-		
+		Organism2d organism = new Organism2d(this);
+
 		// create body and attach parts
 		AntBody body = new AntBody(organism);
 		final Part[] parts = new Part[] { body.locator, body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body) };
@@ -61,6 +50,12 @@ public class FoodAntGenome extends Genome
 
 		// attach body
 		organism.setBodies(new Body2d[] { body });
+
+		// create and attach brain
+		BaseMachine brain = new EvoVM(registerCount, organism.getInputCount(), program.toArray(new OpCode[program.size()]));
+		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
+		// program.toArray(new OpCode[program.size()]));
+		organism.setVM(brain);
 
 		// return assembled organism
 		return organism;

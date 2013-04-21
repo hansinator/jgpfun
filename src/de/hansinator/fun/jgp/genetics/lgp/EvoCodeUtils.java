@@ -73,28 +73,21 @@ class EvoCodeUtils
 				// and add the source operands
 				effectiveRegisters.remove(memVal.trg);
 
-				// special treatment for no source operations
-				if (memVal.operation instanceof NoSourceOperation)
+				// if operation has sources
+				if (!(memVal.operation instanceof NoSourceOperation))
 				{
-					markers[i] = true;
-					continue;
-				}
-
-				// add source operand 1
-				if (!effectiveRegisters.containsValue(memVal.src1))
+					// add source operand 1
 					effectiveRegisters.put(memVal.src1, dummy);
 
-				// add source operand 2, if it is no immediate or unary
-				// operation
-				if (!(memVal.immediate || memVal.operation instanceof UnaryOperation))
-					// add source operand 2
-					if (!effectiveRegisters.containsValue(memVal.src2))
+					// add source operand 2, if it is no immediate or unary operation
+					if (!(memVal.immediate || memVal.operation instanceof UnaryOperation))
 						effectiveRegisters.put(memVal.src2, dummy);
 
-				// mark the instruction as effective
-				markers[i] = true;
+					// mark the instruction as effective
+					markers[i] = true;
+				}
 			} else // mark the instruction as non-effective
-			markers[i] = false;
+				markers[i] = false;
 		}
 
 		// create stripped program from marked instructions

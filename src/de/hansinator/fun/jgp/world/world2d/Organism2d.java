@@ -22,9 +22,9 @@ public class Organism2d extends BaseOrganism
 
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
-	public final BaseMachine vm;
-
 	public Body2d[] bodies;
+
+	private BaseMachine vm;
 
 	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
 
@@ -36,36 +36,35 @@ public class Organism2d extends BaseOrganism
 	 * idea: think of inputs and outputs in term of I/O in computers (i.e. interface to real world) and regard bodies as I/O units or ports
 	 * TODO: I could move the VM into baseorganism and try to write a generic live function
 	 */
-	public Organism2d(Genome genome, BaseMachine brain)
+	public Organism2d(Genome genome)
 	{
 		super(genome);
 		this.food = 0;
-		this.vm = brain;
 	}
-	
+
 	public void setBodies(Body2d[] bodies)
 	{
 		int i, o, x;
 		this.bodies = bodies;
-		
+
 		// count I/O ports
 		for (x = 0, i = 0, o = 0; x < bodies.length; x++)
 		{
 			i += bodies[x].getInputs().length;
 			o += bodies[x].getOutputs().length;
 		}
-		
+
 		// create arrays
 		inputs = new SensorInput[i];
 		outputs = new ActorOutput[o];
-		
+
 		// grab I/O ports
 		for (x = 0, i = 0, o = 0; x < bodies.length; x++)
 		{
 			// collect inputs
 			for (SensorInput in : bodies[x].getInputs())
 				inputs[i++] = in;
-	
+
 			// collect outputs
 			for (ActorOutput out : bodies[x].getOutputs())
 				outputs[o++] = out;
@@ -112,6 +111,16 @@ public class Organism2d extends BaseOrganism
 	public void incFood()
 	{
 		food++;
+	}
+
+	public int getInputCount()
+	{
+		return inputs.length;
+	}
+
+	public void setVM(BaseMachine vm)
+	{
+		this.vm = vm;
 	}
 
 }

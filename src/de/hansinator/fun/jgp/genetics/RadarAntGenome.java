@@ -17,9 +17,6 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 public class RadarAntGenome extends Genome
 {
 
-	private static int NUM_INPUTS = 5;
-
-
 	public RadarAntGenome(List<OpCode> program, int maxLength)
 	{
 		super(program, maxLength);
@@ -44,14 +41,8 @@ public class RadarAntGenome extends Genome
 	@Override
 	public Organism2d synthesize()
 	{
-		final int numBodies = 1;
-		final int numInputs = NUM_INPUTS * numBodies;
-
-		// create brain
-		BaseMachine brain = new EvoVM(registerCount, numInputs, program.toArray(new OpCode[program.size()]));
-
 		// create organism
-		Organism2d organism = new Organism2d(this, brain);
+		Organism2d organism = new Organism2d(this);
 
 		// create body and attach parts
 		Body2d body = new AntBody(organism);
@@ -60,6 +51,10 @@ public class RadarAntGenome extends Genome
 
 		// attach body
 		organism.setBodies(new Body2d[] { body });
+
+		// create and attach brain
+		BaseMachine brain = new EvoVM(registerCount, organism.getInputCount(), program.toArray(new OpCode[program.size()]));
+		organism.setVM(brain);
 
 		// return assembled organism
 		return organism;
