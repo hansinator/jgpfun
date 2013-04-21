@@ -7,8 +7,6 @@ import java.util.Random;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
 import de.hansinator.fun.jgp.genetics.lgp.operations.UnaryOperation;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
@@ -181,8 +179,6 @@ public abstract class Genome
 			program.set(loc, instr);
 		}
 	}
-
-	public abstract Body2d synthesizeBody(Organism2d organism, World world);
 
 	public abstract Organism2d synthesize();
 }

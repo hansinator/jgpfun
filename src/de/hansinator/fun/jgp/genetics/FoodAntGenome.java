@@ -1,15 +1,11 @@
 package de.hansinator.fun.jgp.genetics;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
-import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.FoodAntBody;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
@@ -45,35 +41,30 @@ public class FoodAntGenome extends Genome
 	}
 
 	@Override
-	public Body2d synthesizeBody(Organism2d organism, World world)
-	{
-		// create body and add parts
-		FoodAntBody body = new FoodAntBody(organism, world, NUM_INPUTS, NUM_OUTPUTS, true);
-		body.addBodyPart(body.new OrientationSense());
-		body.addBodyPart(body.new SpeedSense());
-		body.addBodyPart(new WallSense(body, world));
-		body.addBodyPart(new TankMotor(body));
-		return body;
-	}
-
-	@Override
 	public Organism2d synthesize()
 	{
 		final int numBodies = 1;
 		final int numInputs = NUM_INPUTS * numBodies;
-		final int numOutputs = NUM_OUTPUTS * numBodies;
+		
+		// create brain
 		BaseMachine brain = new EvoVM(registerCount, numInputs, program.toArray(new OpCode[program.size()]));
 		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
 		// program.toArray(new OpCode[program.size()]));
+		
+		// create organism
+		Organism2d organism = new Organism2d(this, brain);
+		
+		// create body and add parts
+		FoodAntBody body = new FoodAntBody(organism, NUM_INPUTS, NUM_OUTPUTS, true);
+		body.addBodyPart(body.new OrientationSense());
+		body.addBodyPart(body.new SpeedSense());
+		body.addBodyPart(new WallSense(body));
+		body.addBodyPart(new TankMotor(body));
 
-		try
-		{
-			return new Organism2d(this, brain, numBodies, numInputs, numOutputs);
-		} catch (IOException ex)
-		{
-			Logger.getLogger(Genome.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		// attach body
+		organism.setBodies(new Body2d[] { body });
 
-		return null;
+		// return assembled organism
+		return organism;
 	}
 }

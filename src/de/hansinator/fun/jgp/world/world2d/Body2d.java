@@ -5,12 +5,16 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 
 public abstract class Body2d extends World2dObject
 {
+	protected static final Random rnd = Settings.newRandomSource();
 
 	protected final List<Part> parts;
 
@@ -26,16 +30,13 @@ public abstract class Body2d extends World2dObject
 
 	public double lastSpeed = 0.0;
 
-	public double dir;
-
 	public volatile boolean tagged = false;
 
 	public Body2d(Organism2d organism, double x, double y, double dir, SensorInput[] inputs, ActorOutput[] outputs)
 	{
 		// TODO: fix null pointer
-		super(null, x, y);
+		super(null, x, y, dir);
 		this.organism = organism;
-		this.dir = dir;
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.parts = new ArrayList<Part>();
@@ -52,6 +53,15 @@ public abstract class Body2d extends World2dObject
 		if (part instanceof DrawablePart)
 			drawableParts.add((DrawablePart) part);
 	}
+	
+	public void addToWorld(World world)
+	{
+		for(Part part : parts)
+			part.addToWorld(world);
+		x = rnd.nextInt(world.getWidth());
+		y = rnd.nextInt(world.getHeight());
+		dir = rnd.nextDouble() * 2 * Math.PI;
+	}
 
 	public SensorInput[] getInputs()
 	{
@@ -63,16 +73,16 @@ public abstract class Body2d extends World2dObject
 		return outputs;
 	}
 
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 		for (Part p : parts)
-			p.prepareInputs();
+			p.sampleInputs();
 	}
 
-	public void processOutputs()
+	public void applyOutputs()
 	{
 		for (Part p : parts)
-			p.processOutputs();
+			p.applyOutputs();
 	}
 
 	public abstract void postRoundTrigger();
@@ -136,12 +146,17 @@ public abstract class Body2d extends World2dObject
 		}
 
 		@Override
-		public void prepareInputs()
+		public void sampleInputs()
 		{
 		}
 
 		@Override
-		public void processOutputs()
+		public void applyOutputs()
+		{
+		}
+		
+		@Override
+		public void addToWorld(World world)
 		{
 		}
 	}
@@ -170,12 +185,17 @@ public abstract class Body2d extends World2dObject
 		}
 
 		@Override
-		public void prepareInputs()
+		public void sampleInputs()
 		{
 		}
 
 		@Override
-		public void processOutputs()
+		public void applyOutputs()
+		{
+		}
+
+		@Override
+		public void addToWorld(World world)
 		{
 		}
 	}
@@ -186,9 +206,11 @@ public abstract class Body2d extends World2dObject
 
 		public ActorOutput[] getOutputs();
 
-		public void prepareInputs();
+		public void sampleInputs();
 
-		public void processOutputs();
+		public void applyOutputs();
+		
+		public void addToWorld(World world);
 	}
 
 	public interface DrawablePart extends Part

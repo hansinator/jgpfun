@@ -43,7 +43,7 @@ public class TestOrganismDraw extends JPanel
 		this.organism.addToWorld(world);
 		this.organism.bodies[0].x = 320.0;
 		this.organism.bodies[0].y = 240.0;
-		this.organism.bodies[0].prepareInputs();
+		this.organism.bodies[0].sampleInputs();
 
 		slider = new JSlider(0, 360);
 		slider.addChangeListener(new ChangeListener()

@@ -1,7 +1,5 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import java.io.IOException;
-
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.life.BaseOrganism;
@@ -26,50 +24,59 @@ public class Organism2d extends BaseOrganism
 
 	public final BaseMachine vm;
 
-	public final Body2d[] bodies;
+	public Body2d[] bodies;
 
-	private final SensorInput[] inputs;
+	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
 
-	private final ActorOutput[] outputs;
+	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
 	private int food;
 
 	/*
-	 * TODO: make body composition (senses, actors) genome-defined
+	 * idea: think of inputs and outputs in term of I/O in computers (i.e. interface to real world) and regard bodies as I/O units or ports
+	 * TODO: I could move the VM into baseorganism and try to write a generic live function
 	 */
-	public Organism2d(Genome genome, BaseMachine brain, int numBodies, int numInputs, int numOutputs)
-			throws IOException
+	public Organism2d(Genome genome, BaseMachine brain)
 	{
 		super(genome);
 		this.food = 0;
 		this.vm = brain;
-		this.bodies = new Body2d[numBodies];
-		this.inputs = new SensorInput[numInputs];
-		this.outputs = new ActorOutput[numOutputs];
+	}
+	
+	public void setBodies(Body2d[] bodies)
+	{
+		int i, o, x;
+		this.bodies = bodies;
+		
+		// count I/O ports
+		for (x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			i += bodies[x].getInputs().length;
+			o += bodies[x].getOutputs().length;
+		}
+		
+		// create arrays
+		inputs = new SensorInput[i];
+		outputs = new ActorOutput[o];
+		
+		// grab I/O ports
+		for (x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : bodies[x].getInputs())
+				inputs[i++] = in;
+	
+			// collect outputs
+			for (ActorOutput out : bodies[x].getOutputs())
+				outputs[o++] = out;
+		}
 	}
 
 	public void addToWorld(World world)
 	{
-		int i = 0, o = 0;
-
-		// init bodies and grab inputs
+		// attach bodies to world state
 		for (int x = 0; x < bodies.length; x++)
-		{
-			// create body
-			bodies[x] = genome.synthesizeBody(this, world);
-
-			// collect inputs
-			for (SensorInput in : bodies[x].getInputs())
-				inputs[i++] = in;
-
-			// collect outputs
-			for (ActorOutput out : bodies[x].getOutputs())
-				outputs[o++] = out;
-
-			bodies[x].x = rnd.nextInt(world.getWidth());
-			bodies[x].y = rnd.nextInt(world.getHeight());
-			bodies[x].dir = rnd.nextDouble() * 2 * Math.PI;
-		}
+			bodies[x].addToWorld(world);
 	}
 
 	@Override
@@ -79,7 +86,7 @@ public class Organism2d extends BaseOrganism
 
 		// calculate food stuff for body (prepare sensors..)
 		for (Body2d b : bodies)
-			b.prepareInputs();
+			b.sampleInputs();
 
 		// write input registers
 		for (SensorInput in : inputs)
@@ -93,7 +100,7 @@ public class Organism2d extends BaseOrganism
 
 		// apply outputs (move motor etc)
 		for (Body2d b : bodies)
-			b.processOutputs();
+			b.applyOutputs();
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class TestRadarSense extends JPanel
 		this.organism.addToWorld(world);
 		this.organism.bodies[0].x = 400.0;
 		this.organism.bodies[0].y = 300.0;
-		this.organism.bodies[0].prepareInputs();
+		this.organism.bodies[0].sampleInputs();
 
 		slider = new JSlider(0, 360);
 		slider.addChangeListener(new ChangeListener()

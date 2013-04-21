@@ -17,7 +17,7 @@ public class Food extends World2dObject
 
 	public Food(double x, double y, World world, Random rnd)
 	{
-		super(world, x, y);
+		super(world, x, y, 0.0);
 		this.rnd = rnd;
 	}
 

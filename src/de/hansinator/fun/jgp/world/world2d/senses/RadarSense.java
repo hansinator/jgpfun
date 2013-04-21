@@ -5,11 +5,11 @@ import java.awt.Graphics;
 import java.awt.geom.Point2D;
 
 import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
 /**
@@ -19,9 +19,9 @@ import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 {
 
-	private final Body2d body;
+	private final World2dObject origin;
 
-	private final World world;
+	private World world;
 
 	public double direction = 0.0;
 
@@ -43,10 +43,9 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 
 	ActorOutput[] outputs = { this };
 
-	public RadarSense(Body2d body, World world)
+	public RadarSense(World2dObject origin)
 	{
-		this.body = body;
-		this.world = world;
+		this.origin = origin;
 	}
 
 	public boolean pointInLine(double x1, double y1, double x2, double y2, Point2D p)
@@ -73,14 +72,14 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 		double x1, y1, x2, y2, rdir, bdir;
 
 		// line start
-		x1 = Math.floor(body.x);
-		y1 = Math.floor(body.y);
+		x1 = Math.floor(origin.x);
+		y1 = Math.floor(origin.y);
 
 		// line end
 		rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-		bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
-		x2 = Math.floor(body.x + beamLength * Math.sin(rdir + bdir));
-		y2 = Math.floor(body.y - beamLength * Math.cos(rdir + bdir));
+		bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
+		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
+		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
 
 		for (Food f : ((World2d)world).food)
 			if (pointInLine(x1, y1, x2, y2, f)
@@ -115,35 +114,41 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 	}
 
 	@Override
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 	}
 
 	@Override
-	public void processOutputs()
+	public void applyOutputs()
 	{
 	}
 
 	@Override
 	public void draw(Graphics g)
 	{
-		final int x_center = Math.round((float) body.x);
-		final int y_center = Math.round((float) body.y);
+		final int x_center = Math.round((float) origin.x);
+		final int y_center = Math.round((float) origin.y);
 
 		if (target == null)
 		{
 			g.setColor(Color.darkGray);
 			double rdir, bdir;
 			rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-			bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
+			bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
 			g.drawLine(x_center, y_center,
-					Math.round((float) (body.x + RadarSense.beamLength * Math.sin(rdir + bdir))),
-					Math.round((float) (body.y - RadarSense.beamLength * Math.cos(rdir + bdir))));
+					Math.round((float) (origin.x + RadarSense.beamLength * Math.sin(rdir + bdir))),
+					Math.round((float) (origin.y - RadarSense.beamLength * Math.cos(rdir + bdir))));
 		} else if (target != null)
 		{
 			g.setColor(Color.blue);
 			g.drawLine(x_center, y_center, (int) Math.round(target.getX()), (int) Math.round(target.getY()));
 		}
 
+	}
+
+	@Override
+	public void addToWorld(World world)
+	{
+		this.world = world;
 	}
 }

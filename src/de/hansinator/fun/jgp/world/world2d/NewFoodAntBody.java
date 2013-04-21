@@ -13,12 +13,12 @@ public class NewFoodAntBody extends Body2d
 	public final ObjectLocator locator;
 
 	// FIXME: refactor num inputs & outputs bullshit
-	public NewFoodAntBody(Organism2d organism, World2d world, int numInputs, int numOutputs, boolean useInternalLocator)
+	public NewFoodAntBody(Organism2d organism, int numInputs, int numOutputs, boolean useInternalLocator)
 	{
 		super(organism, 0.0, 0.0, 0.0, new SensorInput[numInputs], new ActorOutput[numOutputs]);
 
 		// init and maybe add locator sense
-		locator = new ObjectLocator(world, this);
+		locator = new ObjectLocator(this);
 		if (useInternalLocator)
 			addBodyPart(locator);
 	}

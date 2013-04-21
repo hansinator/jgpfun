@@ -13,7 +13,7 @@ import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 public class WallSense implements SensorInput, Part
 {
 
-	private final double worldWidth, worldHeight;
+	private double worldWidth, worldHeight;
 
 	private final Body2d body;
 
@@ -21,10 +21,8 @@ public class WallSense implements SensorInput, Part
 
 	private int lastSenseVal = 0;
 
-	public WallSense(Body2d body, World world)
+	public WallSense(Body2d body)
 	{
-		this.worldWidth = Math.floor(world.getWidth());
-		this.worldHeight = Math.floor(world.getHeight());
 		this.body = body;
 	}
 
@@ -66,14 +64,21 @@ public class WallSense implements SensorInput, Part
 	}
 
 	@Override
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 	}
 
 	@Override
-	public void processOutputs()
+	public void applyOutputs()
 	{
 		// pickup wallsense in process outputs before coordinates are clipped
 		sense();
+	}
+
+	@Override
+	public void addToWorld(World world)
+	{
+		this.worldWidth = Math.floor(world.getWidth());
+		this.worldHeight = Math.floor(world.getHeight());
 	}
 }

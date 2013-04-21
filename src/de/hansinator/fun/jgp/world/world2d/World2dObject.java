@@ -7,12 +7,14 @@ import de.hansinator.fun.jgp.world.World;
 
 public abstract class World2dObject extends Point.Double
 {
+	public double dir;
 
 	protected final World world;
-
-	public World2dObject(World world, double x, double y)
+	
+	public World2dObject(World world, double x, double y, double dir)
 	{
 		super(x, y);
+		this.dir = dir;
 		this.world = world;
 	}
 

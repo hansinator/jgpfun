@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.world.world2d;
 
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
@@ -17,12 +16,12 @@ public class FoodAntBody extends Body2d
 	public final ObjectLocator locator;
 
 	// FIXME: refactor num inputs & outputs bullshit
-	public FoodAntBody(Organism2d organism, World world, int numInputs, int numOutputs, boolean useInternalLocator)
+	public FoodAntBody(Organism2d organism, int numInputs, int numOutputs, boolean useInternalLocator)
 	{
 		super(organism, 0.0, 0.0, 0.0, new SensorInput[numInputs], new ActorOutput[numOutputs]);
 
 		// init and maybe add locator sense
-		locator = new ObjectLocator(world, this);
+		locator = new ObjectLocator(this);
 		if (useInternalLocator)
 			addBodyPart(locator);
 	}

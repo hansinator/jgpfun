@@ -20,7 +20,7 @@ import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 public class ObjectLocator implements DrawablePart
 {
 
-	private final World world;
+	private World world;
 	
 	private final World2dObject origin;
 
@@ -79,9 +79,8 @@ public class ObjectLocator implements DrawablePart
 																			// both2
 																			// fix??
 
-	public ObjectLocator(World world, World2dObject origin)
+	public ObjectLocator(World2dObject origin)
 	{
-		this.world = world;
 		this.origin = origin;
 	}
 
@@ -104,13 +103,13 @@ public class ObjectLocator implements DrawablePart
 	}
 
 	@Override
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 		locate();
 	}
 
 	@Override
-	public void processOutputs()
+	public void applyOutputs()
 	{
 	}
 
@@ -123,5 +122,11 @@ public class ObjectLocator implements DrawablePart
 			g.drawLine(Math.round((float) origin.x), Math.round((float) origin.y), (int) Math.round(target.x),
 					(int) Math.round(target.y));
 		}
+	}
+
+	@Override
+	public void addToWorld(World world)
+	{
+		this.world = world;
 	}
 }
