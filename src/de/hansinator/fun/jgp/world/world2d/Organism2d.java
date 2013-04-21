@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.world.world2d;
 
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
@@ -23,12 +22,6 @@ public class Organism2d extends BaseOrganism
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
 	public Body2d[] bodies;
-
-	private BaseMachine vm;
-
-	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
-
-	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
 	private int food;
 
@@ -54,11 +47,9 @@ public class Organism2d extends BaseOrganism
 			o += bodies[x].getOutputs().length;
 		}
 
-		// create arrays
-		inputs = new SensorInput[i];
-		outputs = new ActorOutput[o];
-
 		// grab I/O ports
+		SensorInput[] inputs = new SensorInput[i];
+		ActorOutput[] outputs = new ActorOutput[o];
 		for (x = 0, i = 0, o = 0; x < bodies.length; x++)
 		{
 			// collect inputs
@@ -69,6 +60,10 @@ public class Organism2d extends BaseOrganism
 			for (ActorOutput out : bodies[x].getOutputs())
 				outputs[o++] = out;
 		}
+
+		// attach I/O to organism
+		setInputs(inputs);
+		setOutputs(outputs);
 	}
 
 	public void addToWorld(World world)
@@ -79,24 +74,16 @@ public class Organism2d extends BaseOrganism
 	}
 
 	@Override
-	public void live()
+	public void sampleInputs()
 	{
-		int reg = 0;
-
 		// calculate food stuff for body (prepare sensors..)
 		for (Body2d b : bodies)
 			b.sampleInputs();
+	}
 
-		// write input registers
-		for (SensorInput in : inputs)
-			vm.regs[reg++] = in.get();
-
-		vm.run();
-
-		// write output values
-		for (ActorOutput out : outputs)
-			out.set(vm.regs[reg++]);
-
+	@Override
+	public void applyOutputs()
+	{
 		// apply outputs (move motor etc)
 		for (Body2d b : bodies)
 			b.applyOutputs();
@@ -112,15 +99,4 @@ public class Organism2d extends BaseOrganism
 	{
 		food++;
 	}
-
-	public int getInputCount()
-	{
-		return inputs.length;
-	}
-
-	public void setVM(BaseMachine vm)
-	{
-		this.vm = vm;
-	}
-
 }

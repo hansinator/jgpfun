@@ -21,7 +21,6 @@ import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.life.GenealogyTree;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 public class Simulator
 {
@@ -47,7 +46,7 @@ public class Simulator
 	private final CrossoverOperator crossover;
 
 	private final GenealogyTree genealogyTree;
-	
+
 	private final Scenario scenario;
 
 	private final Random rnd;
@@ -262,11 +261,11 @@ public class Simulator
 		avgProgSize /= organisms.size();
 
 		for (BaseOrganism o : organisms)
-			avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
+			avgRealProgSize += o.getProgramSize();
 		avgRealProgSize /= organisms.size();
 
 		statisticsHistory
-				.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
+		.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
 		genomeSizeChartData.add(generation, avgProgSize);
 		realGenomeSizeChartData.add(generation, avgRealProgSize);
 	}
