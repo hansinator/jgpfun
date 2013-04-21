@@ -6,8 +6,9 @@ import java.util.List;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.FoodAntBody;
+import de.hansinator.fun.jgp.world.world2d.Body2d.Part;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
@@ -16,8 +17,7 @@ public class FoodAntGenome extends Genome
 {
 
 	private static int NUM_INPUTS = 7;
-
-	private static int NUM_OUTPUTS = 2;
+	
 
 	public FoodAntGenome(List<OpCode> program, int maxLength)
 	{
@@ -54,12 +54,10 @@ public class FoodAntGenome extends Genome
 		// create organism
 		Organism2d organism = new Organism2d(this, brain);
 		
-		// create body and add parts
-		FoodAntBody body = new FoodAntBody(organism, NUM_INPUTS, NUM_OUTPUTS, true);
-		body.addBodyPart(body.new OrientationSense());
-		body.addBodyPart(body.new SpeedSense());
-		body.addBodyPart(new WallSense(body));
-		body.addBodyPart(new TankMotor(body));
+		// create body and attach parts
+		AntBody body = new AntBody(organism);
+		final Part[] parts = new Part[] { body.locator, body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body) };
+		body.setParts(parts);
 
 		// attach body
 		organism.setBodies(new Body2d[] { body });

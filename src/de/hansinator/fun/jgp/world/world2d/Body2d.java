@@ -3,8 +3,6 @@ package de.hansinator.fun.jgp.world.world2d;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.util.Settings;
@@ -16,44 +14,64 @@ public abstract class Body2d extends World2dObject
 {
 	protected static final Random rnd = Settings.newRandomSource();
 
-	protected final List<Part> parts;
+	protected Part[] parts = Part.emptyPartArray;
 
-	protected final List<DrawablePart> drawableParts;
+	protected DrawablePart[] drawableParts = DrawablePart.emptyDrawablePartArray;
 
-	protected final SensorInput[] inputs;
+	protected SensorInput[] inputs;
 
-	protected final ActorOutput[] outputs;
+	protected ActorOutput[] outputs;
 
 	protected final Organism2d organism;
-
-	private int inputNum = 0, outputNum = 0;
 
 	public double lastSpeed = 0.0;
 
 	public volatile boolean tagged = false;
 
-	public Body2d(Organism2d organism, double x, double y, double dir, SensorInput[] inputs, ActorOutput[] outputs)
+	public Body2d(Organism2d organism, double x, double y, double dir)
 	{
 		// TODO: fix null pointer
 		super(null, x, y, dir);
 		this.organism = organism;
-		this.inputs = inputs;
-		this.outputs = outputs;
-		this.parts = new ArrayList<Part>();
-		this.drawableParts = new ArrayList<DrawablePart>();
 	}
 
-	public void addBodyPart(Part part)
+	public void setParts(Part[] parts)
 	{
-		for (SensorInput i : part.getInputs())
-			inputs[inputNum++] = i;
-		for (ActorOutput o : part.getOutputs())
-			outputs[outputNum++] = o;
-		parts.add(part);
-		if (part instanceof DrawablePart)
-			drawableParts.add((DrawablePart) part);
+		int i, o, d, x;
+
+		this.parts = parts;
+
+		// count I/O and drawable parts
+		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		{
+			i += parts[x].getInputs().length;
+			o += parts[x].getOutputs().length;
+			if (parts[x] instanceof DrawablePart)
+				d++;
+		}
+
+		// create arrays
+		inputs = new SensorInput[i];
+		outputs = new ActorOutput[o];
+		drawableParts = new DrawablePart[d];
+
+		// collect I/O ports and drawable parts
+		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : parts[x].getInputs())
+				inputs[i++] = in;
+
+			// collect outputs
+			for (ActorOutput out : parts[x].getOutputs())
+				outputs[o++] = out;
+
+			// collect drawable parts
+			if (parts[x] instanceof DrawablePart)
+				drawableParts[d++]= (DrawablePart) parts[x];
+		}
 	}
-	
+
 	public void addToWorld(World world)
 	{
 		for(Part part : parts)
@@ -106,12 +124,12 @@ public abstract class Body2d extends World2dObject
 
 		Polygon p = new Polygon();
 		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top
-																										// of
-																										// triangle
+		// of
+		// triangle
 		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right
-																															// wing
+		// wing
 		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left
-																															// wing
+		// wing
 
 		g.setColor(tagged ? Color.magenta : Color.red);
 		g.drawPolygon(p);
@@ -154,7 +172,7 @@ public abstract class Body2d extends World2dObject
 		public void applyOutputs()
 		{
 		}
-		
+
 		@Override
 		public void addToWorld(World world)
 		{
@@ -202,6 +220,8 @@ public abstract class Body2d extends World2dObject
 
 	public interface Part
 	{
+		Part[] emptyPartArray = {};
+
 		public SensorInput[] getInputs();
 
 		public ActorOutput[] getOutputs();
@@ -209,12 +229,14 @@ public abstract class Body2d extends World2dObject
 		public void sampleInputs();
 
 		public void applyOutputs();
-		
+
 		public void addToWorld(World world);
 	}
 
 	public interface DrawablePart extends Part
 	{
+		DrawablePart[] emptyDrawablePartArray = {};
+
 		public void draw(Graphics g);
 	}
 }

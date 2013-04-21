@@ -6,8 +6,9 @@ import java.util.List;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
 import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.FoodAntBody;
+import de.hansinator.fun.jgp.world.world2d.Body2d.Part;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
@@ -18,7 +19,6 @@ public class RadarAntGenome extends Genome
 
 	private static int NUM_INPUTS = 5;
 
-	private static int NUM_OUTPUTS = 3;
 
 	public RadarAntGenome(List<OpCode> program, int maxLength)
 	{
@@ -46,21 +46,18 @@ public class RadarAntGenome extends Genome
 	{
 		final int numBodies = 1;
 		final int numInputs = NUM_INPUTS * numBodies;
-		
+
 		// create brain
 		BaseMachine brain = new EvoVM(registerCount, numInputs, program.toArray(new OpCode[program.size()]));
-		
+
 		// create organism
 		Organism2d organism = new Organism2d(this, brain);
-		
-		// create body without builtin locator usage and add parts
-		Body2d body = new FoodAntBody(organism, NUM_INPUTS, NUM_OUTPUTS, false);
-		body.addBodyPart(new RadarSense(body));
-		body.addBodyPart(body.new OrientationSense());
-		body.addBodyPart(body.new SpeedSense());
-		body.addBodyPart(new WallSense(body));
-		body.addBodyPart(new TankMotor(body));
-		
+
+		// create body and attach parts
+		Body2d body = new AntBody(organism);
+		final Part[] parts = new Part[] { new RadarSense(body), body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body)};
+		body.setParts(parts);
+
 		// attach body
 		organism.setBodies(new Body2d[] { body });
 

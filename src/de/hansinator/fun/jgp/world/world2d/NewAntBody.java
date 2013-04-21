@@ -1,26 +1,22 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
-import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
 
 /**
  * 
  * @author Hansinator
  */
-public class NewFoodAntBody extends Body2d
+public class NewAntBody extends Body2d
 {
 	public final ObjectLocator locator;
 
 	// FIXME: refactor num inputs & outputs bullshit
-	public NewFoodAntBody(Organism2d organism, int numInputs, int numOutputs, boolean useInternalLocator)
+	public NewAntBody(Organism2d organism)
 	{
-		super(organism, 0.0, 0.0, 0.0, new SensorInput[numInputs], new ActorOutput[numOutputs]);
+		super(organism, 0.0, 0.0, 0.0);
 
 		// init and maybe add locator sense
 		locator = new ObjectLocator(this);
-		if (useInternalLocator)
-			addBodyPart(locator);
 	}
 
 	@Override
