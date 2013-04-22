@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.jfree.data.xy.XYSeries;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
@@ -99,7 +99,7 @@ public class PoolingPopulationManager
 	public int newGeneration()
 	{
 		double mutador;
-		Genome parent1, parent2;
+		AntGenome parent1, parent2;
 		List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
 
 		// enqueue all current organisms into our pool

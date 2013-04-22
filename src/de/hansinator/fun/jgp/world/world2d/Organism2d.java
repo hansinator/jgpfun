@@ -1,6 +1,6 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
@@ -29,7 +29,7 @@ public class Organism2d extends BaseOrganism
 	 * idea: think of inputs and outputs in term of I/O in computers (i.e. interface to real world) and regard bodies as I/O units or ports
 	 * TODO: I could move the VM into baseorganism and try to write a generic live function
 	 */
-	public Organism2d(Genome genome)
+	public Organism2d(AntGenome genome)
 	{
 		super(genome);
 		this.food = 0;

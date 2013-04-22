@@ -11,7 +11,7 @@ import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.gui.InfoPanel;
@@ -195,7 +195,7 @@ public class Simulator
 
 			for (int i = 0; i < popSize; i++)
 			{
-				Genome g = scenario.randomGenome();
+				AntGenome g = scenario.randomGenome();
 				organisms.add(g.synthesize());
 				genealogyTree.put(g);
 			}
@@ -204,7 +204,7 @@ public class Simulator
 
 	private List<BaseOrganism> newGeneration(List<BaseOrganism> organisms, int totalFitness)
 	{
-		Genome child1, child2;
+		AntGenome child1, child2;
 		BaseOrganism parent1, parent2;
 		List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
 

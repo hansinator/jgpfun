@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
@@ -22,7 +22,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 
 	protected static final Random rnd = Settings.newRandomSource();
 
-	protected final Genome genome;
+	protected final AntGenome genome;
 
 	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
 
@@ -32,7 +32,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 
 	private CountDownLatch cb;
 
-	public BaseOrganism(Genome genome)
+	public BaseOrganism(AntGenome genome)
 	{
 		this.genome = genome;
 	}
@@ -101,7 +101,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 
 	public abstract int getFitness();
 
-	public Genome getGenome()
+	public AntGenome getGenome()
 	{
 		return genome;
 	}
