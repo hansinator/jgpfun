@@ -1,16 +1,11 @@
 package de.hansinator.fun.jgp.genetics;
 
-import java.util.Random;
-
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.life.BaseOrganism;
-import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 public class AntGenome implements Genome
 {
-	private static final Random rnd = Settings.newRandomSource();
-
 	private final Body2d.Body2dGene bodyGene;
 
 	public final EvoVMProgramGene brainGene;

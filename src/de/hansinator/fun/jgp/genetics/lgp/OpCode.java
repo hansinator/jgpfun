@@ -15,8 +15,6 @@ public class OpCode
 
 	private final static int maxConstantValDelta = 16384;
 
-	// final int maxConstantValDelta = Integer.maxValue / 2;
-
 	private int mutateVal = 20, mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
 
 	//sum represents 100%, i.e. the sum of all possible chances
@@ -61,16 +59,13 @@ public class OpCode
 
 	public void mutate()
 	{
-		int mutationChoice, val;
+		int mutationChoice = rnd.nextInt(totalMutate);
 
 		// if this is a unary op, don't touch src2 - it'll be noneffective
 		//XXX duplicate - solve by making this class immutable and returning a new opcode
 		//or by having a set chance of opcode mutation in the "mother" gene that is not influenced by this
 		if (BaseMachine.ops[Math.abs(op) % BaseMachine.ops.length] instanceof UnaryOperation)
 			mutateSrc2 = 0;
-
-		// choose mutation
-		mutationChoice = rnd.nextInt(totalMutate);
 
 		// see which one has been chosen
 		// modify the src1 register number by a random value
