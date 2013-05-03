@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Random;
 
+import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
@@ -238,5 +239,11 @@ public abstract class Body2d extends World2dObject
 		DrawablePart[] emptyDrawablePartArray = {};
 
 		public void draw(Graphics g);
+	}
+
+	public interface Body2dGene extends Gene<Body2d, Organism2d>
+	{
+		@Override
+		Body2d express(Organism2d organism);
 	}
 }

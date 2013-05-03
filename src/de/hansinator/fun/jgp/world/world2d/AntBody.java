@@ -13,7 +13,7 @@ public class AntBody extends Body2d
 
 	public final ObjectLocator locator;
 
-	
+
 	public AntBody(Organism2d organism)
 	{
 		super(organism, 0.0, 0.0, 0.0);
@@ -21,6 +21,16 @@ public class AntBody extends Body2d
 		// init locator sense
 		locator = new ObjectLocator(this);
 	}
+
+	/*
+	 * XXX TODO: put collision logic into objects, like in food. food in turn
+	 * adds itself to the fitness count if it encountered an organism. this way
+	 * round it's more natural, because the items are the "special" things with
+	 * the special logic that changes from scenario to scenario. the organism
+	 * itself may stay the same chassis for different scenarios then.
+	 * 
+	 * also maybe create a line following scenario
+	 */
 
 	@Override
 	public void postRoundTrigger()

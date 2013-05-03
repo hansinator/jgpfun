@@ -4,6 +4,7 @@
 package de.hansinator.fun.jgp.simulation;
 
 import de.hansinator.fun.jgp.genetics.AntGenome;
+import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
@@ -50,10 +51,10 @@ public class FindingFoodScenario implements Scenario
 		return new TournamentSelector(3);
 	}
 
-	public class RadarAntGene implements AntGenome.Gene
+	public class RadarAntGene implements Body2d.Body2dGene
 	{
 		@Override
-		public Body2d createBody(Organism2d organism)
+		public Body2d express(Organism2d organism)
 		{
 			// create body and attach parts
 			Body2d body = new AntBody(organism);
@@ -61,18 +62,32 @@ public class FindingFoodScenario implements Scenario
 			body.setParts(parts);
 			return body;
 		}
+
+		@Override
+		public Gene<Body2d, Organism2d> replicate()
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
-	public class FoodFinderAntGene implements AntGenome.Gene
+	public class FoodFinderAntGene implements Body2d.Body2dGene
 	{
 		@Override
-		public Body2d createBody(Organism2d organism)
+		public Body2d express(Organism2d organism)
 		{
 			// create body and attach parts
 			AntBody body = new AntBody(organism);
 			final Part[] parts = new Part[] { body.locator, body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body) };
 			body.setParts(parts);
 			return body;
+		}
+
+		@Override
+		public Gene<Body2d, Organism2d> replicate()
+		{
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 }

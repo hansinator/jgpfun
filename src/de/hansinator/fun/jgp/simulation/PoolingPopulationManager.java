@@ -117,8 +117,8 @@ public class PoolingPopulationManager
 			// select two source genomes and clone them
 			// note: you must copy/clone the genomes before modifying them,
 			// as the genome is passed by reference
-			parent1 = selector.select(organismPool).getGenome().clone();
-			parent2 = selector.select(organismPool).getGenome().clone();
+			parent1 = selector.select(organismPool).getGenome().replicate();
+			parent2 = selector.select(organismPool).getGenome().replicate();
 
 			// mutate or crossover with a user defined chance
 			mutador = rnd.nextDouble();

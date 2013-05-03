@@ -216,14 +216,14 @@ public class Simulator
 			// as the genome is passed by reference
 			parent1 = selector.select(organisms, totalFitness);
 			parent2 = selector.select(organisms, totalFitness);
-			child1 = parent1.getGenome().clone();
-			child2 = parent2.getGenome().clone();
+			child1 = parent1.getGenome().replicate();
+			child2 = parent2.getGenome().replicate();
 
 			// mutate or crossover with a user defined chance
 			// if (rnd.nextDouble() > crossoverRate) {
 			// mutate genomes
-			child1.mutate(rnd.nextInt(maxMutations) + 1, rnd);
-			child2.mutate(rnd.nextInt(maxMutations) + 1, rnd);
+			child1.mutate(rnd.nextInt(maxMutations) + 1);
+			child2.mutate(rnd.nextInt(maxMutations) + 1);
 			/*
 			 * } else { //perform crossover crossover.cross(child1.program,
 			 * child2.program, rnd); }
