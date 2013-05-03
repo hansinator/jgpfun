@@ -21,26 +21,21 @@ import de.hansinator.fun.jgp.world.world2d.Organism2d;
 public abstract class BaseMachine
 {
 
-	static
-	{
-		// compatible instruction set
-		// ops = new Operation[]{new OpAdd(), new OpSub(), new OpMul(), new
-		// OpDiv(), new OpMod()};
+	// compatible instruction set
+	// static Operation[] ops = new Operation[]{new OpAdd(), new OpSub(), new OpMul(), new
+	// OpDiv(), new OpMod()};
 
-		// extended instruction set
-		ops = new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(), new OpSqrt(),
-				new OpNeg(), new OpMin(), new OpMax(), new OpAbs(),
-				// new OpSin(),
-				new OpMov(), //
-				// new OpInc(),
-				// new OpDec(),
-				// new OpBranchLt(), new OpBranchGt()
+	//extended instruction set
+	static Operation[] ops= new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(), new OpSqrt(),
+		new OpNeg(), new OpMin(), new OpMax(), new OpAbs(),
+		// new OpSin(),
+		new OpMov(), //
+		// new OpInc(),
+		// new OpDec(),
+		// new OpBranchLt(), new OpBranchGt()
 		// new JumpOp(),
 		// new JumpTarg()
-		};
-	}
-
-	static Operation[] ops;
+	};
 
 	public int[] regs;
 

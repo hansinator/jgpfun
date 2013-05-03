@@ -3,41 +3,100 @@ package de.hansinator.fun.jgp.genetics.lgp;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
+import de.hansinator.fun.jgp.genetics.lgp.operations.UnaryOperation;
+import de.hansinator.fun.jgp.util.Settings;
 
 public class OpCode
 {
 
-	public int op;
-	public int src1;
-	public int src2;
-	public int trg;
-	public boolean immediate;
+	private static final Random rnd = Settings.newRandomSource();
+
+	private final static int maxRegisterValDelta = 16;
+
+	private final static int maxConstantValDelta = 16384;
+
+	// final int maxConstantValDelta = Integer.maxValue / 2;
+
+	private int mutateVal = 20, mutateSrc2 = 20, mutateTrg = 20, mutateOp = 20, mutateFlags = 20;
+
+	//sum represents 100%, i.e. the sum of all possible chances
+	public int totalMutate = mutateVal + mutateSrc2 + mutateTrg + mutateOp + mutateFlags;
+
+	int op;
+
+	int src1;
+
+	int src2;
+
+	int trg;
+
+	boolean immediate;
+
 	Operation operation;
 
 	public static OpCode randomOpCode(Random rnd)
 	{
-		OpCode oc = new OpCode();
+		return new OpCode(rnd.nextInt(), rnd.nextInt(), rnd.nextInt(), rnd.nextInt(), rnd.nextBoolean());
+	}
 
-		oc.op = rnd.nextInt();
-		oc.src1 = rnd.nextInt();
-		oc.src2 = rnd.nextInt();
-		oc.trg = rnd.nextInt();
-		oc.immediate = rnd.nextBoolean();
 
-		return oc;
+	private OpCode(int op, int src1, int src2, int trg, boolean immediate)
+	{
+		this.op = op;
+		this.src1=src1;
+		this.src2=src2;
+		this.trg=trg;
+		this.immediate=immediate;
+
+		// if this is a unary op, don't touch src2 - it'll be noneffective
+		//XXX see xxx below
+		if (BaseMachine.ops[Math.abs(op) % BaseMachine.ops.length] instanceof UnaryOperation)
+			mutateSrc2 = 0;
 	}
 
 	public OpCode replicate()
 	{
-		OpCode oc = new OpCode();
+		return new OpCode(op, src1, src2, trg, immediate);
+	}
 
-		oc.op = op;
-		oc.src1 = src1;
-		oc.src2 = src2;
-		oc.trg = trg;
-		oc.immediate = immediate;
+	public void mutate()
+	{
+		int mutationChoice, val;
 
-		return oc;
+		// if this is a unary op, don't touch src2 - it'll be noneffective
+		//XXX duplicate - solve by making this class immutable and returning a new opcode
+		//or by having a set chance of opcode mutation in the "mother" gene that is not influenced by this
+		if (BaseMachine.ops[Math.abs(op) % BaseMachine.ops.length] instanceof UnaryOperation)
+			mutateSrc2 = 0;
+
+		// choose mutation
+		mutationChoice = rnd.nextInt(totalMutate);
+
+		// see which one has been chosen
+		// modify the src1 register number by a random value
+		if (mutationChoice < (mutateVal))
+			src1 += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+		// mutate src2
+		else if (mutationChoice < ( mutateVal + mutateSrc2))
+		{
+			// if immediate, modify the constant value by random value
+			if (immediate)
+				src2 += rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
+			// else modify the src2 register number by a random value
+			else
+				src2 += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+		}
+		// modify trg field by random value
+		else if (mutationChoice < (mutateVal + mutateSrc2 + mutateTrg))
+		{
+			trg += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+		}
+		// replace opcode field by random value
+		else if (mutationChoice < (mutateVal + mutateSrc2 + mutateTrg + mutateOp))
+			op = rnd.nextInt();
+		// set new random opflags
+		else
+			immediate = rnd.nextBoolean();
 	}
 
 	@Override

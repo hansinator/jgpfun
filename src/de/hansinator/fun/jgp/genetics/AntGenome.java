@@ -2,9 +2,7 @@ package de.hansinator.fun.jgp.genetics;
 
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.lgp.EvoVM;
-import de.hansinator.fun.jgp.genetics.lgp.OpCode;
-import de.hansinator.fun.jgp.genetics.lgp.ProgramGene;
+import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
@@ -15,12 +13,10 @@ public class AntGenome implements Genome
 
 	private final Body2d.Body2dGene bodyGene;
 
-	static final int registerCount = Settings.getInt("registerCount");
-
-	public final ProgramGene brainGene;
+	public final EvoVMProgramGene brainGene;
 
 
-	public AntGenome(Body2d.Body2dGene bodyGene, ProgramGene brainGene)
+	public AntGenome(Body2d.Body2dGene bodyGene, EvoVMProgramGene brainGene)
 	{
 		this.bodyGene = bodyGene;
 		this.brainGene = brainGene;
@@ -29,7 +25,7 @@ public class AntGenome implements Genome
 	public AntGenome(Body2d.Body2dGene bodyGene, int maxLength)
 	{
 		this.bodyGene = bodyGene;
-		this.brainGene = ProgramGene.randomGene(maxLength);
+		this.brainGene = EvoVMProgramGene.randomGene(maxLength);
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class AntGenome implements Genome
 		organism.setBodies(new Body2d[] { bodyGene.express(organism) });
 
 		// create and attach brain
-		organism.setVM(new EvoVM(registerCount, organism.getInputCount(), brainGene.express(organism).toArray(new OpCode[brainGene.size()])));
+		organism.setVM(brainGene.express(organism));
 		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
 		// program.toArray(new OpCode[program.size()]));
 
