@@ -4,19 +4,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 
+import de.hansinator.fun.jgp.world.ActorOutput;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
 
 /**
  * 
  * @author Hansinator
  */
-public class RadarSense implements SensorInput, ActorOutput, DrawablePart
+public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<World2d>
 {
 
 	private final World2dObject origin;
@@ -147,7 +148,7 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 	}
 
 	@Override
-	public void addToWorld(World world)
+	public void addToWorld(World2d world)
 	{
 		this.world = world;
 	}

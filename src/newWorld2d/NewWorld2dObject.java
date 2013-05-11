@@ -1,15 +1,15 @@
-package de.hansinator.fun.jgp.world.world2d;
+package newWorld2d;
 
 import java.awt.Graphics;
 import java.awt.Point;
 
-public abstract class World2dObject extends Point.Double
+public abstract class NewWorld2dObject extends Point.Double
 {
 	public double dir;
 
-	protected final World2d world;
+	protected final NewWorld2d world;
 
-	public World2dObject(World2d world, double x, double y, double dir)
+	public NewWorld2dObject(NewWorld2d world, double x, double y, double dir)
 	{
 		super(x, y);
 		this.dir = dir;

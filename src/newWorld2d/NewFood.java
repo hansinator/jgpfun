@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world.world2d;
+package newWorld2d;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,12 +8,12 @@ import java.util.Random;
  * 
  * @author hansinator
  */
-public class Food extends World2dObject
+public class NewFood extends NewWorld2dObject
 {
 
 	private final Random rnd;
 
-	public Food(double x, double y, World2d world, Random rnd)
+	public NewFood(double x, double y, NewWorld2d world, Random rnd)
 	{
 		super(world, x, y, 0.0);
 		this.rnd = rnd;

@@ -66,7 +66,7 @@ public class PoolingPopulationManager
 		avgRealProgSize /= organisms.size();
 
 		statisticsHistory
-				.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
+		.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
 		progSizeChartData.add(generation, avgProgSize);
 		realProgSizeChartData.add(generation, avgRealProgSize);
 	}

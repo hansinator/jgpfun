@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world.world2d.senses;
+package de.hansinator.fun.jgp.world;
 
 /**
  * 

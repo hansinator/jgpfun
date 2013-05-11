@@ -51,7 +51,7 @@ public class World2d implements World
 		// screen
 		// TODO: take into account ant size, so it can't hide outside of the
 		// screen
-		for (final BaseOrganism o : curOrganisms)
+		for (final BaseOrganism<World2d> o : curOrganisms)
 			for (final Body2d b : ((Organism2d) o).bodies)
 			{
 				// prevent world wrapping
@@ -96,7 +96,7 @@ public class World2d implements World
 		}
 		if (indexMinDist > -1)
 			return food.get(indexMinDist);
-		else return World2d.OUT_OF_RANGE_FOOD;
+		else return OUT_OF_RANGE_FOOD;
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class World2d implements World
 	{
 		// see if we hit an ant body
 		if (curOrganisms != null)
-			for (BaseOrganism o : curOrganisms)
+			for (BaseOrganism<World2d> o : curOrganisms)
 				for (Body2d b : ((Organism2d) o).bodies)
 					if (Math.abs(b.x - x) < 10.0 && Math.abs(b.y - y) < 10.0)
 					{
@@ -118,9 +118,8 @@ public class World2d implements World
 	public void draw(Graphics g)
 	{
 		if (curOrganisms != null)
-			for (BaseOrganism o : curOrganisms)
-				for (Body2d b : ((Organism2d) o).bodies)
-					b.draw(g);
+			for (BaseOrganism<World2d> o : curOrganisms)
+				o.draw(g);
 
 		for (Food f : food)
 			f.draw(g);
@@ -131,18 +130,15 @@ public class World2d implements World
 	{
 		// take new organisms and inform them about being here
 		curOrganisms = organisms;
-		for (BaseOrganism organism : curOrganisms)
-			((Organism2d) organism).addToWorld(this);
+		for (BaseOrganism<World2d> organism : curOrganisms)
+			organism.addToWorld(this);
 	}
-	
-	
-	@Override
+
 	public int getWidth()
 	{
 		return worldWidth;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return worldHeight;

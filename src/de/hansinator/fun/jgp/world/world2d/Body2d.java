@@ -7,17 +7,20 @@ import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
-import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
+import de.hansinator.fun.jgp.world.ActorOutput;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
+import de.hansinator.fun.jgp.world.SensorInput;
 
-public abstract class Body2d extends World2dObject
+public abstract class Body2d extends World2dObject implements DrawablePart<World2d>
 {
 	protected static final Random rnd = Settings.newRandomSource();
 
-	protected Part[] parts = Part.emptyPartArray;
+	@SuppressWarnings("unchecked")
+	protected BodyPart<World2d>[] parts = BodyPart.emptyPartArray;
 
-	protected DrawablePart[] drawableParts = DrawablePart.emptyDrawablePartArray;
+	@SuppressWarnings("unchecked")
+	protected BodyPart.DrawablePart<World2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
 
 	protected SensorInput[] inputs;
 
@@ -36,7 +39,8 @@ public abstract class Body2d extends World2dObject
 		this.organism = organism;
 	}
 
-	public void setParts(Part[] parts)
+	@SuppressWarnings("unchecked")
+	public void setParts(BodyPart<World2d>[] parts)
 	{
 		int i, o, d, x;
 
@@ -47,14 +51,14 @@ public abstract class Body2d extends World2dObject
 		{
 			i += parts[x].getInputs().length;
 			o += parts[x].getOutputs().length;
-			if (parts[x] instanceof DrawablePart)
+			if (parts[x] instanceof BodyPart.DrawablePart)
 				d++;
 		}
 
 		// create arrays
 		inputs = new SensorInput[i];
 		outputs = new ActorOutput[o];
-		drawableParts = new DrawablePart[d];
+		drawableParts = new BodyPart.DrawablePart[d];
 
 		// collect I/O ports and drawable parts
 		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
@@ -68,39 +72,44 @@ public abstract class Body2d extends World2dObject
 				outputs[o++] = out;
 
 			// collect drawable parts
-			if (parts[x] instanceof DrawablePart)
-				drawableParts[d++]= (DrawablePart) parts[x];
+			if (parts[x] instanceof BodyPart.DrawablePart)
+				drawableParts[d++]= (BodyPart.DrawablePart<World2d>) parts[x];
 		}
 	}
 
-	public void addToWorld(World world)
+	@Override
+	public void addToWorld(World2d world)
 	{
-		for(Part part : parts)
+		for(BodyPart<World2d> part : parts)
 			part.addToWorld(world);
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
 	}
 
+	@Override
 	public SensorInput[] getInputs()
 	{
 		return inputs;
 	}
 
+	@Override
 	public ActorOutput[] getOutputs()
 	{
 		return outputs;
 	}
 
+	@Override
 	public void sampleInputs()
 	{
-		for (Part p : parts)
+		for (BodyPart<World2d> p : parts)
 			p.sampleInputs();
 	}
 
+	@Override
 	public void applyOutputs()
 	{
-		for (Part p : parts)
+		for (BodyPart<World2d> p : parts)
 			p.applyOutputs();
 	}
 
@@ -120,7 +129,7 @@ public abstract class Body2d extends World2dObject
 		final double x_bottom = x - x_len_displace;
 		final double y_bottom = y + y_len_displace;
 
-		for (DrawablePart part : drawableParts)
+		for (BodyPart.DrawablePart<World2d> part : drawableParts)
 			part.draw(g);
 
 		Polygon p = new Polygon();
@@ -140,7 +149,7 @@ public abstract class Body2d extends World2dObject
 		g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
 	}
 
-	public class OrientationSense implements SensorInput, Part
+	public class OrientationSense implements SensorInput, BodyPart<World2d>
 	{
 
 		SensorInput[] inputs = { this };
@@ -175,12 +184,12 @@ public abstract class Body2d extends World2dObject
 		}
 
 		@Override
-		public void addToWorld(World world)
+		public void addToWorld(World2d world)
 		{
 		}
 	}
 
-	public class SpeedSense implements SensorInput, Part
+	public class SpeedSense implements SensorInput, BodyPart<World2d>
 	{
 
 		SensorInput[] inputs = { this };
@@ -214,31 +223,9 @@ public abstract class Body2d extends World2dObject
 		}
 
 		@Override
-		public void addToWorld(World world)
+		public void addToWorld(World2d world)
 		{
 		}
-	}
-
-	public interface Part
-	{
-		Part[] emptyPartArray = {};
-
-		public SensorInput[] getInputs();
-
-		public ActorOutput[] getOutputs();
-
-		public void sampleInputs();
-
-		public void applyOutputs();
-
-		public void addToWorld(World world);
-	}
-
-	public interface DrawablePart extends Part
-	{
-		DrawablePart[] emptyDrawablePartArray = {};
-
-		public void draw(Graphics g);
 	}
 
 	public interface Body2dGene extends Gene<Body2d, Organism2d>

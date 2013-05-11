@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world.world2d;
+package newWorld2d;
 
 import java.awt.Graphics;
 import java.awt.Point;
@@ -10,6 +10,9 @@ import java.util.Random;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
 public class NewWorld2d implements World
 {
@@ -22,16 +25,16 @@ public class NewWorld2d implements World
 
 	public List<BaseOrganism> curOrganisms;
 
-	public final List<Food> food;
+	public final List<NewFood> food;
 
-	final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null,
+	final static NewFood OUT_OF_RANGE_FOOD = new NewFood(Integer.MAX_VALUE, Integer.MAX_VALUE, null,
 			Settings.newRandomSource());
 
 	private final int foodCount;
 
 	//fixed objects
 	private final List<World2dObject> objects;
-	
+
 	//moving objects
 	private final List<Body2d> bodies;
 
@@ -39,7 +42,7 @@ public class NewWorld2d implements World
 	{
 		rnd = new SecureRandom();
 
-		food = new ArrayList<Food>(foodCount);
+		food = new ArrayList<NewFood>(foodCount);
 		objects = new ArrayList<World2dObject>();
 		bodies = new ArrayList<Body2d>();
 		resetState();
@@ -80,12 +83,12 @@ public class NewWorld2d implements World
 		{
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
-				food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
-		} else for (Food f : food)
+				food.add(new NewFood(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
+		} else for (NewFood f : food)
 			f.randomPosition();
 	}
-	
-	
+
+
 	public World2dObject findNearestObject(Point.Double p)
 	{
 		double minDist = 1000000;
@@ -105,7 +108,7 @@ public class NewWorld2d implements World
 		else return null;
 	}
 
-	public Food findNearestFood(Point.Double p)
+	public NewFood findNearestFood(Point.Double p)
 	{
 		double minDist = 1000000;
 		double curDist;
@@ -124,7 +127,7 @@ public class NewWorld2d implements World
 		}
 		if (indexMinDist > -1)
 			return food.get(indexMinDist);
-		else return World2d.OUT_OF_RANGE_FOOD;
+		else return OUT_OF_RANGE_FOOD;
 	}
 
 	@Override
@@ -146,7 +149,7 @@ public class NewWorld2d implements World
 		for (Body2d b : bodies)
 			b.draw(g);
 
-		for (Food f : food)
+		for (NewFood f : food)
 			f.draw(g);
 	}
 
@@ -162,13 +165,11 @@ public class NewWorld2d implements World
 		}
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return worldWidth;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return worldHeight;

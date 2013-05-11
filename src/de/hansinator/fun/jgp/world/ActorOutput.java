@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world.world2d.actors;
+package de.hansinator.fun.jgp.world;
 
 public interface ActorOutput
 {

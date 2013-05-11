@@ -2,8 +2,10 @@ package de.hansinator.fun.jgp.genetics;
 
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 public class AntGenome implements Genome
 {
 	private final Body2d.Body2dGene bodyGene;
@@ -47,14 +49,16 @@ public class AntGenome implements Genome
 			brainGene.mutate();
 	}
 
+	@SuppressWarnings({ "unchecked" })
 	@Override
-	public BaseOrganism synthesize()
+	public BaseOrganism<World2d> synthesize()
 	{
 		// create organism
 		Organism2d organism = new Organism2d(this);
 
 		// create and attach body
-		organism.setBodies(new Body2d[] { bodyGene.express(organism) });
+		BodyPart<World2d>[] bodies = new BodyPart[] { bodyGene.express(organism) };
+		organism.setBodyParts(bodies);
 
 		// create and attach brain
 		organism.setVM(brainGene.express(organism));
@@ -64,4 +68,5 @@ public class AntGenome implements Genome
 		// return assembled organism
 		return organism;
 	}
+
 }

@@ -1,15 +1,16 @@
 package de.hansinator.fun.jgp.world.world2d.senses;
 
-import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.world.ActorOutput;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Body2d.Part;
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
  * @author hansinator
  */
-public class GpsSense implements Part
+public class GpsSense implements BodyPart<World2d>
 {
 
 	private final Body2d body;
@@ -64,9 +65,9 @@ public class GpsSense implements Part
 	}
 
 	@Override
-	public void addToWorld(World world)
+	public void addToWorld(World2d world)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 }

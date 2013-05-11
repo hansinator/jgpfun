@@ -1,5 +1,9 @@
-package de.hansinator.fun.jgp.world.world2d;
+package newWorld2d;
 
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Food;
+import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 
 /**
