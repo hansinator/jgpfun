@@ -40,7 +40,7 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
 	@SuppressWarnings("unchecked")
-	private BodyPart<E>[] bodyParts = BodyPart.emptyPartArray;
+	private BodyPart<E>[] bodyParts = BodyPart.emptyBodyPartArray;
 
 	@SuppressWarnings("unchecked")
 	protected BodyPart.DrawablePart<E>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;

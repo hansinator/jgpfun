@@ -12,13 +12,13 @@ public interface BodyPart<E extends World>
 	public interface DrawablePart<E extends World> extends BodyPart<E>
 	{
 		@SuppressWarnings("rawtypes")
-		DrawablePart[] emptyDrawablePartArray = {};
+		public static DrawablePart[] emptyDrawablePartArray = {};
 
 		public void draw(Graphics g);
 	}
 
 	@SuppressWarnings("rawtypes")
-	BodyPart[] emptyPartArray = {};
+	public static BodyPart[] emptyBodyPartArray = {};
 
 	public SensorInput[] getInputs();
 

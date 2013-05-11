@@ -12,12 +12,12 @@ import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 import de.hansinator.fun.jgp.world.SensorInput;
 
-public abstract class Body2d extends World2dObject implements DrawablePart<World2d>
+public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
 {
 	protected static final Random rnd = Settings.newRandomSource();
 
 	@SuppressWarnings("unchecked")
-	protected BodyPart<World2d>[] parts = BodyPart.emptyPartArray;
+	protected BodyPart<World2d>[] parts = BodyPart.emptyBodyPartArray;
 
 	@SuppressWarnings("unchecked")
 	protected BodyPart.DrawablePart<World2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
@@ -85,6 +85,7 @@ public abstract class Body2d extends World2dObject implements DrawablePart<World
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
+		world.addObject(this);
 	}
 
 	@Override
@@ -113,6 +114,7 @@ public abstract class Body2d extends World2dObject implements DrawablePart<World
 			p.applyOutputs();
 	}
 
+	@Override
 	public abstract void postRoundTrigger();
 
 	public abstract void collision(World2dObject object);
