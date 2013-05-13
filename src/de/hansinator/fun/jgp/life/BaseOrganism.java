@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -21,7 +20,7 @@ import de.hansinator.fun.jgp.world.World;
  * of an output. Also create an integrator. This should ease temporal
  * memory functions.
  */
-public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
+public abstract class BaseOrganism<E extends World> implements Comparable<BaseOrganism<E>>, Runnable
 {
 
 	protected static final Random rnd = Settings.newRandomSource();
@@ -32,7 +31,8 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 
 	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
-	private IOUnit[] ioUnits = BodyPart.emptyBodyPartArray;
+	@SuppressWarnings("unchecked")
+	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
 
 	private BaseMachine vm;
 
@@ -87,8 +87,8 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 		int reg = 0;
 
 		// prepare sensor readings
-		for (IOUnit b : ioUnits)
-			b.sampleInputs();
+		for (IOUnit<E> u : ioUnits)
+			u.sampleInputs();
 
 		// write input registers
 		for (SensorInput in : inputs)
@@ -101,11 +101,13 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 			out.set(vm.regs[reg++]);
 
 		// apply outputs (move motor etc)
-		for (IOUnit b : ioUnits)
-			b.applyOutputs();
+		for (IOUnit<E> u : ioUnits)
+			u.applyOutputs();
 	}
 
 	public abstract int getFitness();
+
+	public abstract void incFitness();
 
 	public Genome getGenome()
 	{
@@ -113,7 +115,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 	}
 
 	@Override
-	public int compareTo(BaseOrganism o)
+	public int compareTo(BaseOrganism<E> o)
 	{
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
@@ -136,7 +138,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 	/*
 	 *sometime later io units may be generalized to be attached to an organism/evaluation(sub)state
 	 */
-	public void setIOUnits(IOUnit[] ioUnits)
+	public void setIOUnits(IOUnit<E>[] ioUnits)
 	{
 		int i, o, x;
 
@@ -166,7 +168,7 @@ public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 		}
 	}
 
-	public void addToWorld(World world)
+	public void addToWorld(E world)
 	{
 		// attach bodies to world state
 		for (int x = 0; x < ioUnits.length; x++)

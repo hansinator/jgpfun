@@ -126,7 +126,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<World2d>
 	}
 
 	@Override
-	public void addToWorld(World2d world)
+	public void attachEvaluationState(World2d world)
 	{
 		this.world = world;
 	}

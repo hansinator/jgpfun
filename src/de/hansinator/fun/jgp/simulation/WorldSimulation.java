@@ -71,6 +71,7 @@ public class WorldSimulation
 	 * re-think generation runtime stat calculation to be better suited for
 	 * re-entrance
 	 */
+	@SuppressWarnings("rawtypes")
 	public List<BaseOrganism> evaluate(Simulator simulator, List<BaseOrganism> organisms, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
@@ -142,6 +143,7 @@ public class WorldSimulation
 	 * 
 	 * @param organisms
 	 */
+	@SuppressWarnings("rawtypes")
 	private void singleStep(List<BaseOrganism> organisms)
 	{
 		final CountDownLatch cb = new CountDownLatch(organisms.size());

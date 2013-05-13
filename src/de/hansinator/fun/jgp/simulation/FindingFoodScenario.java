@@ -10,11 +10,11 @@ import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
+import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
@@ -52,11 +52,11 @@ public class FindingFoodScenario implements Scenario
 		return new TournamentSelector(3);
 	}
 
-	public class RadarAntGene implements Body2d.Body2dGene
+	public class RadarAntGene implements BodyPart.BodyPartGene<World2d>
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public Body2d express(Organism2d organism)
+		public BodyPart<World2d> express(BaseOrganism organism)
 		{
 			// create body and attach parts
 			Body2d body = new AntBody(organism);
@@ -66,18 +66,18 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public Gene<Body2d, Organism2d> replicate()
+		public Gene<BodyPart<World2d>> replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;
 		}
 	}
 
-	public class FoodFinderAntGene implements Body2d.Body2dGene
+	public class FoodFinderAntGene implements BodyPart.BodyPartGene<World2d>
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public Body2d express(Organism2d organism)
+		public Body2d express(BaseOrganism organism)
 		{
 			// create body and attach parts
 			AntBody body = new AntBody(organism);
@@ -87,7 +87,7 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public Gene<Body2d, Organism2d> replicate()
+		public Gene<BodyPart<World2d>> replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;

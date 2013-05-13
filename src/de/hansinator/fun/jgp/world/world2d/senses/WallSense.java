@@ -27,25 +27,6 @@ public class WallSense implements SensorInput, BodyPart<World2d>
 		this.body = body;
 	}
 
-	public int sense()
-	{
-		double dir = body.dir, temp = 0.0;
-		// clip to 2*PI range
-		dir = dir - ((double) Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
-
-		if ((body.x < 0) || (body.x >= worldWidth))
-		{
-			// TODO: fix abs stuff
-			temp = Math.min(Math.abs(2 * Math.PI - dir), Math.abs(Math.PI - dir));
-			if ((body.y < 0) || (body.y >= worldHeight))
-				temp = Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir)));
-		} else if ((body.y < 0) || (body.y >= worldHeight))
-			temp = Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir));
-
-		lastSenseVal = (int) Math.round(temp * Organism2d.intScaleFactor);
-		return lastSenseVal;
-	}
-
 	@Override
 	public int get()
 	{
@@ -72,12 +53,26 @@ public class WallSense implements SensorInput, BodyPart<World2d>
 	@Override
 	public void applyOutputs()
 	{
-		// pickup wallsense in process outputs before coordinates are clipped
-		sense();
+		// pickup wallsense in applyOutputs before coordinates are clipped
+		double dir = body.dir, temp = 0.0;
+
+		// clip to 2*PI range
+		dir = dir - ((double) Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
+
+		if ((body.x < 0) || (body.x >= worldWidth))
+		{
+			// TODO: fix abs stuff
+			temp = Math.min(Math.abs(2 * Math.PI - dir), Math.abs(Math.PI - dir));
+			if ((body.y < 0) || (body.y >= worldHeight))
+				temp = Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir)));
+		} else if ((body.y < 0) || (body.y >= worldHeight))
+			temp = Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir));
+
+		lastSenseVal = (int) Math.round(temp * Organism2d.intScaleFactor);
 	}
 
 	@Override
-	public void addToWorld(World2d world)
+	public void attachEvaluationState(World2d world)
 	{
 		this.worldWidth = Math.floor(world.getWidth());
 		this.worldHeight = Math.floor(world.getHeight());

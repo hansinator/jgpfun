@@ -3,9 +3,12 @@ package de.hansinator.fun.jgp.life;
 import de.hansinator.fun.jgp.world.World;
 
 
-public interface IOUnit
+public interface IOUnit<E extends World>
 {
-	public void attachEvaluationState(World world);
+	@SuppressWarnings("rawtypes")
+	public static IOUnit[] emptyIOUnitArray = {};
+
+	public void attachEvaluationState(E world);
 
 	public void sampleInputs();
 

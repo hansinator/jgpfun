@@ -5,13 +5,12 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
-import de.hansinator.fun.jgp.world.World;
 
 public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
 {
@@ -27,13 +26,13 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 
 	protected ActorOutput[] outputs;
 
-	protected final Organism2d organism;
+	protected final BaseOrganism<World2d> organism;
 
 	public double lastSpeed = 0.0;
 
 	public volatile boolean tagged = false;
 
-	public Body2d(Organism2d organism, double x, double y, double dir)
+	public Body2d(BaseOrganism<World2d> organism, double x, double y, double dir)
 	{
 		// TODO: fix null pointer
 		super(null, x, y, dir);
@@ -79,7 +78,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	}
 
 	@Override
-	public void attachEvaluationState(World world)
+	public void attachEvaluationState(World2d world)
 	{
 		for(BodyPart<World2d> part : parts)
 			part.attachEvaluationState(world);
@@ -187,7 +186,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		}
 
 		@Override
-		public void attachEvaluationState(World world)
+		public void attachEvaluationState(World2d world)
 		{
 		}
 	}
@@ -226,14 +225,8 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		}
 
 		@Override
-		public void attachEvaluationState(World world)
+		public void attachEvaluationState(World2d world)
 		{
 		}
-	}
-
-	public interface Body2dGene extends Gene<Body2d, Organism2d>
-	{
-		@Override
-		Body2d express(Organism2d organism);
 	}
 }

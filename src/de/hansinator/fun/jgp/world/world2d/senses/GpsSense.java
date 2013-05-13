@@ -3,7 +3,6 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
@@ -66,7 +65,7 @@ public class GpsSense implements BodyPart<World2d>
 	}
 
 	@Override
-	public void attachEvaluationState(World world)
+	public void attachEvaluationState(World2d world)
 	{
 		// TODO Auto-generated method stub
 

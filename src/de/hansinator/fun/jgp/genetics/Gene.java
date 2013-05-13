@@ -5,9 +5,9 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 /*
  * XXX implement a GeneView class/interface and construct a geneview factory backed by a geneview<->gene.class mapping
  */
-public interface Gene<T, O extends BaseOrganism>
+public interface Gene<T>
 {
-	public Gene<T, O> replicate();
+	public Gene<T> replicate();
 
-	public T express(O organism);
+	public T express(BaseOrganism organism);
 }

@@ -3,23 +3,22 @@ package de.hansinator.fun.jgp.genetics;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 public class AntGenome implements Genome
 {
-	private final Body2d.Body2dGene bodyGene;
+	private final BodyPart.BodyPartGene<World2d> bodyGene;
 
 	public final EvoVMProgramGene brainGene;
 
 
-	public AntGenome(Body2d.Body2dGene bodyGene, EvoVMProgramGene brainGene)
+	public AntGenome(BodyPart.BodyPartGene<World2d> bodyGene, EvoVMProgramGene brainGene)
 	{
 		this.bodyGene = bodyGene;
 		this.brainGene = brainGene;
 	}
 
-	public AntGenome(Body2d.Body2dGene bodyGene, int maxLength)
+	public AntGenome(BodyPart.BodyPartGene<World2d> bodyGene, int maxLength)
 	{
 		this.bodyGene = bodyGene;
 		this.brainGene = EvoVMProgramGene.randomGene(maxLength);

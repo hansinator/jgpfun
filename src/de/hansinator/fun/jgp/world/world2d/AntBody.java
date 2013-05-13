@@ -1,5 +1,6 @@
 package de.hansinator.fun.jgp.world.world2d;
 
+import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 
@@ -14,7 +15,7 @@ public class AntBody extends Body2d
 	public final ObjectLocator locator;
 
 
-	public AntBody(Organism2d organism)
+	public AntBody(BaseOrganism<World2d> organism)
 	{
 		super(organism, 0.0, 0.0, 0.0);
 
@@ -39,7 +40,7 @@ public class AntBody extends Body2d
 		if ((food.x >= (x - foodPickupRadius)) && (food.x <= (x + foodPickupRadius))
 				&& (food.y >= (y - foodPickupRadius)) && (food.y <= (y + foodPickupRadius)))
 		{
-			organism.incFood();
+			organism.incFitness();
 			food.randomPosition();
 		}
 	}

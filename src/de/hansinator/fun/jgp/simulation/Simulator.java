@@ -39,6 +39,7 @@ public class Simulator
 
 	private final WorldSimulation simulation;
 
+	@SuppressWarnings("rawtypes")
 	protected List<BaseOrganism> organisms;
 
 	private final SelectionStrategy selector;
@@ -67,6 +68,7 @@ public class Simulator
 
 	private volatile boolean running;
 
+	@SuppressWarnings("rawtypes")
 	public Simulator(Scenario scenario)
 	{
 		this.scenario = scenario;
@@ -202,6 +204,7 @@ public class Simulator
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private List<BaseOrganism> newGeneration(List<BaseOrganism> organisms, int totalFitness)
 	{
 		Genome child1, child2;
@@ -241,6 +244,7 @@ public class Simulator
 		return newAnts;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private int calculateTotalFitness(List<BaseOrganism> organisms)
 	{
 		int totalFit = 0;
@@ -252,6 +256,7 @@ public class Simulator
 	/**
 	 * temporary callback solution
 	 */
+	@SuppressWarnings("rawtypes")
 	void printPopStats(int totalFood, int generation)
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
