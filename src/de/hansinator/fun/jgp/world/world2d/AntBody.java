@@ -1,6 +1,6 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 
@@ -15,7 +15,7 @@ public class AntBody extends Body2d
 	public final ObjectLocator locator;
 
 
-	public AntBody(BaseOrganism<World2d> organism)
+	public AntBody(Organism<World2d> organism)
 	{
 		super(organism, 0.0, 0.0, 0.0);
 

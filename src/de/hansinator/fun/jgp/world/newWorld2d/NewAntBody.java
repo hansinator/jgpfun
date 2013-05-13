@@ -1,8 +1,9 @@
 package de.hansinator.fun.jgp.world.newWorld2d;
 
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 
@@ -15,7 +16,7 @@ public class NewAntBody extends Body2d
 	public final ObjectLocator locator;
 
 	// FIXME: refactor num inputs & outputs bullshit
-	public NewAntBody(Organism2d organism)
+	public NewAntBody(Organism<World2d> organism)
 	{
 		super(organism, 0.0, 0.0, 0.0);
 
@@ -34,7 +35,7 @@ public class NewAntBody extends Body2d
 	{
 		if (object instanceof Food)
 		{
-			organism.incFood();
+			organism.incFitness();
 			((Food) object).randomPosition();
 		}
 	}

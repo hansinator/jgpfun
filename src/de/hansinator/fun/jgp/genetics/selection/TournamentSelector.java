@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -26,11 +26,11 @@ public class TournamentSelector implements SelectionStrategy
 	}
 
 	@Override
-	public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness)
+	public Organism select(List<Organism> organisms, int totalFitness)
 	{
 		int maxFit = -1;
 		int size;
-		BaseOrganism fittest = null;
+		Organism fittest = null;
 
 		if (organisms.size() < tournamentSize)
 			size = organisms.size();
@@ -41,7 +41,7 @@ public class TournamentSelector implements SelectionStrategy
 
 		for (int i = 0; i < size; i++)
 		{
-			BaseOrganism candidate = organisms.get(rnd.nextInt(organisms.size()));
+			Organism candidate = organisms.get(rnd.nextInt(organisms.size()));
 
 			if (candidate.getFitness() > maxFit)
 			{

@@ -1,6 +1,6 @@
 package de.hansinator.fun.jgp.genetics;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 
 public interface Genome
 {
@@ -10,5 +10,5 @@ public interface Genome
 
 	public void mutate(int mutCount);
 
-	public BaseOrganism synthesize();
+	public Organism synthesize();
 }

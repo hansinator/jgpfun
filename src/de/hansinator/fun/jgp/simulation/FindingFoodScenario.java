@@ -10,7 +10,7 @@ import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
@@ -56,7 +56,7 @@ public class FindingFoodScenario implements Scenario
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public BodyPart<World2d> express(BaseOrganism organism)
+		public BodyPart<World2d> express(Organism organism)
 		{
 			// create body and attach parts
 			Body2d body = new AntBody(organism);
@@ -77,7 +77,7 @@ public class FindingFoodScenario implements Scenario
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public Body2d express(BaseOrganism organism)
+		public Body2d express(Organism organism)
 		{
 			// create body and attach parts
 			AntBody body = new AntBody(organism);

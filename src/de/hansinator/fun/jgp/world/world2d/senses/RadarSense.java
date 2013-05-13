@@ -6,9 +6,9 @@ import java.awt.geom.Point2D;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Food;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
@@ -35,7 +35,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		@Override
 		public int get()
 		{
-			return (int) (direction * Organism2d.intScaleFactor);
+			return (int) (direction * Simulator.intScaleFactor);
 		}
 	};
 
@@ -96,7 +96,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	@Override
 	public void set(int value)
 	{
-		direction += (Math.max(-65535, Math.min(value, 65535)) / Organism2d.intScaleFactor) / 10.0;
+		direction += (Math.max(-65535, Math.min(value, 65535)) / Simulator.intScaleFactor) / 10.0;
 		direction -= 2 * Math.PI
 				* (direction < 0.0 ? Math.ceil(direction / (2 * Math.PI)) : (Math.floor(direction / (2 * Math.PI))));
 	}

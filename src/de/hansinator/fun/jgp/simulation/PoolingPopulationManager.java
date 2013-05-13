@@ -8,7 +8,7 @@ import org.jfree.data.xy.XYSeries;
 
 import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
@@ -20,7 +20,7 @@ public class PoolingPopulationManager
 
 	public static final int maxPoolSize = 26;
 
-	private List<BaseOrganism> organismPool;
+	private List<Organism> organismPool;
 
 	private int bestInPool;
 
@@ -31,7 +31,7 @@ public class PoolingPopulationManager
 	public PoolingPopulationManager(int popSize, int progSize)
 	{
 		super(popSize, progSize);
-		organismPool = new ArrayList<BaseOrganism>(maxPoolSize);
+		organismPool = new ArrayList<Organism>(maxPoolSize);
 	}
 
 	public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation,
@@ -40,11 +40,11 @@ public class PoolingPopulationManager
 		int avgProgSize = 0, avgRealProgSize = 0;
 
 		// pool statistics
-		for (BaseOrganism o : organismPool)
+		for (Organism o : organismPool)
 			avgProgSize += o.getGenome().program.size();
 		avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
-		for (BaseOrganism o : organismPool)
+		for (Organism o : organismPool)
 			avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
 		avgRealProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
 
@@ -56,12 +56,12 @@ public class PoolingPopulationManager
 
 		// generation statistics
 		avgProgSize = 0;
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 			avgProgSize += o.getGenome().program.size();
 		avgProgSize /= organisms.size();
 
 		avgRealProgSize = 0;
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 			avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
 		avgRealProgSize /= organisms.size();
 
@@ -100,7 +100,7 @@ public class PoolingPopulationManager
 	{
 		double mutador;
 		AntGenome parent1, parent2;
-		List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
+		List<Organism> newAnts = new ArrayList<Organism>(organisms.size());
 
 		// enqueue all current organisms into our pool
 		organismPool.addAll(organisms);
@@ -146,12 +146,12 @@ public class PoolingPopulationManager
 	}
 
 	// the team effort
-	private int calculateFitness(List<BaseOrganism> organisms)
+	private int calculateFitness(List<Organism> organisms)
 	{
 		int totalFit = 0;
 		bestInPool = 0;
 
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 		{
 			totalFit += o.getFitness();
 

@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -72,14 +72,14 @@ public class WorldSimulation
 	 * re-entrance
 	 */
 	@SuppressWarnings("rawtypes")
-	public List<BaseOrganism> evaluate(Simulator simulator, List<BaseOrganism> organisms, MainView mainView, InfoPanel infoPanel)
+	public List<Organism> evaluate(Simulator simulator, List<Organism> organisms, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
 
 		// attach evaluation state to organisms
-		for (BaseOrganism organism : organisms)
+		for (Organism organism : organisms)
 			organism.addToWorld(world);
 
 		synchronized (runLock)
@@ -144,12 +144,12 @@ public class WorldSimulation
 	 * @param organisms
 	 */
 	@SuppressWarnings("rawtypes")
-	private void singleStep(List<BaseOrganism> organisms)
+	private void singleStep(List<Organism> organisms)
 	{
 		final CountDownLatch cb = new CountDownLatch(organisms.size());
 
 		// evaluate each organism
-		for (final BaseOrganism organism : organisms)
+		for (final Organism organism : organisms)
 			organism.evaluate(cb, pool);
 
 		// wait for all organisms to finish

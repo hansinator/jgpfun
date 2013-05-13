@@ -2,9 +2,9 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
@@ -68,7 +68,7 @@ public class WallSense implements SensorInput, BodyPart<World2d>
 		} else if ((body.y < 0) || (body.y >= worldHeight))
 			temp = Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir));
 
-		lastSenseVal = (int) Math.round(temp * Organism2d.intScaleFactor);
+		lastSenseVal = (int) Math.round(temp * Simulator.intScaleFactor);
 	}
 
 	@Override

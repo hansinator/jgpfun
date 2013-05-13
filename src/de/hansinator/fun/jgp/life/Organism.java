@@ -20,7 +20,7 @@ import de.hansinator.fun.jgp.world.World;
  * of an output. Also create an integrator. This should ease temporal
  * memory functions.
  */
-public abstract class BaseOrganism<E extends World> implements Comparable<BaseOrganism<E>>, Runnable
+public class Organism<E extends World> implements Comparable<Organism<E>>, Runnable
 {
 
 	protected static final Random rnd = Settings.newRandomSource();
@@ -38,9 +38,12 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 
 	private CountDownLatch cb;
 
-	public BaseOrganism(Genome genome)
+	private int fitness;
+
+	public Organism(Genome genome)
 	{
 		this.genome = genome;
+		this.fitness = 0;
 	}
 
 	@Override
@@ -52,7 +55,7 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 			live();
 		} catch (Exception ex)
 		{
-			Logger.getLogger(BaseOrganism.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Organism.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		cb.countDown();
@@ -105,9 +108,15 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 			u.applyOutputs();
 	}
 
-	public abstract int getFitness();
+	public int getFitness()
+	{
+		return fitness;
+	}
 
-	public abstract void incFitness();
+	public void incFitness()
+	{
+		fitness++;
+	}
 
 	public Genome getGenome()
 	{
@@ -115,7 +124,7 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 	}
 
 	@Override
-	public int compareTo(BaseOrganism<E> o)
+	public int compareTo(Organism<E> o)
 	{
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}

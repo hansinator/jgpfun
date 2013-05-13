@@ -5,7 +5,7 @@ package de.hansinator.fun.jgp.genetics.selection;
 
 import java.util.List;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 
 /**
  * 
@@ -14,5 +14,5 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 public interface SelectionStrategy
 {
 
-	public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness);
+	public Organism select(List<Organism> organisms, int totalFitness);
 }

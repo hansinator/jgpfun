@@ -1,9 +1,8 @@
 package de.hansinator.fun.jgp.genetics;
 
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 public class AntGenome implements Genome
 {
@@ -50,10 +49,10 @@ public class AntGenome implements Genome
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public BaseOrganism synthesize()
+	public Organism synthesize()
 	{
 		// create organism
-		Organism2d organism = new Organism2d(this);
+		Organism organism = new Organism(this);
 
 		// create and attach body
 		BodyPart<World2d>[] bodies = new BodyPart[] { bodyGene.express(organism) };

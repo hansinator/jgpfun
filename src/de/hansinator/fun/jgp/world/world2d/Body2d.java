@@ -6,8 +6,9 @@ import java.awt.Polygon;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
@@ -26,13 +27,13 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 
 	protected ActorOutput[] outputs;
 
-	protected final BaseOrganism<World2d> organism;
+	protected final Organism<World2d> organism;
 
 	public double lastSpeed = 0.0;
 
 	public volatile boolean tagged = false;
 
-	public Body2d(BaseOrganism<World2d> organism, double x, double y, double dir)
+	public Body2d(Organism<World2d> organism, double x, double y, double dir)
 	{
 		// TODO: fix null pointer
 		super(null, x, y, dir);
@@ -160,7 +161,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		public int get()
 		{
 			// could also be sin
-			return (int) (Math.cos(dir) * Organism2d.intScaleFactor);
+			return (int) (Math.cos(dir) * Simulator.intScaleFactor);
 		}
 
 		@Override
@@ -199,7 +200,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		@Override
 		public int get()
 		{
-			return (int) (lastSpeed * Organism2d.intScaleFactor);
+			return (int) (lastSpeed * Simulator.intScaleFactor);
 		}
 
 		@Override

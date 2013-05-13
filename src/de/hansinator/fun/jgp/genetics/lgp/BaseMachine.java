@@ -12,7 +12,7 @@ import de.hansinator.fun.jgp.genetics.lgp.operations.OpNeg;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
  * 
@@ -46,7 +46,7 @@ public abstract class BaseMachine
 			OpCode curop = program[i];
 
 			curop.src1 = Math.abs(curop.src1) % numRegs;
-			curop.src2 = curop.immediate ? (curop.src2 / (int) Organism2d.intScaleFactor)
+			curop.src2 = curop.immediate ? (curop.src2 / (int) Simulator.intScaleFactor)
 					: (Math.abs(curop.src2) % numRegs);
 			curop.trg = Math.abs(curop.trg) % numRegs;
 			curop.op = Math.abs(curop.op) % ops.length;

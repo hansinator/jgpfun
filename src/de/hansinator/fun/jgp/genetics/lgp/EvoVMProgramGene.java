@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 
 public class EvoVMProgramGene implements Gene<BaseMachine>
@@ -52,7 +52,7 @@ public class EvoVMProgramGene implements Gene<BaseMachine>
 	}
 
 	@Override
-	public BaseMachine express(BaseOrganism organism)
+	public BaseMachine express(Organism organism)
 	{
 		return new EvoVM(registerCount, organism.getInputCount(), program.toArray(new OpCode[program.size()]));
 	}

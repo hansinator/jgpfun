@@ -18,7 +18,7 @@ import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.GenealogyTree;
 import de.hansinator.fun.jgp.util.Settings;
 
@@ -30,6 +30,8 @@ public class Simulator
 		Settings.load(new File("default.properties"));
 	}
 
+	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
+
 	/*
 	 * The chance with which crossover happens, rest is mutation.
 	 */
@@ -40,7 +42,7 @@ public class Simulator
 	private final WorldSimulation simulation;
 
 	@SuppressWarnings("rawtypes")
-	protected List<BaseOrganism> organisms;
+	protected List<Organism> organisms;
 
 	private final SelectionStrategy selector;
 
@@ -74,7 +76,7 @@ public class Simulator
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
 		popSize = Settings.getInt("popSize");
-		organisms = new ArrayList<BaseOrganism>(popSize);
+		organisms = new ArrayList<Organism>(popSize);
 		genealogyTree = new GenealogyTree();
 		selector = scenario.getSelectionStrategy();
 		crossover = scenario.getCrossoverOperator();
@@ -205,11 +207,11 @@ public class Simulator
 	}
 
 	@SuppressWarnings("rawtypes")
-	private List<BaseOrganism> newGeneration(List<BaseOrganism> organisms, int totalFitness)
+	private List<Organism> newGeneration(List<Organism> organisms, int totalFitness)
 	{
 		Genome child1, child2;
-		BaseOrganism parent1, parent2;
-		List<BaseOrganism> newAnts = new ArrayList<BaseOrganism>(organisms.size());
+		Organism parent1, parent2;
+		List<Organism> newAnts = new ArrayList<Organism>(organisms.size());
 
 		// create new genomes via cloning and mutation or crossover
 		for (int i = 0; i < (organisms.size() / 2); i++)
@@ -245,10 +247,10 @@ public class Simulator
 	}
 
 	@SuppressWarnings("rawtypes")
-	private int calculateTotalFitness(List<BaseOrganism> organisms)
+	private int calculateTotalFitness(List<Organism> organisms)
 	{
 		int totalFit = 0;
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 			totalFit += o.getFitness();
 		return totalFit;
 	}
@@ -261,11 +263,11 @@ public class Simulator
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
 
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 			avgProgSize += o.getGenome().size();
 		avgProgSize /= organisms.size();
 
-		for (BaseOrganism o : organisms)
+		for (Organism o : organisms)
 			avgRealProgSize += o.getProgramSize();
 		avgRealProgSize /= organisms.size();
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
@@ -22,7 +22,7 @@ public class NewWorld2d implements World
 
 	public final int worldWidth, worldHeight;
 
-	public List<BaseOrganism> curOrganisms;
+	public List<Organism> curOrganisms;
 
 	public final List<NewFood> food;
 

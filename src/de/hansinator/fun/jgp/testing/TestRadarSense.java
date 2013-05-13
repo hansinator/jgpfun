@@ -12,9 +12,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.hansinator.fun.jgp.genetics.RadarAntGenome;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
-import de.hansinator.fun.jgp.world.world2d.RadarAntBody;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
@@ -24,7 +22,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
 public class TestRadarSense extends JPanel
 {
 
-	private final Organism2d organism;
+	private final Organism organism;
 
 	private final JSlider slider;
 

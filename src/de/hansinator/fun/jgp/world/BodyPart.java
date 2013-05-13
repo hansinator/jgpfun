@@ -3,7 +3,7 @@ package de.hansinator.fun.jgp.world;
 import java.awt.Graphics;
 
 import de.hansinator.fun.jgp.genetics.Gene;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.IOUnit;
 
 /*
@@ -27,6 +27,6 @@ public interface BodyPart<E extends World> extends IOUnit<E>
 	public interface BodyPartGene<E extends World> extends Gene<BodyPart<E>>
 	{
 		@Override
-		BodyPart<E> express(BaseOrganism organism);
+		BodyPart<E> express(Organism organism);
 	}
 }

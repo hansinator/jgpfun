@@ -5,9 +5,9 @@ import java.awt.Graphics;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Food;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
@@ -35,7 +35,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<World2d>
 		@Override
 		public int get()
 		{
-			return (int) (((target.x - origin.x) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.x - origin.x) / objDist) * Simulator.intScaleFactor);
 		}
 
 	};
@@ -46,7 +46,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<World2d>
 		@Override
 		public int get()
 		{
-			return (int) (((target.y - origin.y) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.y - origin.y) / objDist) * Simulator.intScaleFactor);
 		}
 
 	};
@@ -57,7 +57,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<World2d>
 		@Override
 		public int get()
 		{
-			return (int) (objDist * Organism2d.intScaleFactor);
+			return (int) (objDist * Simulator.intScaleFactor);
 		}
 
 	};
