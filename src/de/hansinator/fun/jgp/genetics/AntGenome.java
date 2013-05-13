@@ -1,7 +1,10 @@
 package de.hansinator.fun.jgp.genetics;
 
+import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
+import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 public class AntGenome implements Genome
@@ -49,19 +52,51 @@ public class AntGenome implements Genome
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public Organism synthesize()
+	public Organism<World2d> synthesize()
 	{
+		int i, o, x;
+
 		// create organism
-		Organism organism = new Organism(this);
+		Organism<World2d> organism = new Organism<World2d>(this);
 
 		// create and attach body
 		BodyPart<World2d>[] bodies = new BodyPart[] { bodyGene.express(organism) };
 		organism.setIOUnits(bodies);
 
-		// create and attach brain
-		organism.setVM(brainGene.express(organism));
+		// count I/O ports
+		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			i += bodies[x].getInputs().length;
+			o += bodies[x].getOutputs().length;
+		}
+
+		// create I/O arrays
+		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
+		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
+
+		// collect I/O
+		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : bodies[x].getInputs())
+				inputs[i++] = in;
+
+			// collect outputs
+			for (ActorOutput out : bodies[x].getOutputs())
+				outputs[o++] = out;
+		}
+
+		// create brain
+		BaseMachine vm = brainGene.express(organism);
 		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
 		// program.toArray(new OpCode[program.size()]));
+
+		// attach inputs and outputs to brain
+		vm.setInputs(inputs);
+		vm.setOutputs(outputs);
+
+		// attach brain
+		organism.setVM(vm);
 
 		// return assembled organism
 		return organism;

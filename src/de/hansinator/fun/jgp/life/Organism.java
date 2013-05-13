@@ -36,6 +36,8 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	private int fitness;
 
+	private int inputCount;
+
 	public Organism(Genome genome)
 	{
 		this.genome = genome;
@@ -122,7 +124,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	public int getInputCount()
 	{
-		return vm.getInputCount();
+		return inputCount;
 	}
 
 	public int getProgramSize()
@@ -135,36 +137,12 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	 */
 	public void setIOUnits(IOUnit<E>[] ioUnits)
 	{
-		int i, o, x;
-
+		int x;
 		this.ioUnits = ioUnits;
 
-		// count I/O ports and drawable parts
-		for(x = 0, i = 0, o = 0; x < ioUnits.length; x++)
-		{
-			i += ioUnits[x].getInputs().length;
-			o += ioUnits[x].getOutputs().length;
-		}
-
-		// create arrays
-		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
-		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
-
-		// collect I/O
-		for(x = 0, i = 0, o = 0; x < ioUnits.length; x++)
-		{
-			// collect inputs
-			for (SensorInput in : ioUnits[x].getInputs())
-				inputs[i++] = in;
-
-			// collect outputs
-			for (ActorOutput out : ioUnits[x].getOutputs())
-				outputs[o++] = out;
-		}
-
-		// attach inputs and outputs to brain
-		vm.setInputs(inputs);
-		vm.setOutputs(outputs);
+		// count input ports
+		for(x = 0, inputCount = 0; x < ioUnits.length; x++)
+			inputCount += ioUnits[x].getInputs().length;
 	}
 
 	public void addToWorld(E world)
