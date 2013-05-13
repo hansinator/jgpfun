@@ -6,11 +6,12 @@ import java.awt.Polygon;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.ActorOutput;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
-import de.hansinator.fun.jgp.world.SensorInput;
+import de.hansinator.fun.jgp.world.World;
 
 public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
 {
@@ -78,10 +79,10 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	}
 
 	@Override
-	public void addToWorld(World2d world)
+	public void attachEvaluationState(World world)
 	{
 		for(BodyPart<World2d> part : parts)
-			part.addToWorld(world);
+			part.attachEvaluationState(world);
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
@@ -186,7 +187,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		}
 
 		@Override
-		public void addToWorld(World2d world)
+		public void attachEvaluationState(World world)
 		{
 		}
 	}
@@ -225,7 +226,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		}
 
 		@Override
-		public void addToWorld(World2d world)
+		public void attachEvaluationState(World world)
 		{
 		}
 	}

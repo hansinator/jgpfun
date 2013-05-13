@@ -77,8 +77,9 @@ public class WorldSimulation
 		long lastStatTime = start;
 		int lastStatRound = 0;
 
-		// put organisms into world
-		world.setOrganisms(organisms);
+		// attach evaluation state to organisms
+		for (BaseOrganism organism : organisms)
+			organism.addToWorld(world);
 
 		synchronized (runLock)
 		{
@@ -107,12 +108,12 @@ public class WorldSimulation
 
 					if (slowMode && (time < (1000 / fpsMax)))
 						try
-						{
+					{
 							Thread.sleep((1000 / fpsMax) - time);
-						} catch (InterruptedException ex)
-						{
-							Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
-						}
+					} catch (InterruptedException ex)
+					{
+						Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
+					}
 				}
 			}
 		}

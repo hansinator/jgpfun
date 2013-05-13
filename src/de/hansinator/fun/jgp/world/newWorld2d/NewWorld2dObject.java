@@ -1,4 +1,4 @@
-package newWorld2d;
+package de.hansinator.fun.jgp.world.newWorld2d;
 
 import java.awt.Graphics;
 import java.awt.Point;

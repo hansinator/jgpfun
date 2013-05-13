@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.world;
+package de.hansinator.fun.jgp.life;
 
 /**
  * 

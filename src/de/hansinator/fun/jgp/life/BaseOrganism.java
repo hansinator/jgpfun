@@ -1,6 +1,5 @@
 package de.hansinator.fun.jgp.life;
 
-import java.awt.Graphics;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -10,9 +9,7 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.ActorOutput;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -24,11 +21,7 @@ import de.hansinator.fun.jgp.world.World;
  * of an output. Also create an integrator. This should ease temporal
  * memory functions.
  */
-/*
- * idea: think of inputs and outputs in term of I/O in computers (i.e. interface to real world) and regard bodies as I/O units or ports
- * TODO: I could move the VM into baseorganism and try to write a generic live function
- */
-public abstract class BaseOrganism<E extends World> implements Comparable<BaseOrganism<E>>, Runnable
+public abstract class BaseOrganism implements Comparable<BaseOrganism>, Runnable
 {
 
 	protected static final Random rnd = Settings.newRandomSource();
@@ -39,11 +32,7 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 
 	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
-	@SuppressWarnings("unchecked")
-	private BodyPart<E>[] bodyParts = BodyPart.emptyBodyPartArray;
-
-	@SuppressWarnings("unchecked")
-	protected BodyPart.DrawablePart<E>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
+	private IOUnit[] ioUnits = BodyPart.emptyBodyPartArray;
 
 	private BaseMachine vm;
 
@@ -97,7 +86,9 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 	{
 		int reg = 0;
 
-		sampleInputs();
+		// prepare sensor readings
+		for (IOUnit b : ioUnits)
+			b.sampleInputs();
 
 		// write input registers
 		for (SensorInput in : inputs)
@@ -109,7 +100,9 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 		for (ActorOutput out : outputs)
 			out.set(vm.regs[reg++]);
 
-		applyOutputs();
+		// apply outputs (move motor etc)
+		for (IOUnit b : ioUnits)
+			b.applyOutputs();
 	}
 
 	public abstract int getFitness();
@@ -120,7 +113,7 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 	}
 
 	@Override
-	public int compareTo(BaseOrganism<E> o)
+	public int compareTo(BaseOrganism o)
 	{
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
@@ -140,90 +133,43 @@ public abstract class BaseOrganism<E extends World> implements Comparable<BaseOr
 		return vm.getProgramSize();
 	}
 
-	public void setInputs(SensorInput[] inputs)
-	{
-		if(inputs == null)
-			this.inputs = SensorInput.emptySensorInputArray;
-		else
-			this.inputs = inputs;
-	}
-
-	public void setOutputs(ActorOutput[] outputs)
-	{
-		if(outputs == null)
-			this.outputs = ActorOutput.emptyActorOutputArray;
-		else
-			this.outputs = outputs;
-	}
-
 	/*
-	 *sometime later bodyparts may also be generalized to some kind of i/o bundles/modules attached to an organism/evaluation(sub)state
+	 *sometime later io units may be generalized to be attached to an organism/evaluation(sub)state
 	 */
-	@SuppressWarnings("unchecked")
-	public void setBodyParts(BodyPart<E>[] parts)
+	public void setIOUnits(IOUnit[] ioUnits)
 	{
-		int i, o, d, x;
+		int i, o, x;
 
-		this.bodyParts = parts;
+		this.ioUnits = ioUnits;
 
 		// count I/O ports and drawable parts
-		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		for(x = 0, i = 0, o = 0; x < ioUnits.length; x++)
 		{
-			i += parts[x].getInputs().length;
-			o += parts[x].getOutputs().length;
-			if (parts[x] instanceof BodyPart.DrawablePart)
-				d++;
+			i += ioUnits[x].getInputs().length;
+			o += ioUnits[x].getOutputs().length;
 		}
 
 		// create arrays
-		SensorInput[] inputs = new SensorInput[i];
-		ActorOutput[] outputs = new ActorOutput[o];
-		drawableParts = new BodyPart.DrawablePart[d];
+		inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
+		outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
 
-		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		// attach I/O
+		for(x = 0, i = 0, o = 0; x < ioUnits.length; x++)
 		{
 			// collect inputs
-			for (SensorInput in : parts[x].getInputs())
+			for (SensorInput in : ioUnits[x].getInputs())
 				inputs[i++] = in;
 
 			// collect outputs
-			for (ActorOutput out : parts[x].getOutputs())
+			for (ActorOutput out : ioUnits[x].getOutputs())
 				outputs[o++] = out;
-
-			// collect drawable parts
-			if (parts[x] instanceof BodyPart.DrawablePart)
-				drawableParts[d++]= (BodyPart.DrawablePart<E>) parts[x];
 		}
-
-		// attach I/O
-		setInputs(inputs);
-		setOutputs(outputs);
 	}
 
-	public void addToWorld(E world)
+	public void addToWorld(World world)
 	{
 		// attach bodies to world state
-		for (int x = 0; x < bodyParts.length; x++)
-			bodyParts[x].addToWorld(world);
-	}
-
-	public void sampleInputs()
-	{
-		// calculate food stuff for body (prepare sensors..)
-		for (BodyPart<E> b : bodyParts)
-			b.sampleInputs();
-	}
-
-	public void applyOutputs()
-	{
-		// apply outputs (move motor etc)
-		for (BodyPart<E> b : bodyParts)
-			b.applyOutputs();
-	}
-
-	public void draw(Graphics g)
-	{
-		for (BodyPart.DrawablePart<E> part : drawableParts)
-			part.draw(g);
+		for (int x = 0; x < ioUnits.length; x++)
+			ioUnits[x].attachEvaluationState(world);
 	}
 }

@@ -1,8 +1,8 @@
 package de.hansinator.fun.jgp.world.world2d.actors;
 
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.ActorOutput;
-import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
@@ -88,9 +88,9 @@ public class TankMotor implements Motor2d
 	}
 
 	@Override
-	public void addToWorld(World world)
+	public void attachEvaluationState(World world)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 }

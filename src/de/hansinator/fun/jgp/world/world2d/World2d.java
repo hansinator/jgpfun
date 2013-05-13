@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 
@@ -30,6 +29,7 @@ public class World2d implements World
 	private final List<World2dObject> objects;
 
 	private final List<AnimatableObject> animatableObjects;
+
 
 	public World2d(int worldWidth, int worldHeight, int foodCount)
 	{
@@ -127,13 +127,6 @@ public class World2d implements World
 			f.draw(g);
 	}
 
-	@Override
-	public void setOrganisms(List<BaseOrganism> organisms)
-	{
-		// take new organisms and inform them about being here
-		for (BaseOrganism<World2d> organism : organisms)
-			organism.addToWorld(this);
-	}
 
 	public void addObject(World2dObject object)
 	{

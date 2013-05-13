@@ -1,4 +1,4 @@
-package newWorld2d;
+package de.hansinator.fun.jgp.world.newWorld2d;
 
 import java.awt.Graphics;
 import java.awt.Point;
@@ -11,7 +11,6 @@ import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
 public class NewWorld2d implements World
@@ -151,18 +150,6 @@ public class NewWorld2d implements World
 
 		for (NewFood f : food)
 			f.draw(g);
-	}
-
-	@Override
-	public void setOrganisms(List<BaseOrganism> organisms)
-	{
-		// take new organisms and inform them about being here
-		for (BaseOrganism organism : curOrganisms)
-		{
-			((Organism2d) organism).addToWorld(this);
-			for(Body2d b : ((Organism2d)organism).bodies)
-				bodies.add(b);
-		}
 	}
 
 	public int getWidth()

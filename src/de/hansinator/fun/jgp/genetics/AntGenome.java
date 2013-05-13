@@ -51,14 +51,14 @@ public class AntGenome implements Genome
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public BaseOrganism<World2d> synthesize()
+	public BaseOrganism synthesize()
 	{
 		// create organism
 		Organism2d organism = new Organism2d(this);
 
 		// create and attach body
 		BodyPart<World2d>[] bodies = new BodyPart[] { bodyGene.express(organism) };
-		organism.setBodyParts(bodies);
+		organism.setIOUnits(bodies);
 
 		// create and attach brain
 		organism.setVM(brainGene.express(organism));

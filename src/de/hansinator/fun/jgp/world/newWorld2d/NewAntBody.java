@@ -1,4 +1,4 @@
-package newWorld2d;
+package de.hansinator.fun.jgp.world.newWorld2d;
 
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;

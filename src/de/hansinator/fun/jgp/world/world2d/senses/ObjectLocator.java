@@ -3,9 +3,9 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import de.hansinator.fun.jgp.world.ActorOutput;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;

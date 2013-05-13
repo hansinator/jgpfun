@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 
-import de.hansinator.fun.jgp.world.ActorOutput;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.SensorInput;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.Organism2d;
@@ -82,6 +82,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
 		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
 
+		//XXX this depends on world2d, but that's okay, the whole class does.
 		for (Food f : ((World2d)world).food)
 			if (pointInLine(x1, y1, x2, y2, f)
 					&& (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength)
@@ -148,7 +149,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	}
 
 	@Override
-	public void addToWorld(World2d world)
+	public void attachEvaluationState(World world)
 	{
 		this.world = world;
 	}

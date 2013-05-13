@@ -9,7 +9,7 @@ import de.hansinator.fun.jgp.util.Settings;
  * 
  * @author hansinator
  */
-public class Organism2d extends BaseOrganism<World2d>
+public class Organism2d extends BaseOrganism
 {
 
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
