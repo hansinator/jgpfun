@@ -12,6 +12,8 @@ import de.hansinator.fun.jgp.genetics.lgp.operations.OpNeg;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.genetics.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
@@ -56,8 +58,13 @@ public abstract class BaseMachine
 		return program;
 	}
 
+	public abstract void setInputs(SensorInput[] inputs);
+
+	public abstract void setOutputs(ActorOutput[] outputs);
+
 	public abstract void run();
 
 	public abstract int getProgramSize();
 
+	public abstract int getInputCount();
 }

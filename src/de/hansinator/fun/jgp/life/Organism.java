@@ -27,10 +27,6 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	protected final Genome genome;
 
-	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
-
-	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
-
 	@SuppressWarnings("unchecked")
 	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
 
@@ -87,21 +83,11 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	private void live()
 	{
-		int reg = 0;
-
 		// prepare sensor readings
 		for (IOUnit<E> u : ioUnits)
 			u.sampleInputs();
 
-		// write input registers
-		for (SensorInput in : inputs)
-			vm.regs[reg++] = in.get();
-
 		vm.run();
-
-		// write output values
-		for (ActorOutput out : outputs)
-			out.set(vm.regs[reg++]);
 
 		// apply outputs (move motor etc)
 		for (IOUnit<E> u : ioUnits)
@@ -136,7 +122,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	public int getInputCount()
 	{
-		return inputs.length;
+		return vm.getInputCount();
 	}
 
 	public int getProgramSize()
@@ -161,10 +147,10 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		}
 
 		// create arrays
-		inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
-		outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
+		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
+		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
 
-		// attach I/O
+		// collect I/O
 		for(x = 0, i = 0, o = 0; x < ioUnits.length; x++)
 		{
 			// collect inputs
@@ -175,6 +161,10 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 			for (ActorOutput out : ioUnits[x].getOutputs())
 				outputs[o++] = out;
 		}
+
+		// attach inputs and outputs to brain
+		vm.setInputs(inputs);
+		vm.setOutputs(outputs);
 	}
 
 	public void addToWorld(E world)

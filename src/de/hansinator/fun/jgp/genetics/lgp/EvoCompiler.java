@@ -14,6 +14,8 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
 import de.hansinator.fun.jgp.genetics.lgp.operations.Operation;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.SensorInput;
 
 /**
  * 
@@ -179,6 +181,10 @@ public class EvoCompiler
 	private static class CompiledVM extends BaseMachine
 	{
 
+		private SensorInput[] inputs = SensorInput.emptySensorInputArray;
+
+		private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
+
 		int programSize;
 
 		@Override
@@ -192,5 +198,22 @@ public class EvoCompiler
 			return programSize;
 		}
 
+		@Override
+		public void setInputs(SensorInput[] inputs)
+		{
+			this.inputs = inputs;
+		}
+
+		@Override
+		public void setOutputs(ActorOutput[] outputs)
+		{
+			this.outputs = outputs;
+		}
+
+		@Override
+		public int getInputCount()
+		{
+			return inputs.length;
+		}
 	}
 }

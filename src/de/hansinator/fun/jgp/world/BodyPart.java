@@ -3,12 +3,11 @@ package de.hansinator.fun.jgp.world;
 import java.awt.Graphics;
 
 import de.hansinator.fun.jgp.genetics.Gene;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.Organism;
 
 /*
- * TODO: refactor this into a generic organismpart that resides in life package
- * and make an abstract BodyPart in this package that implements the generic iface
+ * TODO: make an abstract BodyPart in this package that implements IOUnit
  * but unifies the duplicate code in clients of this current interface
  */
 public interface BodyPart<E extends World> extends IOUnit<E>
