@@ -200,7 +200,6 @@ public class Simulator
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private Genome[] newGeneration(Genome[] generation, int totalFitness)
 	{
 		Genome child1, child2, parent1, parent2;
@@ -234,10 +233,9 @@ public class Simulator
 			genealogyTree.put(parent2, child2);
 		}
 
-		return generation;
+		return newAnts;
 	}
 
-	@SuppressWarnings("rawtypes")
 	private int calculateTotalFitness(Genome[] generation)
 	{
 		int totalFit = 0;
@@ -249,7 +247,6 @@ public class Simulator
 	/**
 	 * temporary callback solution
 	 */
-	@SuppressWarnings("rawtypes")
 	void printPopStats(int totalFood, int generation)
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
