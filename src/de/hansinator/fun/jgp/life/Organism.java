@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -42,6 +43,59 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	{
 		this.genome = genome;
 		this.fitness = 0;
+	}
+
+	public static <E extends World> Organism<E> synthesize(Genome genome, E world)
+	{
+		int i, o, x;
+
+		// create organism
+		Organism<E> organism = new Organism<E>(genome);
+
+		// create and attach body
+		BodyPart<E>[] bodies = new BodyPart[] { genome.getBodyGene().express(organism) };
+		organism.setIOUnits(bodies);
+
+		// count I/O ports
+		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			i += bodies[x].getInputs().length;
+			o += bodies[x].getOutputs().length;
+		}
+
+		// create I/O arrays
+		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
+		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
+
+		// collect I/O
+		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : bodies[x].getInputs())
+				inputs[i++] = in;
+
+			// collect outputs
+			for (ActorOutput out : bodies[x].getOutputs())
+				outputs[o++] = out;
+		}
+
+		// create brain
+		BaseMachine vm = genome.getBrainGene().express(organism);
+		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
+		// program.toArray(new OpCode[program.size()]));
+
+		// attach inputs and outputs to brain
+		vm.setInputs(inputs);
+		vm.setOutputs(outputs);
+
+		// attach brain
+		organism.setVM(vm);
+
+		//attach to evaluation state
+		organism.addToWorld(world);
+
+		// return assembled organism
+		return organism;
 	}
 
 	@Override

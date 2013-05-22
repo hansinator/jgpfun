@@ -1,28 +1,56 @@
 package de.hansinator.fun.jgp.genetics;
 
 import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
-import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.BodyPart.BodyPartGene;
 
-public abstract class Genome
+/*
+ * XXX refactor this into a Gene (OrganismGene) somehow
+ */
+public class Genome
 {
 
 	public final EvoVMProgramGene brainGene;
+
+	private final BodyPart.BodyPartGene bodyGene;
 
 	private int fitness;
 
 	private int exonSize;
 
-	public Genome(EvoVMProgramGene brainGene)
+	public Genome(BodyPart.BodyPartGene bodyGene, EvoVMProgramGene brainGene)
 	{
 		this.brainGene = brainGene;
+		this.bodyGene = bodyGene;
 	}
 
 
-	abstract public Genome replicate();
+	public Genome replicate()
+	{
+		return new Genome(bodyGene, brainGene.replicate());
+	}
 
-	abstract public void mutate(int mutCount);
+	// make random changes to random locations in the genome
+	public void mutate(int mutCount)
+	{
+		// determine amount of mutations, minimum 1
+		// int mutCount = maxMutations;
+		// int mutCount = randomR.Next(maxMutations) + 1;
 
-	abstract public Organism synthesize();
+		for (int i = 0; i < mutCount; i++)
+			brainGene.mutate();
+	}
+
+	@SuppressWarnings("rawtypes")
+	public BodyPartGene getBodyGene()
+	{
+		return bodyGene;
+	}
+
+	public EvoVMProgramGene getBrainGene()
+	{
+		return brainGene;
+	}
 
 	public int size()
 	{
@@ -34,6 +62,7 @@ public abstract class Genome
 		return fitness;
 	}
 
+	//XXX make thism something like "addEvaluation" to add an evaluation with world parameter reference and datetime and stuff so a genome is multi-evaluatable
 	public void setFitness(int fitness)
 	{
 		this.fitness = fitness;

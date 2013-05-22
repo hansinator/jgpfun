@@ -47,6 +47,7 @@ public class WorldSimulation
 
 	public static final int ROUNDS_PER_GENERATION = 4000;
 
+	//XXX distinguish only between generational and continuous simulation, not world and mona lisa; mona lisa needs to be implemented by a scenario only
 	public WorldSimulation(World world)
 	{
 		this.world = world;
@@ -79,12 +80,11 @@ public class WorldSimulation
 		int lastStatRound = 0;
 		Organism[] organisms = new Organism[generation.length];
 
-		// synthesize organisms and attach to evaluation state
+		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
 		{
-			Organism o = generation[i].synthesize();
+			Organism o = Organism.synthesize(generation[i], world);
 			organisms[i] = o;
-			o.addToWorld(world);
 		}
 
 		synchronized (runLock)

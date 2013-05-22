@@ -3,11 +3,11 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import de.hansinator.fun.jgp.genetics.AntGenome;
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
+import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.Organism;
@@ -37,7 +37,7 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		return new AntGenome(new FoodFinderAntGene(), progSize);
+		return new Genome(new FoodFinderAntGene(), EvoVMProgramGene.randomGene(progSize));
 	}
 
 	@Override
