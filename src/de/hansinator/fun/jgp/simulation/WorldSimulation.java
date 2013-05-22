@@ -1,12 +1,12 @@
 package de.hansinator.fun.jgp.simulation;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.Organism;
@@ -71,16 +71,21 @@ public class WorldSimulation
 	 * re-think generation runtime stat calculation to be better suited for
 	 * re-entrance
 	 */
-	@SuppressWarnings("rawtypes")
-	public List<Organism> evaluate(Simulator simulator, List<Organism> organisms, MainView mainView, InfoPanel infoPanel)
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Genome[] evaluate(Simulator simulator, Genome[] generation, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
+		Organism[] organisms = new Organism[generation.length];
 
-		// attach evaluation state to organisms
-		for (Organism organism : organisms)
-			organism.addToWorld(world);
+		// synthesize organisms and attach to evaluation state
+		for (int i = 0; i < generation.length; i++)
+		{
+			Organism o = generation[i].synthesize();
+			organisms[i] = o;
+			o.addToWorld(world);
+		}
 
 		synchronized (runLock)
 		{
@@ -126,8 +131,15 @@ public class WorldSimulation
 		// prepare world for next generation
 		world.resetState();
 
-		// return evaluated generation
-		return organisms;
+		// update and return evaluated generation
+		for(Organism o : organisms)
+		{
+			Genome g = o.getGenome();
+			g.setFitness(o.getFitness());
+			g.setExonSize(o.getProgramSize());
+		}
+
+		return generation;
 	}
 
 	/**
@@ -144,9 +156,9 @@ public class WorldSimulation
 	 * @param organisms
 	 */
 	@SuppressWarnings("rawtypes")
-	private void singleStep(List<Organism> organisms)
+	private void singleStep(Organism[] organisms)
 	{
-		final CountDownLatch cb = new CountDownLatch(organisms.size());
+		final CountDownLatch cb = new CountDownLatch(organisms.length);
 
 		// evaluate each organism
 		for (final Organism organism : organisms)

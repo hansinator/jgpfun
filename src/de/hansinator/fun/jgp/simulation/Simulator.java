@@ -1,8 +1,6 @@
 package de.hansinator.fun.jgp.simulation;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.jfree.data.xy.XYSeries;
@@ -11,6 +9,7 @@ import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
+import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
@@ -18,8 +17,6 @@ import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.life.GenealogyTree;
 import de.hansinator.fun.jgp.util.Settings;
 
 public class Simulator
@@ -41,8 +38,7 @@ public class Simulator
 
 	private final WorldSimulation simulation;
 
-	@SuppressWarnings("rawtypes")
-	protected List<Organism> organisms;
+	protected Genome[] currentGeneration;
 
 	private final SelectionStrategy selector;
 
@@ -70,13 +66,12 @@ public class Simulator
 
 	private volatile boolean running;
 
-	@SuppressWarnings("rawtypes")
 	public Simulator(Scenario scenario)
 	{
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
 		popSize = Settings.getInt("popSize");
-		organisms = new ArrayList<Organism>(popSize);
+		currentGeneration = new Genome[popSize];
 		genealogyTree = new GenealogyTree();
 		selector = scenario.getSelectionStrategy();
 		crossover = scenario.getCrossoverOperator();
@@ -128,8 +123,8 @@ public class Simulator
 			while (running)
 			{
 				// evaluate organisms
-				organisms = simulation.evaluate(this, organisms, mainView, infoPanel);
-				totalFitness = calculateTotalFitness(organisms);
+				currentGeneration = simulation.evaluate(this, currentGeneration, mainView, infoPanel);
+				totalFitness = calculateTotalFitness(currentGeneration);
 				evaluationCount++;
 
 				// update population statistics
@@ -137,7 +132,7 @@ public class Simulator
 				fitnessChartData.add(evaluationCount, totalFitness);
 
 				// produce new generation
-				organisms = newGeneration(organisms, totalFitness);
+				currentGeneration = newGeneration(currentGeneration, totalFitness);
 
 				// statistics
 				System.out.println("GEN: " + evaluationCount);
@@ -190,7 +185,6 @@ public class Simulator
 		synchronized (runLock)
 		{
 			genealogyTree.clear();
-			organisms.clear();
 			fitnessChartData.clear();
 			genomeSizeChartData.clear();
 			realGenomeSizeChartData.clear();
@@ -200,29 +194,26 @@ public class Simulator
 			for (int i = 0; i < popSize; i++)
 			{
 				Genome g = scenario.randomGenome();
-				organisms.add(g.synthesize());
+				currentGeneration[i] = g;
 				genealogyTree.put(g);
 			}
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	private List<Organism> newGeneration(List<Organism> organisms, int totalFitness)
+	private Genome[] newGeneration(Genome[] generation, int totalFitness)
 	{
-		Genome child1, child2;
-		Organism parent1, parent2;
-		List<Organism> newAnts = new ArrayList<Organism>(organisms.size());
+		Genome child1, child2, parent1, parent2;
+		Genome[] newAnts = new Genome[generation.length];
 
 		// create new genomes via cloning and mutation or crossover
-		for (int i = 0; i < (organisms.size() / 2); i++)
+		for (int i = 0; i < (generation.length / 2); i++)
 		{
 			// select two source genomes and clone them
-			// note: you must copy/clone the genomes before modifying them,
-			// as the genome is passed by reference
-			parent1 = selector.select(organisms, totalFitness);
-			parent2 = selector.select(organisms, totalFitness);
-			child1 = parent1.getGenome().replicate();
-			child2 = parent2.getGenome().replicate();
+			parent1 = selector.select(generation, totalFitness);
+			parent2 = selector.select(generation, totalFitness);
+			child1 = parent1.replicate();
+			child2 = parent2.replicate();
 
 			// mutate or crossover with a user defined chance
 			// if (rnd.nextDouble() > crossoverRate) {
@@ -235,23 +226,23 @@ public class Simulator
 			 */
 
 			// create new ants from the modified genomes and save them
-			newAnts.add(child1.synthesize());
-			newAnts.add(child2.synthesize());
+			newAnts[i*2] = child1;
+			newAnts[i*2+1] = child2;
 
 			// add to genealogy tree
-			genealogyTree.put(parent1.getGenome(), child1, parent1.getFitness());
-			genealogyTree.put(parent2.getGenome(), child2, parent2.getFitness());
+			genealogyTree.put(parent1, child1);
+			genealogyTree.put(parent2, child2);
 		}
 
-		return newAnts;
+		return generation;
 	}
 
 	@SuppressWarnings("rawtypes")
-	private int calculateTotalFitness(List<Organism> organisms)
+	private int calculateTotalFitness(Genome[] generation)
 	{
 		int totalFit = 0;
-		for (Organism o : organisms)
-			totalFit += o.getFitness();
+		for (Genome g : generation)
+			totalFit += g.getFitness();
 		return totalFit;
 	}
 
@@ -263,16 +254,16 @@ public class Simulator
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
 
-		for (Organism o : organisms)
-			avgProgSize += o.getGenome().size();
-		avgProgSize /= organisms.size();
+		for (Genome g : currentGeneration)
+			avgProgSize += g.size();
+		avgProgSize /= currentGeneration.length;
 
-		for (Organism o : organisms)
-			avgRealProgSize += o.getProgramSize();
-		avgRealProgSize /= organisms.size();
+		for (Genome g : currentGeneration)
+			avgRealProgSize += g.getExonSize();
+		avgRealProgSize /= currentGeneration.length;
 
 		statisticsHistory
-		.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
+		.appendEntry(generation, totalFood, totalFood / currentGeneration.length, avgProgSize, avgRealProgSize);
 		genomeSizeChartData.add(generation, avgProgSize);
 		realGenomeSizeChartData.add(generation, avgRealProgSize);
 	}

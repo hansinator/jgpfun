@@ -7,35 +7,26 @@ import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-public class AntGenome implements Genome
+public class AntGenome extends Genome
 {
 	private final BodyPart.BodyPartGene<World2d> bodyGene;
 
-	public final EvoVMProgramGene brainGene;
-
-
 	public AntGenome(BodyPart.BodyPartGene<World2d> bodyGene, EvoVMProgramGene brainGene)
 	{
+		super(brainGene);
 		this.bodyGene = bodyGene;
-		this.brainGene = brainGene;
 	}
 
 	public AntGenome(BodyPart.BodyPartGene<World2d> bodyGene, int maxLength)
 	{
+		super(EvoVMProgramGene.randomGene(maxLength));
 		this.bodyGene = bodyGene;
-		this.brainGene = EvoVMProgramGene.randomGene(maxLength);
 	}
 
 	@Override
 	public AntGenome replicate()
 	{
 		return new AntGenome(bodyGene, brainGene.replicate());
-	}
-
-	@Override
-	public int size()
-	{
-		return brainGene.size();
 	}
 
 	// make random changes to random locations in the genome
@@ -101,5 +92,6 @@ public class AntGenome implements Genome
 		// return assembled organism
 		return organism;
 	}
+
 
 }

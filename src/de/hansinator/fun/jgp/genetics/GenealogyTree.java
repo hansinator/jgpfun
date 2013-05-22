@@ -1,11 +1,10 @@
 /*
  */
-package de.hansinator.fun.jgp.life;
+package de.hansinator.fun.jgp.genetics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 
 /**
  * 
@@ -36,13 +35,13 @@ public class GenealogyTree
 
 	public void put(Genome genome)
 	{
-		put(genome, null, 0);
+		put(genome, null);
 	}
 
-	public void put(Genome genome, Genome parent, int fitness)
+	public void put(Genome genome, Genome parent)
 	{
 		if (!nodes.containsKey(genome) && ((parent == null) || nodes.containsKey(parent)))
-			new Node(genome, parent, fitness);
+			new Node(genome, parent);
 	}
 
 	// private final
@@ -53,14 +52,11 @@ public class GenealogyTree
 
 		public final Node parent;
 
-		public final int fitness;
-
 		private Node child = null;
 
-		Node(Genome genome, Genome parent, int fitness)
+		Node(Genome genome, Genome parent)
 		{
 			this.genome = genome;
-			this.fitness = fitness;
 			if (parent == null)
 			{
 				this.parent = null;

@@ -2,12 +2,11 @@
  */
 package de.hansinator.fun.jgp.genetics.selection;
 
-import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -23,14 +22,14 @@ public class RouletteWheelSelector implements SelectionStrategy
 	 * fitness proportionate selection
 	 */
 	@Override
-	public Organism select(List<Organism> organisms, int totalFitness)
+	public Genome select(Genome[] pool, int totalFitness)
 	{
 		int stopPoint = 0;
 		int fitnessSoFar = 0;
 
 		if (totalFitness > 0)
 			stopPoint = rnd.nextInt(totalFitness);
-		else return organisms.get(rnd.nextInt(organisms.size()));
+		else return pool[rnd.nextInt(pool.length)];
 
 		/*
 		 * Shuffle the organism list to make roulettewheel work better. In case
@@ -39,17 +38,17 @@ public class RouletteWheelSelector implements SelectionStrategy
 		 * would have a greater chance of being selected. This shuffle hopefully
 		 * eliminates this problem, if it does exist.
 		 */
-		Collections.shuffle(organisms);
+		Collections.shuffle(Arrays.asList(pool));
 
-		for (int i = 0; i < organisms.size(); i++)
+		for (int i = 0; i < pool.length; i++)
 		{
-			fitnessSoFar += organisms.get(i).getFitness();
+			fitnessSoFar += pool[i].getFitness();
 			// this way zero fitness ants are omitted
 			if (fitnessSoFar > stopPoint)
-				return organisms.get(i);
+				return pool[i];
 		}
 
-		return organisms.get(rnd.nextInt(organisms.size()));
+		return pool[rnd.nextInt(pool.length)];
 	}
 
 }
