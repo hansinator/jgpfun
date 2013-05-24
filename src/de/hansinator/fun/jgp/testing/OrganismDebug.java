@@ -3,8 +3,8 @@ package de.hansinator.fun.jgp.testing;
 import java.io.IOException;
 
 import de.hansinator.fun.jgp.genetics.AntGenome;
-import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.lgp.ExecutionUnit;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
@@ -19,7 +19,7 @@ public class OrganismDebug extends Organism
 	// speed profiling helper vars
 	// public long vmrun, allrun, comp;
 
-	public OrganismDebug(AntGenome genome, BaseMachine brain, int numBodies, int numInputs, int numOutputs, World2d world)
+	public OrganismDebug(AntGenome genome, ExecutionUnit brain, int numBodies, int numInputs, int numOutputs, World2d world)
 			throws IOException
 			{
 		super(genome);

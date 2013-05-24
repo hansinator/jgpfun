@@ -7,9 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -31,7 +29,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	@SuppressWarnings("unchecked")
 	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
 
-	private BaseMachine vm;
+	private ExecutionUnit brain;
 
 	private CountDownLatch cb;
 
@@ -45,6 +43,10 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		this.fitness = 0;
 	}
 
+	/*
+	 * I need a "world IO unit" and an accompanying gene which would realize the synthesize function - much like organism and organismgenome
+	 */
+	@SuppressWarnings("unchecked")
 	public static <E extends World> Organism<E> synthesize(Genome genome, E world)
 	{
 		int i, o, x;
@@ -53,7 +55,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		Organism<E> organism = new Organism<E>(genome);
 
 		// create and attach body
-		BodyPart<E>[] bodies = new BodyPart[] { genome.getBodyGene().express(organism) };
+		IOUnit<E>[] bodies = new IOUnit[] { genome.getBodyGene().express(organism) };
 		organism.setIOUnits(bodies);
 
 		// count I/O ports
@@ -80,16 +82,16 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		}
 
 		// create brain
-		BaseMachine vm = genome.getBrainGene().express(organism);
+		ExecutionUnit brain = genome.getBrainGene().express(organism);
 		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
 		// program.toArray(new OpCode[program.size()]));
 
 		// attach inputs and outputs to brain
-		vm.setInputs(inputs);
-		vm.setOutputs(outputs);
+		brain.setInputs(inputs);
+		brain.setOutputs(outputs);
 
 		// attach brain
-		organism.setVM(vm);
+		organism.setExecutionUnit(brain);
 
 		//attach to evaluation state
 		organism.addToWorld(world);
@@ -137,13 +139,14 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		live();
 	}
 
+	//XXX i need some computation graph to replace this call sequence
 	private void live()
 	{
 		// prepare sensor readings
 		for (IOUnit<E> u : ioUnits)
 			u.sampleInputs();
 
-		vm.run();
+		brain.run();
 
 		// apply outputs (move motor etc)
 		for (IOUnit<E> u : ioUnits)
@@ -171,9 +174,9 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
 
-	public void setVM(BaseMachine vm)
+	public void setExecutionUnit(ExecutionUnit brain)
 	{
-		this.vm = vm;
+		this.brain = brain;
 	}
 
 	public int getInputCount()
@@ -183,7 +186,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	public int getProgramSize()
 	{
-		return vm.getProgramSize();
+		return brain.getProgramSize();
 	}
 
 	/*

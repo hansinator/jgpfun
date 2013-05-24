@@ -18,4 +18,12 @@ public interface IOUnit<E extends World>
 
 	public ActorOutput[] getOutputs();
 
+	public interface Gene<E extends World> extends de.hansinator.fun.jgp.genetics.Gene<IOUnit<E>>
+	{
+		@Override
+		public Gene<E> replicate();
+
+		@Override
+		public IOUnit<E> express(Organism organism);
+	}
 }

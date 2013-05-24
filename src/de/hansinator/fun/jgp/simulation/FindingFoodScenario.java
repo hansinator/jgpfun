@@ -3,14 +3,14 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
-import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
+import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
@@ -37,7 +37,7 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		return new Genome(new FoodFinderAntGene(), EvoVMProgramGene.randomGene(progSize));
+		return new Genome(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
 	}
 
 	@Override
@@ -52,11 +52,11 @@ public class FindingFoodScenario implements Scenario
 		return new TournamentSelector(3);
 	}
 
-	public class RadarAntGene implements BodyPart.BodyPartGene<World2d>
+	public class RadarAntGene implements IOUnit.Gene<World2d>
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public BodyPart<World2d> express(Organism organism)
+		public IOUnit<World2d> express(Organism organism)
 		{
 			// create body and attach parts
 			Body2d body = new AntBody(organism);
@@ -66,18 +66,18 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public Gene<BodyPart<World2d>> replicate()
+		public RadarAntGene replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;
 		}
 	}
 
-	public class FoodFinderAntGene implements BodyPart.BodyPartGene<World2d>
+	public class FoodFinderAntGene implements IOUnit.Gene<World2d>
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public Body2d express(Organism organism)
+		public IOUnit<World2d> express(Organism organism)
 		{
 			// create body and attach parts
 			AntBody body = new AntBody(organism);
@@ -87,7 +87,7 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public Gene<BodyPart<World2d>> replicate()
+		public FoodFinderAntGene replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;

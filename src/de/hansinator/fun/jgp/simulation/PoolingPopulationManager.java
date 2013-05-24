@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jfree.data.xy.XYSeries;
-
-import de.hansinator.fun.jgp.genetics.AntGenome;
-import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 
 /**
  * 
@@ -30,53 +26,9 @@ public class PoolingPopulationManager
 
 	public PoolingPopulationManager(int popSize, int progSize)
 	{
-		super(popSize, progSize);
 		organismPool = new ArrayList<Organism>(maxPoolSize);
 	}
 
-	public void printStats(StatisticsHistoryModel statisticsHistory, int totalFood, int generation,
-			XYSeries progSizeChartData, XYSeries realProgSizeChartData)
-	{
-		int avgProgSize = 0, avgRealProgSize = 0;
-
-		// pool statistics
-		for (Organism o : organismPool)
-			avgProgSize += o.getGenome().program.size();
-		avgProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
-
-		for (Organism o : organismPool)
-			avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
-		avgRealProgSize /= (organismPool.size() > 0) ? organismPool.size() : 1;
-
-		System.out.println("Avg pool prg size (cur gen): " + avgProgSize);
-		System.out.println("Avg real pool prg size (cur gen): " + avgRealProgSize);
-		System.out.println("Pool food: " + totalFit);
-		System.out.println("Pool avg food: " + (totalFit / ((organismPool.size() > 0) ? organismPool.size() : 1)));
-		System.out.println("Best in pool: " + bestInPool);
-
-		// generation statistics
-		avgProgSize = 0;
-		for (Organism o : organisms)
-			avgProgSize += o.getGenome().program.size();
-		avgProgSize /= organisms.size();
-
-		avgRealProgSize = 0;
-		for (Organism o : organisms)
-			avgRealProgSize += ((Organism2d) o).vm.getProgramSize();
-		avgRealProgSize /= organisms.size();
-
-		statisticsHistory
-		.appendEntry(generation, totalFood, totalFood / organisms.size(), avgProgSize, avgRealProgSize);
-		progSizeChartData.add(generation, avgProgSize);
-		realProgSizeChartData.add(generation, avgRealProgSize);
-	}
-
-	private void printPool()
-	{
-		System.out.println("Pool:");
-		for (int i = 0; i < organismPool.size(); i++)
-			System.out.println("" + i + ":\t" + organismPool.get(i).getFitness());
-	}
 
 	// this funtion ensures that the populatio pool
 	// does not exceed it's maximum size by purging
@@ -99,7 +51,7 @@ public class PoolingPopulationManager
 	public int newGeneration()
 	{
 		double mutador;
-		AntGenome parent1, parent2;
+		Genome parent1, parent2;
 		List<Organism> newAnts = new ArrayList<Organism>(organisms.size());
 
 		// enqueue all current organisms into our pool
@@ -160,11 +112,6 @@ public class PoolingPopulationManager
 				bestInPool = o.getFitness();
 		}
 
-		return totalFit;
-	}
-
-	public int getCurrentPopulationFitness()
-	{
 		return totalFit;
 	}
 

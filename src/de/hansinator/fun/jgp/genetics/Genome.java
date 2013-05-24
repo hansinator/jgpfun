@@ -1,8 +1,7 @@
 package de.hansinator.fun.jgp.genetics;
 
-import de.hansinator.fun.jgp.genetics.lgp.EvoVMProgramGene;
-import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.BodyPart.BodyPartGene;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.life.IOUnit;
 
 /*
  * XXX refactor this into a Gene (OrganismGene) somehow
@@ -10,15 +9,15 @@ import de.hansinator.fun.jgp.world.BodyPart.BodyPartGene;
 public class Genome
 {
 
-	public final EvoVMProgramGene brainGene;
+	private final ExecutionUnit.Gene brainGene;
 
-	private final BodyPart.BodyPartGene bodyGene;
+	private final IOUnit.Gene bodyGene;
 
 	private int fitness;
 
 	private int exonSize;
 
-	public Genome(BodyPart.BodyPartGene bodyGene, EvoVMProgramGene brainGene)
+	public Genome(IOUnit.Gene bodyGene, ExecutionUnit.Gene brainGene)
 	{
 		this.brainGene = brainGene;
 		this.bodyGene = bodyGene;
@@ -42,12 +41,12 @@ public class Genome
 	}
 
 	@SuppressWarnings("rawtypes")
-	public BodyPartGene getBodyGene()
+	public IOUnit.Gene getBodyGene()
 	{
 		return bodyGene;
 	}
 
-	public EvoVMProgramGene getBrainGene()
+	public ExecutionUnit.Gene getBrainGene()
 	{
 		return brainGene;
 	}

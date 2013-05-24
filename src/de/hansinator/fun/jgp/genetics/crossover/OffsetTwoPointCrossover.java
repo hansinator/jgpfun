@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.life.lgp.OpCode;
 
 /**
  * Basically the same as TwoPointCrossover, only that the exchanged part is not
