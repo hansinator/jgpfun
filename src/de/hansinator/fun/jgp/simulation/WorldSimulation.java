@@ -6,10 +6,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.world.World;
 
 /**
@@ -73,7 +73,7 @@ public class WorldSimulation
 	 * re-entrance
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Genome[] evaluate(Simulator simulator, Genome[] generation, MainView mainView, InfoPanel infoPanel)
+	public OrganismGene[] evaluate(Simulator simulator, OrganismGene[] generation, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
@@ -83,7 +83,7 @@ public class WorldSimulation
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
 		{
-			Organism o = Organism.synthesize(generation[i], world);
+			Organism o = generation[i].express(world);
 			organisms[i] = o;
 		}
 
@@ -134,7 +134,7 @@ public class WorldSimulation
 		// update and return evaluated generation
 		for(Organism o : organisms)
 		{
-			Genome g = o.getGenome();
+			OrganismGene g = o.getGenome();
 			g.setFitness(o.getFitness());
 			g.setExonSize(o.getProgramSize());
 		}

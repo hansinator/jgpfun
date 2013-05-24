@@ -3,13 +3,13 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
@@ -35,9 +35,9 @@ public class FindingFoodScenario implements Scenario
 	}
 
 	@Override
-	public Genome randomGenome()
+	public OrganismGene randomGenome()
 	{
-		return new Genome(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
+		return new OrganismGene(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
 	}
 
 	@Override
@@ -71,6 +71,11 @@ public class FindingFoodScenario implements Scenario
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public void mutate()
+		{
+		}
 	}
 
 	public class FoodFinderAntGene implements IOUnit.Gene<World2d>
@@ -91,6 +96,11 @@ public class FindingFoodScenario implements Scenario
 		{
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+		@Override
+		public void mutate()
+		{
 		}
 	}
 }

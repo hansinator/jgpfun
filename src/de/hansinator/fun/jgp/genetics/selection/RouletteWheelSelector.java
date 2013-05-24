@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -22,7 +22,7 @@ public class RouletteWheelSelector implements SelectionStrategy
 	 * fitness proportionate selection
 	 */
 	@Override
-	public Genome select(Genome[] pool, int totalFitness)
+	public OrganismGene select(OrganismGene[] pool, int totalFitness)
 	{
 		int stopPoint = 0;
 		int fitnessSoFar = 0;

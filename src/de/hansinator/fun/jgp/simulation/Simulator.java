@@ -10,13 +10,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.util.Settings;
 
 public class Simulator
@@ -38,7 +38,7 @@ public class Simulator
 
 	private final WorldSimulation simulation;
 
-	protected Genome[] currentGeneration;
+	protected OrganismGene[] currentGeneration;
 
 	private final SelectionStrategy selector;
 
@@ -71,7 +71,7 @@ public class Simulator
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
 		popSize = Settings.getInt("popSize");
-		currentGeneration = new Genome[popSize];
+		currentGeneration = new OrganismGene[popSize];
 		genealogyTree = new GenealogyTree();
 		selector = scenario.getSelectionStrategy();
 		crossover = scenario.getCrossoverOperator();
@@ -193,17 +193,17 @@ public class Simulator
 
 			for (int i = 0; i < popSize; i++)
 			{
-				Genome g = scenario.randomGenome();
+				OrganismGene g = scenario.randomGenome();
 				currentGeneration[i] = g;
 				genealogyTree.put(g);
 			}
 		}
 	}
 
-	private Genome[] newGeneration(Genome[] generation, int totalFitness)
+	private OrganismGene[] newGeneration(OrganismGene[] generation, int totalFitness)
 	{
-		Genome child1, child2, parent1, parent2;
-		Genome[] newAnts = new Genome[generation.length];
+		OrganismGene child1, child2, parent1, parent2;
+		OrganismGene[] newAnts = new OrganismGene[generation.length];
 
 		// create new genomes via cloning and mutation or crossover
 		for (int i = 0; i < (generation.length / 2); i++)
@@ -236,10 +236,10 @@ public class Simulator
 		return newAnts;
 	}
 
-	private int calculateTotalFitness(Genome[] generation)
+	private int calculateTotalFitness(OrganismGene[] generation)
 	{
 		int totalFit = 0;
-		for (Genome g : generation)
+		for (OrganismGene g : generation)
 			totalFit += g.getFitness();
 		return totalFit;
 	}
@@ -251,11 +251,11 @@ public class Simulator
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
 
-		for (Genome g : currentGeneration)
+		for (OrganismGene g : currentGeneration)
 			avgProgSize += g.size();
 		avgProgSize /= currentGeneration.length;
 
-		for (Genome g : currentGeneration)
+		for (OrganismGene g : currentGeneration)
 			avgRealProgSize += g.getExonSize();
 		avgRealProgSize /= currentGeneration.length;
 

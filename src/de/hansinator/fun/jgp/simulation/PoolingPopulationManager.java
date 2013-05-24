@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.OrganismGene;
 
 /**
  * 
@@ -51,7 +51,7 @@ public class PoolingPopulationManager
 	public int newGeneration()
 	{
 		double mutador;
-		Genome parent1, parent2;
+		OrganismGene parent1, parent2;
 		List<Organism> newAnts = new ArrayList<Organism>(organisms.size());
 
 		// enqueue all current organisms into our pool

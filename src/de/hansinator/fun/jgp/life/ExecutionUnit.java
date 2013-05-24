@@ -12,12 +12,11 @@ public interface ExecutionUnit
 
 	public int getInputCount();
 
-	public interface Gene extends de.hansinator.fun.jgp.genetics.Gene<ExecutionUnit>
+	@SuppressWarnings("rawtypes")
+	public interface Gene extends de.hansinator.fun.jgp.genetics.Gene<ExecutionUnit, Organism>
 	{
 		@Override
 		public Gene replicate();
-
-		public void mutate();
 
 		public int size();
 	}

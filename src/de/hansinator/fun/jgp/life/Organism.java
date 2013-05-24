@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 
@@ -24,7 +23,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	protected static final Random rnd = Settings.newRandomSource();
 
-	protected final Genome genome;
+	protected final OrganismGene<E> genome;
 
 	@SuppressWarnings("unchecked")
 	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
@@ -37,68 +36,12 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	private int inputCount;
 
-	public Organism(Genome genome)
+	public Organism(OrganismGene<E> genome)
 	{
 		this.genome = genome;
 		this.fitness = 0;
 	}
 
-	/*
-	 * I need a "world IO unit" and an accompanying gene which would realize the synthesize function - much like organism and organismgenome
-	 */
-	@SuppressWarnings("unchecked")
-	public static <E extends World> Organism<E> synthesize(Genome genome, E world)
-	{
-		int i, o, x;
-
-		// create organism
-		Organism<E> organism = new Organism<E>(genome);
-
-		// create and attach body
-		IOUnit<E>[] bodies = new IOUnit[] { genome.getBodyGene().express(organism) };
-		organism.setIOUnits(bodies);
-
-		// count I/O ports
-		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
-		{
-			i += bodies[x].getInputs().length;
-			o += bodies[x].getOutputs().length;
-		}
-
-		// create I/O arrays
-		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
-		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
-
-		// collect I/O
-		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
-		{
-			// collect inputs
-			for (SensorInput in : bodies[x].getInputs())
-				inputs[i++] = in;
-
-			// collect outputs
-			for (ActorOutput out : bodies[x].getOutputs())
-				outputs[o++] = out;
-		}
-
-		// create brain
-		ExecutionUnit brain = genome.getBrainGene().express(organism);
-		// BaseMachine brain = EvoCompiler.compile(registerCount, numInputs,
-		// program.toArray(new OpCode[program.size()]));
-
-		// attach inputs and outputs to brain
-		brain.setInputs(inputs);
-		brain.setOutputs(outputs);
-
-		// attach brain
-		organism.setExecutionUnit(brain);
-
-		//attach to evaluation state
-		organism.addToWorld(world);
-
-		// return assembled organism
-		return organism;
-	}
 
 	@Override
 	public void run()
@@ -163,7 +106,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		fitness++;
 	}
 
-	public Genome getGenome()
+	public OrganismGene<E> getGenome()
 	{
 		return genome;
 	}

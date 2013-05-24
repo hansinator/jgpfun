@@ -51,17 +51,20 @@ public class LGPGene implements ExecutionUnit.Gene
 		return new LGPGene(p, maxLength);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public ExecutionUnit express(Organism organism)
+	public ExecutionUnit express(Organism context)
 	{
-		return new EvoVM(registerCount, organism.getInputCount(), program.toArray(new OpCode[program.size()]));
+		return new EvoVM(registerCount, context.getInputCount(), program.toArray(new OpCode[program.size()]));
 	}
 
+	@Override
 	public int size()
 	{
 		return program.size();
 	}
 
+	@Override
 	public void mutate()
 	{
 		// chances sum represents 100%, i.e. the sum of all possible chances

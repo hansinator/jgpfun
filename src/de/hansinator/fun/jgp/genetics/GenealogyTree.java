@@ -5,6 +5,8 @@ package de.hansinator.fun.jgp.genetics;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import de.hansinator.fun.jgp.life.OrganismGene;
+
 
 /**
  * 
@@ -13,7 +15,7 @@ import java.util.HashMap;
 public class GenealogyTree
 {
 
-	private final HashMap<Genome, Node> nodes;
+	private final HashMap<OrganismGene, Node> nodes;
 
 	private final ArrayList<Node> roots;
 
@@ -23,7 +25,7 @@ public class GenealogyTree
 
 	public GenealogyTree()
 	{
-		nodes = new HashMap<Genome, Node>();
+		nodes = new HashMap<OrganismGene, Node>();
 		roots = new ArrayList<Node>();
 	}
 
@@ -33,12 +35,12 @@ public class GenealogyTree
 		nodes.clear();
 	}
 
-	public void put(Genome genome)
+	public void put(OrganismGene genome)
 	{
 		put(genome, null);
 	}
 
-	public void put(Genome genome, Genome parent)
+	public void put(OrganismGene genome, OrganismGene parent)
 	{
 		if (!nodes.containsKey(genome) && ((parent == null) || nodes.containsKey(parent)))
 			new Node(genome, parent);
@@ -48,13 +50,13 @@ public class GenealogyTree
 	private class Node
 	{
 
-		public final Genome genome;
+		public final OrganismGene genome;
 
 		public final Node parent;
 
 		private Node child = null;
 
-		Node(Genome genome, Genome parent)
+		Node(OrganismGene genome, OrganismGene parent)
 		{
 			this.genome = genome;
 			if (parent == null)
