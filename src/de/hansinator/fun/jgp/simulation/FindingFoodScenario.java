@@ -35,9 +35,9 @@ public class FindingFoodScenario implements Scenario
 	}
 
 	@Override
-	public OrganismGene randomGenome()
+	public OrganismGene<World2d> randomGenome()
 	{
-		return new OrganismGene(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
+		return new OrganismGene<World2d>(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
 	}
 
 	@Override
