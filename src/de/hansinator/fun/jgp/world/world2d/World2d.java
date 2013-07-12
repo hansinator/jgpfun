@@ -52,32 +52,37 @@ public class World2d implements World
 		// screen
 		// TODO: take into account ant size, so it can't hide outside of the
 		// screen
-		for(AnimatableObject o : animatableObjects)
+		for(AnimatableObject ao : animatableObjects)
 		{
 			// prevent world wrapping
-			o.x = Math.min(Math.max(o.x, 0), worldWidth - 1);
-			o.y = Math.min(Math.max(o.y, 0), worldHeight - 1);
+			ao.x = Math.min(Math.max(ao.x, 0), worldWidth - 1);
+			ao.y = Math.min(Math.max(ao.y, 0), worldHeight - 1);
 
-			// eat food
-			// synchronized (worldLock) {
-			o.postRoundTrigger();
-			// }
+			//execute collisions
+			int r = ao.getCollisionRadius();
+			for(World2dObject o : objects)
+				if ((o.x >= (ao.x - r)) && (o.x <= (ao.x + r))
+						&& (o.y >= (ao.y - r)) && (o.y <= (ao.y + r)))
+					ao.collision(o);
 		}
 	}
 
 	@Override
 	public final void resetState()
 	{
+		objects.clear();
+		animatableObjects.clear();
+
 		if (food.size() != foodCount)
 		{
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
 				food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
 		} else for (Food f : food)
+		{
 			f.randomPosition();
-
-		objects.clear();
-		animatableObjects.clear();
+			registerObject(f);
+		}
 	}
 
 	public Food findNearestFood(Point.Double p)
@@ -128,11 +133,18 @@ public class World2d implements World
 	}
 
 
-	public void addObject(World2dObject object)
+	public synchronized void registerObject(World2dObject object)
 	{
 		objects.add(object);
 		if(object instanceof AnimatableObject)
 			animatableObjects.add((AnimatableObject)object);
+	}
+
+	public synchronized void unregisterObject(World2dObject object)
+	{
+		objects.remove(object);
+		if(object instanceof AnimatableObject)
+			animatableObjects.remove(object);
 	}
 
 	public int getWidth()

@@ -17,6 +17,8 @@ public class Food extends World2dObject
 	{
 		super(world, x, y, 0.0);
 		this.rnd = rnd;
+		if(world != null)
+			world.registerObject(this);
 	}
 
 	public void randomPosition()

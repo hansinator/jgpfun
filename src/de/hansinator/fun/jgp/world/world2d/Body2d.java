@@ -15,6 +15,8 @@ import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
 public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
 {
+	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
+
 	protected static final Random rnd = Settings.newRandomSource();
 
 	@SuppressWarnings("unchecked")
@@ -86,7 +88,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
-		world.addObject(this);
+		world.registerObject(this);
 	}
 
 	@Override
@@ -114,11 +116,6 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		for (BodyPart<World2d> p : parts)
 			p.applyOutputs();
 	}
-
-	@Override
-	public abstract void postRoundTrigger();
-
-	public abstract void collision(World2dObject object);
 
 	@Override
 	public void draw(Graphics g)
@@ -150,6 +147,12 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 
 		g.setColor(Color.green);
 		g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
+	}
+
+	@Override
+	public int getCollisionRadius()
+	{
+		return bodyCollisionRadius;
 	}
 
 	public class OrientationSense implements SensorInput, BodyPart<World2d>
