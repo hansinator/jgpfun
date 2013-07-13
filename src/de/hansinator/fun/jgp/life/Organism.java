@@ -23,7 +23,9 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	protected static final Random rnd = Settings.newRandomSource();
 
-	protected final OrganismGene<E> genome;
+	private final OrganismGene<E> genome;
+
+	public final FitnessEvaluator fitnessEvaluator;
 
 	@SuppressWarnings("unchecked")
 	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
@@ -32,14 +34,12 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	private CountDownLatch cb;
 
-	private int fitness;
-
 	private int inputCount;
 
-	public Organism(OrganismGene<E> genome)
+	public Organism(OrganismGene<E> genome, FitnessEvaluator evaluator)
 	{
 		this.genome = genome;
-		this.fitness = 0;
+		this.fitnessEvaluator = evaluator;
 	}
 
 
@@ -98,12 +98,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	public int getFitness()
 	{
-		return fitness;
-	}
-
-	public void incFitness()
-	{
-		fitness++;
+		return fitnessEvaluator.getFitness();
 	}
 
 	public OrganismGene<E> getGenome()

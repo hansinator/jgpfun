@@ -46,7 +46,7 @@ public class World2d implements World
 	}
 
 	@Override
-	public void animate(/* Object worldLock */)
+	public void animate()
 	{
 		// TODO: have a more compex world, add a barrier in the middle of the
 		// screen

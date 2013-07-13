@@ -2,6 +2,7 @@ package de.hansinator.fun.jgp.life;
 
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 /*
  * XXX refactor this into a Gene (OrganismGene) somehow
@@ -13,21 +14,24 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 
 	private final IOUnit.Gene<E> bodyGene;
 
+	private final FitnessEvaluator fitnessEvaluator;
+
 	private int fitness;
 
 	private int exonSize;
 
-	public OrganismGene(IOUnit.Gene<E> bodyGene, ExecutionUnit.Gene brainGene)
+	public OrganismGene(IOUnit.Gene<E> bodyGene, ExecutionUnit.Gene brainGene, FitnessEvaluator evaluator)
 	{
 		this.brainGene = brainGene;
 		this.bodyGene = bodyGene;
+		this.fitnessEvaluator = evaluator;
 	}
 
 
 	@Override
 	public OrganismGene<E> replicate()
 	{
-		return new OrganismGene<E>(bodyGene, brainGene.replicate());
+		return new OrganismGene<E>(bodyGene, brainGene.replicate(), fitnessEvaluator.replicate());
 	}
 
 
@@ -88,11 +92,15 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 		int i, o, x;
 
 		// create organism
-		Organism<E> org = new Organism<E>(this);
+		Organism<E> org = new Organism<E>(this, fitnessEvaluator);
 
 		// create and attach body
 		IOUnit<E>[] bodies = new IOUnit[] { bodyGene.express(org) };
 		org.setIOUnits(bodies);
+
+		//XXX move this somewhere else
+		//listen for collsions
+		((Body2d)bodies[0]).addCollisionListener(fitnessEvaluator);
 
 		// count I/O ports
 		for(x = 0, i = 0, o = 0; x < bodies.length; x++)

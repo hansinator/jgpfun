@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.world.World;
@@ -79,12 +80,12 @@ public class WorldSimulation
 		long lastStatTime = start;
 		int lastStatRound = 0;
 		Organism[] organisms = new Organism[generation.length];
+		FitnessEvaluator[] evaluators = new FitnessEvaluator[generation.length];
 
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
 		{
-			Organism o = generation[i].express(world);
-			organisms[i] = o;
+			organisms[i] = generation[i].express(world);
 		}
 
 		synchronized (runLock)
@@ -95,7 +96,7 @@ public class WorldSimulation
 				while (paused)
 					Thread.yield();
 
-				singleStep(organisms);
+				singleStep(organisms, evaluators);
 
 				// calc stats and draw stuff
 				// TODO: try to decouple this from pure generation running
@@ -156,7 +157,7 @@ public class WorldSimulation
 	 * @param organisms
 	 */
 	@SuppressWarnings("rawtypes")
-	private void singleStep(Organism[] organisms)
+	private void singleStep(Organism[] organisms, FitnessEvaluator[] evaluators)
 	{
 		final CountDownLatch cb = new CountDownLatch(organisms.length);
 

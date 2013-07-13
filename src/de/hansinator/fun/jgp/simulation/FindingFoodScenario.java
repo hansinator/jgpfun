@@ -7,6 +7,7 @@ import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.OrganismGene;
@@ -15,7 +16,10 @@ import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
+import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
@@ -37,7 +41,7 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public OrganismGene<World2d> randomGenome()
 	{
-		return new OrganismGene<World2d>(new FoodFinderAntGene(), LGPGene.randomGene(progSize));
+		return new OrganismGene<World2d>(new LocatorAntGene(), LGPGene.randomGene(progSize), new FoodFitnessEvaluator());
 	}
 
 	@Override
@@ -78,7 +82,7 @@ public class FindingFoodScenario implements Scenario
 		}
 	}
 
-	public class FoodFinderAntGene implements IOUnit.Gene<World2d>
+	public class LocatorAntGene implements IOUnit.Gene<World2d>
 	{
 		@SuppressWarnings("unchecked")
 		@Override
@@ -92,7 +96,7 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public FoodFinderAntGene replicate()
+		public LocatorAntGene replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;
@@ -101,6 +105,36 @@ public class FindingFoodScenario implements Scenario
 		@Override
 		public void mutate()
 		{
+		}
+	}
+
+	public class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
+	{
+		private int fitness = 0;
+
+		@SuppressWarnings("rawtypes")
+		private Organism organism = null;
+
+		@Override
+		public int getFitness()
+		{
+			return fitness;
+		}
+
+		@Override
+		public FitnessEvaluator replicate()
+		{
+			return new FoodFitnessEvaluator();
+		}
+
+		@Override
+		public void onCollision(World2dObject a, World2dObject b)
+		{
+			if (b instanceof Food)
+			{
+				fitness++;
+				((Food) b).randomPosition();
+			}
 		}
 	}
 }
