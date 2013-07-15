@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.geom.Point2D;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
@@ -150,5 +152,31 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	public void attachEvaluationState(World2d world)
 	{
 		this.world = world;
+	}
+
+	public class Gene implements IOUnit.Gene<World2d>
+	{
+
+		@Override
+		public void mutate()
+		{
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public de.hansinator.fun.jgp.life.IOUnit.Gene<World2d> replicate()
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public IOUnit<World2d> express(Organism<World2d> context)
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 }

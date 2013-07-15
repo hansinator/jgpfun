@@ -40,6 +40,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	{
 		this.genome = genome;
 		this.fitnessEvaluator = evaluator;
+		evaluator.attach(this);
 	}
 
 
@@ -145,5 +146,11 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		// attach bodies to world state
 		for (int x = 0; x < ioUnits.length; x++)
 			ioUnits[x].attachEvaluationState(world);
+	}
+
+
+	public IOUnit[] getIOUnits()
+	{
+		return ioUnits;
 	}
 }

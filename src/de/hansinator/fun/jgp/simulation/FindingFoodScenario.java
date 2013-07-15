@@ -3,6 +3,9 @@
 
 package de.hansinator.fun.jgp.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
@@ -112,8 +115,7 @@ public class FindingFoodScenario implements Scenario
 	{
 		private int fitness = 0;
 
-		@SuppressWarnings("rawtypes")
-		private Organism organism = null;
+		private List<Body2d> bodies;
 
 		@Override
 		public int getFitness()
@@ -135,6 +137,16 @@ public class FindingFoodScenario implements Scenario
 				fitness++;
 				((Food) b).randomPosition();
 			}
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public void attach(Organism organism)
+		{
+			bodies = new ArrayList<Body2d>();
+			for(IOUnit u : organism.getIOUnits())
+				if(u instanceof Body2d)
+					bodies.add((Body2d)u);
 		}
 	}
 }
