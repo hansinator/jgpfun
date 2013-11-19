@@ -24,7 +24,10 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
+import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
@@ -44,7 +47,18 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public OrganismGene<World2d> randomGenome()
 	{
-		return new OrganismGene<World2d>(new LocatorAntGene(), LGPGene.randomGene(progSize), new FoodFitnessEvaluator());
+		AntBody.Gene bodyGene = new AntBody.Gene();
+		bodyGene.children.add(new RadarSense.Gene());
+		// add body.locator as a gene somehow (internal locator stuff) instead of radargene for LocatorAnts
+		bodyGene.children.add(new OrientationSense.Gene());
+		bodyGene.children.add(new SpeedSense.Gene());
+		bodyGene.children.add(new WallSense.Gene());
+		bodyGene.children.add(new TankMotor.Gene());
+		
+		OrganismGene<World2d> organismGene = new OrganismGene<World2d>(LGPGene.randomGene(progSize), new FoodFitnessEvaluator());
+		organismGene.bodyGenes.add(bodyGene);
+		
+		return organismGene;
 	}
 
 	@Override
@@ -59,57 +73,6 @@ public class FindingFoodScenario implements Scenario
 		return new TournamentSelector(3);
 	}
 
-	public class RadarAntGene implements IOUnit.Gene<World2d>
-	{
-		@SuppressWarnings("unchecked")
-		@Override
-		public IOUnit<World2d> express(Organism organism)
-		{
-			// create body and attach parts
-			Body2d body = new AntBody(organism);
-			final BodyPart<World2d>[] parts = new BodyPart[] { new RadarSense(body), body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body)};
-			body.setParts(parts);
-			return body;
-		}
-
-		@Override
-		public RadarAntGene replicate()
-		{
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void mutate()
-		{
-		}
-	}
-
-	public class LocatorAntGene implements IOUnit.Gene<World2d>
-	{
-		@SuppressWarnings("unchecked")
-		@Override
-		public IOUnit<World2d> express(Organism organism)
-		{
-			// create body and attach parts
-			AntBody body = new AntBody(organism);
-			final BodyPart<World2d>[] parts = new BodyPart[] { body.locator, body.new OrientationSense(), body.new SpeedSense(), new WallSense(body), new TankMotor(body) };
-			body.setParts(parts);
-			return body;
-		}
-
-		@Override
-		public LocatorAntGene replicate()
-		{
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void mutate()
-		{
-		}
-	}
 
 	public class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
 	{

@@ -1,18 +1,23 @@
 package de.hansinator.fun.jgp.life;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.genetics.Gene;
+import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 /*
  * XXX refactor this into a Gene (OrganismGene) somehow
  */
-public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
+public class OrganismGene<E extends World> extends BaseGene<ExecutionUnit, E>
 {
 
-	private final ExecutionUnit.Gene brainGene;
+	private final LGPGene brainGene;
 
-	private final IOUnit.Gene<E> bodyGene;
+	public final List<IOUnit.Gene<Organism<E>>> bodyGenes = new ArrayList<IOUnit.Gene<Organism<E>>>();
 
 	private final FitnessEvaluator fitnessEvaluator;
 
@@ -20,10 +25,10 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 
 	private int exonSize;
 
-	public OrganismGene(IOUnit.Gene<E> bodyGene, ExecutionUnit.Gene brainGene, FitnessEvaluator evaluator)
+	public OrganismGene(LGPGene brainGene, FitnessEvaluator evaluator, int mutationChance)
 	{
+		super(mutationChance);
 		this.brainGene = brainGene;
-		this.bodyGene = bodyGene;
 		this.fitnessEvaluator = evaluator;
 	}
 
@@ -31,7 +36,12 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 	@Override
 	public OrganismGene<E> replicate()
 	{
-		return new OrganismGene<E>(bodyGene, brainGene.replicate(), fitnessEvaluator.replicate());
+		OrganismGene<E> og = new OrganismGene<E>(brainGene.replicate(), fitnessEvaluator.replicate(), mutationChance);
+		
+		for(IOUnit.Gene<Organism<E>> bg : bodyGenes)
+			og.bodyGenes.add(bg.replicate());
+		
+		return og;
 	}
 
 
@@ -76,18 +86,11 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 	{
 		this.exonSize = exonSize;
 	}
-
-
-	@Override
-	public void mutate()
-	{
-		brainGene.mutate();
-	}
-
+	
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Organism<E> express(E context)
+	public ExecutionUnit express(E context)
 	{
 		int i, o, x;
 
@@ -142,5 +145,12 @@ public class OrganismGene<E extends World> implements Gene<Organism<E>, E>
 
 		// return assembled organism
 		return org;
+	}
+
+
+	@Override
+	public List<Gene<?, ?>> getChildren() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

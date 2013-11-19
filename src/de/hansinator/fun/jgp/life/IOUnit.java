@@ -3,7 +3,7 @@ package de.hansinator.fun.jgp.life;
 import de.hansinator.fun.jgp.world.World;
 
 
-public interface IOUnit<E extends World>
+public interface IOUnit<E>
 {
 	@SuppressWarnings("rawtypes")
 	public static IOUnit[] emptyIOUnitArray = {};
@@ -18,12 +18,12 @@ public interface IOUnit<E extends World>
 
 	public ActorOutput[] getOutputs();
 
-	public interface Gene<E extends World> extends de.hansinator.fun.jgp.genetics.Gene<IOUnit<E>, Organism<E>>
+	public interface Gene<E> extends de.hansinator.fun.jgp.genetics.Gene<IOUnit<E>, E>
 	{
 		@Override
 		public Gene<E> replicate();
 
 		@Override
-		public IOUnit<E> express(Organism<E> context);
+		public IOUnit<E> express(E context);
 	}
 }

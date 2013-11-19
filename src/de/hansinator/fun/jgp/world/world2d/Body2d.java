@@ -6,30 +6,30 @@ import java.awt.Polygon;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
+public abstract class Body2d extends AnimatableObject implements DrawablePart<Organism<World2d>>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
 	protected static final Random rnd = Settings.newRandomSource();
 
 	@SuppressWarnings("unchecked")
-	protected BodyPart<World2d>[] parts = BodyPart.emptyBodyPartArray;
+	protected IOUnit<Body2d>[] parts = BodyPart.emptyBodyPartArray;
 
 	@SuppressWarnings("unchecked")
-	protected BodyPart.DrawablePart<World2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
+	protected BodyPart.DrawablePart<Body2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
 
 	protected SensorInput[] inputs;
 
 	protected ActorOutput[] outputs;
 
-	protected final Organism<World2d> organism;
+	public final Organism<World2d> organism;
 
 	public double lastSpeed = 0.0;
 
@@ -43,7 +43,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setParts(BodyPart<World2d>[] parts)
+	public void setParts(IOUnit<Body2d>[] parts)
 	{
 		int i, o, d, x;
 
@@ -76,19 +76,20 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 
 			// collect drawable parts
 			if (parts[x] instanceof BodyPart.DrawablePart)
-				drawableParts[d++]= (BodyPart.DrawablePart<World2d>) parts[x];
+				drawableParts[d++]= (BodyPart.DrawablePart<Body2d>) parts[x];
 		}
 	}
 
 	@Override
-	public void attachEvaluationState(World2d world)
+	public void attachEvaluationState(Organism<World2d> context)
 	{
-		for(BodyPart<World2d> part : parts)
-			part.attachEvaluationState(world);
+		for(IOUnit<Body2d> part : parts)
+			part.attachEvaluationState(this);
+		
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
-		world.registerObject(this);
+		context.world.registerObject(this);
 	}
 
 	@Override
@@ -106,14 +107,14 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	@Override
 	public void sampleInputs()
 	{
-		for (BodyPart<World2d> p : parts)
+		for (IOUnit<Body2d> p : parts)
 			p.sampleInputs();
 	}
 
 	@Override
 	public void applyOutputs()
 	{
-		for (BodyPart<World2d> p : parts)
+		for (IOUnit<Body2d> p : parts)
 			p.applyOutputs();
 	}
 
@@ -129,7 +130,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		final double x_bottom = x - x_len_displace;
 		final double y_bottom = y + y_len_displace;
 
-		for (BodyPart.DrawablePart<World2d> part : drawableParts)
+		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
 			part.draw(g);
 
 		Polygon p = new Polygon();
@@ -153,84 +154,5 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	public int getCollisionRadius()
 	{
 		return bodyCollisionRadius;
-	}
-
-	public class OrientationSense implements SensorInput, BodyPart<World2d>
-	{
-
-		SensorInput[] inputs = { this };
-
-		@Override
-		public int get()
-		{
-			// could also be sin
-			return (int) (Math.cos(dir) * Simulator.intScaleFactor);
-		}
-
-		@Override
-		public SensorInput[] getInputs()
-		{
-			return inputs;
-		}
-
-		@Override
-		public ActorOutput[] getOutputs()
-		{
-			return ActorOutput.emptyActorOutputArray;
-		}
-
-		@Override
-		public void sampleInputs()
-		{
-		}
-
-		@Override
-		public void applyOutputs()
-		{
-		}
-
-		@Override
-		public void attachEvaluationState(World2d world)
-		{
-		}
-	}
-
-	public class SpeedSense implements SensorInput, BodyPart<World2d>
-	{
-
-		SensorInput[] inputs = { this };
-
-		@Override
-		public int get()
-		{
-			return (int) (lastSpeed * Simulator.intScaleFactor);
-		}
-
-		@Override
-		public SensorInput[] getInputs()
-		{
-			return inputs;
-		}
-
-		@Override
-		public ActorOutput[] getOutputs()
-		{
-			return ActorOutput.emptyActorOutputArray;
-		}
-
-		@Override
-		public void sampleInputs()
-		{
-		}
-
-		@Override
-		public void applyOutputs()
-		{
-		}
-
-		@Override
-		public void attachEvaluationState(World2d world)
-		{
-		}
 	}
 }

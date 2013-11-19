@@ -1,32 +1,27 @@
 package de.hansinator.fun.jgp.life.lgp;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.life.lgp.operations.BranchOperation;
+import de.hansinator.fun.jgp.world.World;
 
 /**
  * 
  * @author hansinator
  */
-public class BranchVM extends LGPMachine
+public class BranchVM<E extends World> extends LGPMachine<E>
 {
-	private final OpCode[] program;
 
-	private SensorInput[] inputs = SensorInput.emptySensorInputArray;
-
-	private ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
-
-	public BranchVM(int numRegs, int numInputRegs, OpCode[] program)
+	public BranchVM(OrganismGene<E> genome, FitnessEvaluator evaluator, int numRegs, int numInputRegs, OpCode[] program)
 	{
-		regs = new int[numRegs];
-
 		// normalize program and strip strctural intron code portions
-		this.program = EvoCodeUtils
-				.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs);
+		super(genome, evaluator, numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
 	}
 
 	@Override
-	public void run()
+	public void execute()
 	{
 		int reg = 0, pc = 0;
 
@@ -50,29 +45,5 @@ public class BranchVM extends LGPMachine
 		// write output values
 		for (ActorOutput out : outputs)
 			out.set(regs[reg++]);
-	}
-
-	@Override
-	public int getProgramSize()
-	{
-		return program.length;
-	}
-
-	@Override
-	public void setInputs(SensorInput[] inputs)
-	{
-		this.inputs = inputs;
-	}
-
-	@Override
-	public void setOutputs(ActorOutput[] outputs)
-	{
-		this.outputs = outputs;
-	}
-
-	@Override
-	public int getInputCount()
-	{
-		return inputs.length;
 	}
 }

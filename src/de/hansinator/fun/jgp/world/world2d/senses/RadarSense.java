@@ -3,13 +3,14 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
+import java.util.List;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
@@ -18,7 +19,7 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
  * 
  * @author Hansinator
  */
-public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<World2d>
+public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>
 {
 
 	private final World2dObject origin;
@@ -31,8 +32,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 	public Point2D target = null;
 
-	public final SensorInput senseDirection = new SensorInput()
-	{
+	public final SensorInput senseDirection = new SensorInput() {
 
 		@Override
 		public int get()
@@ -149,33 +149,48 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	}
 
 	@Override
-	public void attachEvaluationState(World2d world)
+	public void attachEvaluationState(Body2d context)
 	{
-		this.world = world;
+		this.world = context.organism.world;
 	}
 
-	public class Gene implements IOUnit.Gene<World2d>
+	public static class Gene implements IOUnit.Gene<Body2d>
 	{
 
 		@Override
 		public void mutate()
 		{
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
-		public de.hansinator.fun.jgp.life.IOUnit.Gene<World2d> replicate()
+		public List<de.hansinator.fun.jgp.genetics.Gene<?, ?>> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public IOUnit<World2d> express(Organism<World2d> context)
+		public void setMutationChance(int mutationChance)
+		{
+		}
+
+		@Override
+		public int getMutationChance()
+		{
+			return 0;
+		}
+
+		@Override
+		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+		@Override
+		public IOUnit<Body2d> express(Body2d context)
+		{
+			return new RadarSense(context);
 		}
 
 	}

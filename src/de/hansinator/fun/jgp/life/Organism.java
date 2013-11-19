@@ -18,10 +18,14 @@ import de.hansinator.fun.jgp.world.World;
  * of an output. Also create an integrator. This should ease temporal
  * memory functions.
  */
-public class Organism<E extends World> implements Comparable<Organism<E>>, Runnable
+public abstract class Organism<E extends World> implements Comparable<Organism<E>>, Runnable, ExecutionUnit
 {
 
 	protected static final Random rnd = Settings.newRandomSource();
+
+	protected SensorInput[] inputs = SensorInput.emptySensorInputArray;
+
+	protected ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
 
 	private final OrganismGene<E> genome;
 
@@ -30,11 +34,11 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	@SuppressWarnings("unchecked")
 	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
 
-	private ExecutionUnit brain;
-
 	private CountDownLatch cb;
 
 	private int inputCount;
+	
+	public E world;
 
 	public Organism(OrganismGene<E> genome, FitnessEvaluator evaluator)
 	{
@@ -83,6 +87,12 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		live();
 	}
 
+	/**
+	 * Execute the program
+	 */
+	@Override
+	public abstract void execute();
+
 	//XXX i need some computation graph to replace this call sequence
 	private void live()
 	{
@@ -90,7 +100,7 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		for (IOUnit<E> u : ioUnits)
 			u.sampleInputs();
 
-		brain.run();
+		execute();
 
 		// apply outputs (move motor etc)
 		for (IOUnit<E> u : ioUnits)
@@ -113,21 +123,6 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
 
-	public void setExecutionUnit(ExecutionUnit brain)
-	{
-		this.brain = brain;
-	}
-
-	public int getInputCount()
-	{
-		return inputCount;
-	}
-
-	public int getProgramSize()
-	{
-		return brain.getProgramSize();
-	}
-
 	/*
 	 *sometime later io units may be generalized to be attached to an organism/evaluation(sub)state
 	 */
@@ -143,6 +138,8 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 
 	public void addToWorld(E world)
 	{
+		this.world = world;
+		
 		// attach bodies to world state
 		for (int x = 0; x < ioUnits.length; x++)
 			ioUnits[x].attachEvaluationState(world);
@@ -152,5 +149,23 @@ public class Organism<E extends World> implements Comparable<Organism<E>>, Runna
 	public IOUnit[] getIOUnits()
 	{
 		return ioUnits;
+	}
+
+	@Override
+	public void setInputs(SensorInput[] inputs)
+	{
+		this.inputs = inputs;
+	}
+
+	@Override
+	public void setOutputs(ActorOutput[] outputs)
+	{
+		this.outputs = outputs;
+	}
+
+	@Override
+	public int getInputCount()
+	{
+		return inputs.length;
 	}
 }

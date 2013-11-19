@@ -1,6 +1,8 @@
 package de.hansinator.fun.jgp.life.lgp;
 
-import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
+import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.lgp.operations.OpAbs;
 import de.hansinator.fun.jgp.life.lgp.operations.OpAdd;
 import de.hansinator.fun.jgp.life.lgp.operations.OpDiv;
@@ -14,12 +16,13 @@ import de.hansinator.fun.jgp.life.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
 import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.world.World;
 
 /**
  * 
  * @author hansinator
  */
-public abstract class LGPMachine implements ExecutionUnit
+public abstract class LGPMachine<E extends World> extends Organism<E>
 {
 
 	// compatible instruction set
@@ -40,18 +43,33 @@ public abstract class LGPMachine implements ExecutionUnit
 
 	public int[] regs;
 
+	protected final OpCode[] program;
+
+	public LGPMachine(OrganismGene<E> genome, FitnessEvaluator evaluator, int numRegs, OpCode[] program)
+	{
+		super(genome, evaluator);
+		this.regs = new int[numRegs];
+		this.program = program;
+	}
+
+	@Override
+	public int getProgramSize()
+	{
+		return program.length;
+	}
+
 	protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
 	{
 		for (int i = 0; i < program.length; i++)
 		{
 			OpCode curop = program[i];
 
-			curop.src1 = Math.abs(curop.src1) % numRegs;
-			curop.src2 = curop.immediate ? (curop.src2 / (int) Simulator.intScaleFactor)
-					: (Math.abs(curop.src2) % numRegs);
-			curop.trg = Math.abs(curop.trg) % numRegs;
-			curop.op = Math.abs(curop.op) % ops.length;
-			curop.operation = ops[curop.op];
+			curop.src1.setValue(Math.abs(curop.src1.getValue()) % numRegs);
+			curop.src2.setValue(curop.immediate.getValue() ? (curop.src2.getValue() / (int) Simulator.intScaleFactor)
+					: (Math.abs(curop.src2.getValue()) % numRegs));
+			curop.trg.setValue(Math.abs(curop.trg.getValue()) % numRegs);
+			curop.op.setValue(Math.abs(curop.op.getValue()) % ops.length);
+			curop.operation = ops[curop.op.getValue()];
 		}
 
 		return program;

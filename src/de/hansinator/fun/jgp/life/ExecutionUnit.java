@@ -6,18 +6,9 @@ public interface ExecutionUnit
 
 	public void setOutputs(ActorOutput[] outputs);
 
-	public void run();
+	public void execute();
 
 	public int getProgramSize();
 
 	public int getInputCount();
-
-	@SuppressWarnings("rawtypes")
-	public interface Gene extends de.hansinator.fun.jgp.genetics.Gene<ExecutionUnit, Organism>
-	{
-		@Override
-		public Gene replicate();
-
-		public int size();
-	}
 }
