@@ -37,7 +37,9 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	 * Also I don't like the fitness evaluator being attached to this class.
 	 * Fitness evaluation should be decoupled from the function of the unit
 	 * to be evaluated. Furthermore the getFitness path should not be through
-	 * any element of the evaluation unit.
+	 * any element of the evaluation unit, as the fitness value is something
+	 * that is inherent to the genome or more specifically to a pair of genome
+	 * and a concrete evaluation enviroment.
 	 * 
 	 */
 

@@ -14,7 +14,6 @@ import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
@@ -103,7 +102,7 @@ public class FindingFoodScenario implements Scenario
 
 		@SuppressWarnings("rawtypes")
 		@Override
-		public void attach(Organism organism)
+		public void attach(Body2d organism)
 		{
 			bodies = new ArrayList<Body2d>();
 			for(IOUnit u : organism.getIOUnits())

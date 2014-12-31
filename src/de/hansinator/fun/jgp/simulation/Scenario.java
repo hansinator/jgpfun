@@ -14,7 +14,7 @@ public interface Scenario
 
 	public WorldSimulation getSimulation();
 
-	public BaseGene<ExecutionUnit, World2d> randomGenome();
+	public BaseGene<ExecutionUnit<World2d>, World2d> randomGenome();
 
 	public CrossoverOperator getCrossoverOperator();
 
