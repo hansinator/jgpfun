@@ -6,14 +6,14 @@ import java.awt.Polygon;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends AnimatableObject implements DrawablePart<Organism<World2d>>
+public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
@@ -29,17 +29,17 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Or
 
 	protected ActorOutput[] outputs;
 
-	public final Organism<World2d> organism;
+	public final ExecutionUnit<World2d> parent;
 
 	public double lastSpeed = 0.0;
 
 	public volatile boolean tagged = false;
 
-	public Body2d(Organism<World2d> organism, double x, double y, double dir)
+	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
 		// TODO: fix null pointer
 		super(null, x, y, dir);
-		this.organism = organism;
+		this.parent = parent;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -81,15 +81,17 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Or
 	}
 
 	@Override
-	public void attachEvaluationState(Organism<World2d> context)
+	public void attachEvaluationState(World2d context)
 	{
+		this.world = context;
+		
 		for(IOUnit<Body2d> part : parts)
 			part.attachEvaluationState(this);
 		
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
-		context.world.registerObject(this);
+		context.registerObject(this);
 	}
 
 	@Override
@@ -154,5 +156,10 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Or
 	public int getCollisionRadius()
 	{
 		return bodyCollisionRadius;
+	}
+	
+	public World2d getWorld()
+	{
+		return world;
 	}
 }

@@ -77,11 +77,11 @@ class EvoCodeUtils
 				if (!(memVal.operation instanceof NoSourceOperation))
 				{
 					// add source operand 1
-					effectiveRegisters.put(memVal.src1, dummy);
+					effectiveRegisters.put(memVal.src1.getValue(), dummy);
 
 					// add source operand 2, if it is no immediate or unary operation
-					if (!(memVal.immediate || memVal.operation instanceof UnaryOperation))
-						effectiveRegisters.put(memVal.src2, dummy);
+					if (!(memVal.immediate.getValue() || memVal.operation instanceof UnaryOperation))
+						effectiveRegisters.put(memVal.src2.getValue(), dummy);
 
 					// mark the instruction as effective
 					markers[i] = true;

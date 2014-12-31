@@ -151,7 +151,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	@Override
 	public void attachEvaluationState(Body2d context)
 	{
-		this.world = context.organism.world;
+		this.world = context.getWorld();
 	}
 
 	public static class Gene implements IOUnit.Gene<Body2d>

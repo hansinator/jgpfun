@@ -6,17 +6,17 @@ package de.hansinator.fun.jgp.simulation;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
@@ -25,7 +25,6 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
@@ -45,7 +44,7 @@ public class FindingFoodScenario implements Scenario
 	}
 
 	@Override
-	public OrganismGene<World2d> randomGenome()
+	public BaseGene<ExecutionUnit, World2d> randomGenome()
 	{
 		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.children.add(new RadarSense.Gene());
@@ -55,8 +54,8 @@ public class FindingFoodScenario implements Scenario
 		bodyGene.children.add(new WallSense.Gene());
 		bodyGene.children.add(new TankMotor.Gene());
 		
-		OrganismGene<World2d> organismGene = new OrganismGene<World2d>(LGPGene.randomGene(progSize), new FoodFitnessEvaluator());
-		organismGene.bodyGenes.add(bodyGene);
+		LGPGene organismGene = LGPGene.randomGene(new FoodFitnessEvaluator(), progSize);
+		organismGene.ioGenes.add(bodyGene);
 		
 		return organismGene;
 	}

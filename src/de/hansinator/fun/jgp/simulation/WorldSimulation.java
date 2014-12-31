@@ -6,12 +6,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.life.OrganismGene;
+import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
@@ -48,7 +51,8 @@ public class WorldSimulation
 
 	public static final int ROUNDS_PER_GENERATION = 4000;
 
-	//XXX distinguish only between generational and continuous simulation, not world and mona lisa; mona lisa needs to be implemented by a scenario only
+	// XXX distinguish only between generational and continuous simulation, not
+	// world and mona lisa; mona lisa needs to be implemented by a scenario only
 	public WorldSimulation(World world)
 	{
 		this.world = world;
@@ -74,19 +78,16 @@ public class WorldSimulation
 	 * re-entrance
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public OrganismGene[] evaluate(Simulator simulator, OrganismGene[] generation, MainView mainView, InfoPanel infoPanel)
+	public LGPGene[] evaluate(Simulator simulator, LGPGene[] generation, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		Organism[] organisms = new Organism[generation.length];
-		FitnessEvaluator[] evaluators = new FitnessEvaluator[generation.length];
+		ExecutionUnit[] organisms = new ExecutionUnit[generation.length];
 
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
-		{
-			organisms[i] = generation[i].express(world);
-		}
+			organisms[i] = generation[i].express((World2d) world);
 
 		synchronized (runLock)
 		{
@@ -96,7 +97,7 @@ public class WorldSimulation
 				while (paused)
 					Thread.yield();
 
-				singleStep(organisms, evaluators);
+				singleStep(organisms);
 
 				// calc stats and draw stuff
 				// TODO: try to decouple this from pure generation running
@@ -115,12 +116,12 @@ public class WorldSimulation
 
 					if (slowMode && (time < (1000 / fpsMax)))
 						try
-					{
+						{
 							Thread.sleep((1000 / fpsMax) - time);
-					} catch (InterruptedException ex)
-					{
-						Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
-					}
+						} catch (InterruptedException ex)
+						{
+							Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
+						}
 				}
 			}
 		}
@@ -133,9 +134,9 @@ public class WorldSimulation
 		world.resetState();
 
 		// update and return evaluated generation
-		for(Organism o : organisms)
+		for (ExecutionUnit o : organisms)
 		{
-			OrganismGene g = o.getGenome();
+			LGPGene g = (LGPGene) o.getGenome();
 			g.setFitness(o.getFitness());
 			g.setExonSize(o.getProgramSize());
 		}
@@ -157,13 +158,38 @@ public class WorldSimulation
 	 * @param organisms
 	 */
 	@SuppressWarnings("rawtypes")
-	private void singleStep(Organism[] organisms, FitnessEvaluator[] evaluators)
+	private void singleStep(ExecutionUnit[] organisms)
 	{
 		final CountDownLatch cb = new CountDownLatch(organisms.length);
 
-		// evaluate each organism
-		for (final Organism organism : organisms)
-			organism.evaluate(cb, pool);
+		/*
+		 * Evaluate each organism non-blocking as a thread using an
+		 * ExecutorService. The count-down latch will be count down when the
+		 * organism is done living one round.
+		 * 
+		 * Use an anonymous runnable here to decouple threading logic from
+		 * the unit under evaluation. It doesn't make me happy but it's not
+		 * as ugly as having each organism implement runnable.
+		 */
+		for (final ExecutionUnit unit : organisms)
+		{
+			pool.execute(new Runnable() {
+				
+				@Override
+				public void run()
+				{
+					try
+					{
+						unit.execute();
+					} catch (Exception ex)
+					{
+						Logger.getLogger(ExecutionUnit.class.getName()).log(Level.SEVERE, null, ex);
+					}
+
+					cb.countDown();
+				}
+			});
+		}
 
 		// wait for all organisms to finish
 		try

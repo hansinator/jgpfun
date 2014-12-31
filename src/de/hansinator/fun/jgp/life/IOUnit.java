@@ -1,6 +1,5 @@
 package de.hansinator.fun.jgp.life;
 
-import de.hansinator.fun.jgp.world.World;
 
 
 public interface IOUnit<E>

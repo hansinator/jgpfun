@@ -77,8 +77,8 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void attachEvaluationState(Body2d context)
 	{
-		this.worldWidth = Math.floor(context.organism.world.getWidth());
-		this.worldHeight = Math.floor(context.organism.world.getHeight());
+		this.worldWidth = Math.floor(context.getWorld().getWidth());
+		this.worldHeight = Math.floor(context.getWorld().getHeight());
 	}
 	
 	public static class Gene implements IOUnit.Gene<Body2d>

@@ -1,8 +1,9 @@
 package de.hansinator.fun.jgp.life.lgp;
 
+import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
-import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.World;
 
@@ -12,14 +13,14 @@ import de.hansinator.fun.jgp.world.World;
  */
 public class EvoVM<E extends World> extends LGPMachine<E>
 {
-	public EvoVM(OrganismGene<E> genome, FitnessEvaluator evaluator, int numRegs, int numInputRegs, OpCode[] program)
+	public EvoVM(BaseGene<ExecutionUnit<E>, E> genome, FitnessEvaluator evaluator, int numRegs, int numInputRegs, OpCode[] program)
 	{
 		// normalize program and strip strctural intron code portions
 		super(genome, evaluator, numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
 	}
 
 	@Override
-	public void execute()
+	public void step()
 	{
 		int reg = 0, pc = 0;
 

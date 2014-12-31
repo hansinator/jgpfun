@@ -3,8 +3,8 @@ package de.hansinator.fun.jgp.world.world2d;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 
 /**
@@ -16,7 +16,7 @@ public class AntBody extends Body2d
 	public final ObjectLocator locator;
 
 
-	public AntBody(Organism<World2d> organism)
+	public AntBody(ExecutionUnit<World2d> organism)
 	{
 		super(organism, 0.0, 0.0, 0.0);
 
@@ -24,7 +24,7 @@ public class AntBody extends Body2d
 		locator = new ObjectLocator(this);
 	}
 	
-	public static class Gene implements IOUnit.Gene<Organism<World2d>>
+	public static class Gene implements IOUnit.Gene<ExecutionUnit<World2d>>
 	{
 		
 		public List<IOUnit.Gene<Body2d>> children = new ArrayList<IOUnit.Gene<Body2d>>();
@@ -53,16 +53,16 @@ public class AntBody extends Body2d
 		}
 
 		@Override
-		public de.hansinator.fun.jgp.life.IOUnit.Gene<Organism<World2d>> replicate()
+		public de.hansinator.fun.jgp.life.IOUnit.Gene<ExecutionUnit<World2d>> replicate()
 		{
 			return null;
 		}
 
 		@Override
-		public IOUnit<Organism<World2d>> express(Organism<World2d> context)
+		public IOUnit<ExecutionUnit<World2d>> express(ExecutionUnit<World2d> context)
 		{
 			AntBody body = new AntBody(context);
-			IOUnit<Body2d>[] parts = new IOUnit[children.size()];
+			IOUnit<ExecutionUnit<World2d>>[] parts = new IOUnit[children.size()];
 			int i = 0;
 			
 			for(IOUnit.Gene<Body2d> gene : children)

@@ -6,5 +6,5 @@ public interface FitnessEvaluator
 
 	FitnessEvaluator replicate();
 
-	void attach(Organism organism);
+	void attach(ExecutionUnit organism);
 }

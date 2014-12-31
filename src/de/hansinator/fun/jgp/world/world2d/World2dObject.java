@@ -11,7 +11,7 @@ public abstract class World2dObject extends Point.Double
 
 	public double dir;
 
-	protected final World2d world;
+	protected World2d world;
 
 	public World2dObject(World2d world, double x, double y, double dir)
 	{

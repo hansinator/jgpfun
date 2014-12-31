@@ -1,6 +1,8 @@
 package de.hansinator.fun.jgp.life;
 
-public interface ExecutionUnit
+import de.hansinator.fun.jgp.genetics.BaseGene;
+
+public interface ExecutionUnit<E>
 {
 	public void setInputs(SensorInput[] inputs);
 
@@ -11,4 +13,6 @@ public interface ExecutionUnit
 	public int getProgramSize();
 
 	public int getInputCount();
+	
+	public BaseGene<ExecutionUnit<E>, E> getGenome();
 }

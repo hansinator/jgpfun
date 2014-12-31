@@ -131,7 +131,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	@Override
 	public void attachEvaluationState(Body2d context)
 	{
-		this.world = context.organism.world;
+		this.world = context.getWorld();
 	}
 	
 	
