@@ -120,5 +120,17 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 			return new WallSense(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 1;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }

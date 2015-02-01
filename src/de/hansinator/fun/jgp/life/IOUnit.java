@@ -24,5 +24,9 @@ public interface IOUnit<E>
 
 		@Override
 		public IOUnit<E> express(E context);
+		
+		public int getInputCount();
+
+		public int getOutputCount();
 	}
 }

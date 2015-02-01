@@ -133,5 +133,17 @@ public class TankMotor implements BodyPart<Body2d>
 			return new TankMotor(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 0;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 2;
+		}
+
 	}
 }

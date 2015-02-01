@@ -69,11 +69,13 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	public int[] regs;
 	
 	@SuppressWarnings("unchecked")
-	private IOUnit<E>[] ioUnits = IOUnit.emptyIOUnitArray;
+	private IOUnit<ExecutionUnit<E>>[] ioUnits = IOUnit.emptyIOUnitArray;
 
 	protected SensorInput[] inputs = SensorInput.emptySensorInputArray;
 
 	protected ActorOutput[] outputs = ActorOutput.emptyActorOutputArray;
+	
+	private E executionContext;
 	
 
 	public LGPMachine(BaseGene<ExecutionUnit<E>, E> genome, FitnessEvaluator evaluator, int numRegs, OpCode[] program)
@@ -94,22 +96,22 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	public void execute()
 	{
 		// prepare sensor readings
-		for (IOUnit<E> u : ioUnits)
+		for (IOUnit<ExecutionUnit<E>> u : ioUnits)
 			u.sampleInputs();
 
 		step();
 
 		// apply outputs (move motor etc)
-		for (IOUnit<E> u : ioUnits)
+		for (IOUnit<ExecutionUnit<E>> u : ioUnits)
 			u.applyOutputs();
 	}
 
-	public void setIOUnits(IOUnit<E>[] ioUnits)
+	public void setIOUnits(IOUnit<ExecutionUnit<E>>[] ioUnits)
 	{
 		this.ioUnits = ioUnits;
 	}
 
-	public IOUnit<E>[] getIOUnits()
+	public IOUnit<ExecutionUnit<E>>[] getIOUnits()
 	{
 		return ioUnits;
 	}
@@ -154,12 +156,20 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
 
-
-	public void addToWorld(E world)
+	@Override
+	public void setExecutionContext(E executionContext)
 	{
+		this.executionContext = executionContext;
+		
 		// attach bodies to world state
 		for (int x = 0; x < ioUnits.length; x++)
-			ioUnits[x].attachEvaluationState(world);
+			ioUnits[x].attachEvaluationState(this);
+	}
+	
+	@Override
+	public E getExecutionContext()
+	{
+		return executionContext;
 	}
 	
 	protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
@@ -178,4 +188,5 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 
 		return program;
 	}
+
 }

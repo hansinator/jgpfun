@@ -43,7 +43,7 @@ public class FindingFoodScenario implements Scenario
 	}
 
 	@Override
-	public BaseGene<ExecutionUnit, World2d> randomGenome()
+	public BaseGene<ExecutionUnit<World2d>, World2d> randomGenome()
 	{
 		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.children.add(new RadarSense.Gene());

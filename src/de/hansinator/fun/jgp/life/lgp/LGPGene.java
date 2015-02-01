@@ -81,34 +81,22 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 		int i, o, x;
 
 		// count I/O ports
-		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		for(IOUnit.Gene<ExecutionUnit<World2d>> ioGene : ioGenes)
 		{
-			i += bodies[x].getInputs().length;
-			o += bodies[x].getOutputs().length;
+			i += ioGene.getInputCount();
+			o += ioGene.getOutputCount();
 		}
-
-		// create I/O arrays
+		
+		// create IO port arrays
 		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
 		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
-
-		// collect I/O
-		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
-		{
-			// collect inputs
-			for (SensorInput in : bodies[x].getInputs())
-				inputs[i++] = in;
-
-			// collect outputs
-			for (ActorOutput out : bodies[x].getOutputs())
-				outputs[o++] = out;
-		}
 		
 		// create ExecutionUnit
 		EvoVM<World2d> eu = new EvoVM<World2d>(this, fitnessEvaluator, registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
 		
-		// create io
+		// create IO
 		@SuppressWarnings("unchecked")
-		IOUnit<World2d>[] bodies = new IOUnit[ioGenes.size()];
+		IOUnit<ExecutionUnit<World2d>>[] bodies = new IOUnit[ioGenes.size()];
 		for(i = 0; i < ioGenes.size(); i++)
 			bodies[i] = ioGenes.get(i).express(eu);
 		
@@ -119,12 +107,24 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 		// attach bodies
 		eu.setIOUnits(bodies);
 
-		// attach inputs and outputs to brain
+		// collect IO ports
+		for(x = 0, i = 0, o = 0; x < bodies.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : bodies[x].getInputs())
+				inputs[i++] = in;
+
+			// collect outputs
+			for (ActorOutput out : bodies[x].getOutputs())
+				outputs[o++] = out;
+		}
+
+		// attach IO ports to brain
 		eu.setInputs(inputs);
 		eu.setOutputs(outputs);
 
-		//attach to evaluation state
-		eu.addToWorld(context);
+		// attach to evaluation state
+		eu.setExecutionContext(context);
 
 		// return assembled organism
 		return eu;

@@ -13,7 +13,7 @@ import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends AnimatableObject implements DrawablePart<World2d>
+public abstract class Body2d extends AnimatableObject implements DrawablePart<ExecutionUnit<World2d>>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
@@ -81,9 +81,9 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 	}
 
 	@Override
-	public void attachEvaluationState(World2d context)
+	public void attachEvaluationState(ExecutionUnit<World2d> context)
 	{
-		this.world = context;
+		world = context.getExecutionContext();
 		
 		for(IOUnit<Body2d> part : parts)
 			part.attachEvaluationState(this);
@@ -91,7 +91,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Wo
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
-		context.registerObject(this);
+		world.registerObject(this);
 	}
 
 	@Override

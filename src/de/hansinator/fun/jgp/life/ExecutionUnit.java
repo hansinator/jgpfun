@@ -15,4 +15,8 @@ public interface ExecutionUnit<E>
 	public int getInputCount();
 	
 	public BaseGene<ExecutionUnit<E>, E> getGenome();
+	
+	public void setExecutionContext(E context);
+	
+	public E getExecutionContext();
 }

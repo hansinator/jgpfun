@@ -3,7 +3,6 @@
 
 package de.hansinator.fun.jgp.genetics.selection;
 
-import de.hansinator.fun.jgp.life.OrganismGene;
 
 /**
  * 

@@ -6,12 +6,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.FitnessEvaluator;
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.World2d;

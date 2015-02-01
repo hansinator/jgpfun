@@ -193,5 +193,17 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 			return new RadarSense(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 2;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 1;
+		}
+
 	}
 }

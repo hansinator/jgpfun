@@ -93,5 +93,17 @@ public class SpeedSense implements SensorInput, BodyPart<Body2d>
 			return new SpeedSense(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 1;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }

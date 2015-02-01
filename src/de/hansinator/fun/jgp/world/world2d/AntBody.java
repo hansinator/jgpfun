@@ -62,7 +62,8 @@ public class AntBody extends Body2d
 		public IOUnit<ExecutionUnit<World2d>> express(ExecutionUnit<World2d> context)
 		{
 			AntBody body = new AntBody(context);
-			IOUnit<ExecutionUnit<World2d>>[] parts = new IOUnit[children.size()];
+			@SuppressWarnings("unchecked")
+			IOUnit<Body2d>[] parts = new IOUnit[children.size()];
 			int i = 0;
 			
 			for(IOUnit.Gene<Body2d> gene : children)
@@ -70,6 +71,28 @@ public class AntBody extends Body2d
 			body.setParts(parts);
 			
 			return body;
+		}
+
+		@Override
+		public int getInputCount()
+		{
+			int i = 0;
+			
+			for(IOUnit.Gene<Body2d> child : children)
+				i += child.getInputCount();
+			
+			return i;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			int o = 0;
+			
+			for(IOUnit.Gene<Body2d> child : children)
+				o += child.getOutputCount();
+			
+			return o;
 		}
 
 	}

@@ -174,5 +174,17 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 			return new ObjectLocator(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 4;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }

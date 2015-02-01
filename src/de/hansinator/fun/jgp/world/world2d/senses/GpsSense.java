@@ -114,5 +114,17 @@ public class GpsSense implements BodyPart<Body2d>
 			return new GpsSense(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 2;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }

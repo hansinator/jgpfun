@@ -94,5 +94,17 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 			return new OrientationSense(context);
 		}
 
+		@Override
+		public int getInputCount()
+		{
+			return 1;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }
