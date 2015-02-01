@@ -183,8 +183,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			return new RadarSense.Gene();
 		}
 
 		@Override

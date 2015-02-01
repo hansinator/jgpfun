@@ -37,7 +37,6 @@ public class AntBody extends Body2d
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene<?, ?>> getChildren()
 		{
-			// TODO Auto-generated method stub
 			return null;
 		}
 
@@ -55,7 +54,12 @@ public class AntBody extends Body2d
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<ExecutionUnit<World2d>> replicate()
 		{
-			return null;
+			AntBody.Gene gene =  new AntBody.Gene();
+			
+			for(IOUnit.Gene<Body2d> child : children)
+				gene.children.add(child.replicate());
+			
+			return gene;
 		}
 
 		@Override

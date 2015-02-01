@@ -110,8 +110,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			return new WallSense.Gene();
 		}
 
 		@Override

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -21,7 +22,7 @@ public class RouletteWheelSelector implements SelectionStrategy
 	 * fitness proportionate selection
 	 */
 	@Override
-	public OrganismGene select(OrganismGene[] pool, int totalFitness)
+	public Genome select(Genome[] pool, int totalFitness)
 	{
 		int stopPoint = 0;
 		int fitnessSoFar = 0;
@@ -41,7 +42,7 @@ public class RouletteWheelSelector implements SelectionStrategy
 
 		for (int i = 0; i < pool.length; i++)
 		{
-			fitnessSoFar += pool[i].getFitness();
+			fitnessSoFar += pool[i].getFitnessEvaluator().getFitness();
 			// this way zero fitness ants are omitted
 			if (fitnessSoFar > stopPoint)
 				return pool[i];

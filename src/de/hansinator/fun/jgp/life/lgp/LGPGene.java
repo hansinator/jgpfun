@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.BaseGene;
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -12,10 +11,9 @@ import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
-public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
+public class LGPGene extends ExecutionUnit.Gene<World2d>
 {
 	private static final Random rnd = Settings.newRandomSource();
 
@@ -25,20 +23,16 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 	
 	public final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
 
-	private final FitnessEvaluator fitnessEvaluator;
-	
-	private int fitness;
-
-	private int exonSize;
-
 	static final int registerCount = Settings.getInt("registerCount");
+	
+	private int exonSize = 0;
 	
 
 	// define chances for what mutation could happen in some sort of
 	// percentage
 	private static int mutateIns = 22, mutateRem = 18, mutateRep = 20;
 
-	public static LGPGene randomGene(FitnessEvaluator evaluator, int maxLength)
+	public static LGPGene randomGene(int maxLength)
 	{
 		int size = rnd.nextInt(maxLength - 200) + 201;
 		List<OpCode> program = new ArrayList<OpCode>(size);
@@ -46,14 +40,13 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 		for (int i = 0; i < size; i++)
 			program.add(OpCode.randomOpCode(rnd));
 
-		return new LGPGene(evaluator, program, maxLength, mutateIns + mutateRem + mutateRep);
+		return new LGPGene(program, maxLength, mutateIns + mutateRem + mutateRep);
 	}
 
 
-	private LGPGene(FitnessEvaluator evaluator, List<OpCode> program, int maxLength, int mutationChance)
+	private LGPGene(List<OpCode> program, int maxLength, int mutationChance)
 	{
 		super(mutationChance);
-		this.fitnessEvaluator = evaluator;
 		this.program = program;
 		this.maxLength = maxLength;
 	}
@@ -66,7 +59,7 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 		for (OpCode oc : program)
 			p.add(oc.replicate());
 
-		LGPGene lg = new LGPGene(fitnessEvaluator, p, maxLength, mutationChance);
+		LGPGene lg = new LGPGene(p, maxLength, mutationChance);
 		
 		for(IOUnit.Gene<ExecutionUnit<World2d>> bg : ioGenes)
 			lg.ioGenes.add(bg.replicate());
@@ -78,7 +71,7 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 	@Override
 	public ExecutionUnit express(World2d context)
 	{
-		int i, o, x;
+		int i = 0, o = 0, x;
 
 		// count I/O ports
 		for(IOUnit.Gene<ExecutionUnit<World2d>> ioGene : ioGenes)
@@ -92,18 +85,17 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
 		
 		// create ExecutionUnit
-		EvoVM<World2d> eu = new EvoVM<World2d>(this, fitnessEvaluator, registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
+		EvoVM<World2d> eu = new EvoVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
+		
+		// update exon size
+		exonSize = eu.getProgramSize();
 		
 		// create IO
 		@SuppressWarnings("unchecked")
 		IOUnit<ExecutionUnit<World2d>>[] bodies = new IOUnit[ioGenes.size()];
 		for(i = 0; i < ioGenes.size(); i++)
 			bodies[i] = ioGenes.get(i).express(eu);
-		
-		//XXX move this somewhere else
-		//listen for collsions
-		((Body2d)bodies[0]).addCollisionListener(fitnessEvaluator);
-		
+
 		// attach bodies
 		eu.setIOUnits(bodies);
 
@@ -128,11 +120,6 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 
 		// return assembled organism
 		return eu;
-	}
-
-	public int size()
-	{
-		return program.size();
 	}
 	
 	@Override
@@ -176,31 +163,22 @@ public class LGPGene extends BaseGene<ExecutionUnit<World2d>, World2d>
 
 	@Override
 	public List<Gene<?, ?>> getChildren() {
-		return program;
-	}
-	
-	public int getFitness()
-	{
-		return fitness;
+		//return program;
+		return null; //XXX fix this
 	}
 
 
-	//XXX make thism something like "addEvaluation" to add an evaluation with world parameter reference and datetime and stuff so a genome is multi-evaluatable
-	public void setFitness(int fitness)
-	{
-		this.fitness = fitness;
-	}
-
-
+	@Override
 	public int getExonSize()
 	{
 		return exonSize;
 	}
 
 
-	public void setExonSize(int exonSize)
+	@Override
+	public int getSize()
 	{
-		this.exonSize = exonSize;
+		return program.size();
 	}
 	
 }

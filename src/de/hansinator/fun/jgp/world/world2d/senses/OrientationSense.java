@@ -84,8 +84,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			return new OrientationSense.Gene();
 		}
 
 		@Override

@@ -1,6 +1,6 @@
 package de.hansinator.fun.jgp.life.lgp;
 
-import de.hansinator.fun.jgp.genetics.BaseGene;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
@@ -25,7 +25,7 @@ import de.hansinator.fun.jgp.world.World;
  * 
  * @author hansinator
  */
-public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, Comparable<LGPMachine<E>>
+public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 {
 	/*
 	 * Notes 31.12.2014
@@ -59,11 +59,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	// new JumpOp(),
 	// new JumpTarg()
 	};
-	
-	private final BaseGene<ExecutionUnit<E>, E> genome;
-	
-	public final FitnessEvaluator fitnessEvaluator;
-	
+
 	protected final OpCode[] program;
 
 	public int[] regs;
@@ -78,13 +74,10 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	private E executionContext;
 	
 
-	public LGPMachine(BaseGene<ExecutionUnit<E>, E> genome, FitnessEvaluator evaluator, int numRegs, OpCode[] program)
+	public LGPMachine(int numRegs, OpCode[] program)
 	{
-		this.fitnessEvaluator = evaluator;
-		this.genome = genome;
 		this.regs = new int[numRegs];
 		this.program = program;
-		evaluator.attach(this);
 	}
 	
 	protected abstract void step();
@@ -111,6 +104,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 		this.ioUnits = ioUnits;
 	}
 
+	@Override
 	public IOUnit<ExecutionUnit<E>>[] getIOUnits()
 	{
 		return ioUnits;
@@ -138,22 +132,6 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>, C
 	public int getProgramSize()
 	{
 		return program.length;
-	}
-	
-	public int getFitness()
-	{
-		return fitnessEvaluator.getFitness();
-	}
-	
-	public BaseGene<ExecutionUnit<E>, E> getGenome()
-	{
-		return genome;
-	}
-	
-	@Override
-	public int compareTo(LGPMachine<E> o)
-	{
-		return new Integer(this.getFitness()).compareTo(o.getFitness());
 	}
 
 	@Override

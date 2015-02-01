@@ -104,8 +104,7 @@ public class GpsSense implements BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			return new GpsSense.Gene();
 		}
 
 		@Override

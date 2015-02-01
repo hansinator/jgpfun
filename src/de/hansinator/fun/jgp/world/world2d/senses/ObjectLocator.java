@@ -13,6 +13,7 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 /**
  * Sensory input to locate objects in world. Currently only locates food
@@ -164,8 +165,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			return new ObjectLocator.Gene();
 		}
 
 		@Override

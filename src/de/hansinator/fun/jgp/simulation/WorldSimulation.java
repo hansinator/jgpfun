@@ -6,10 +6,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
@@ -74,8 +74,8 @@ public class WorldSimulation
 	 * re-think generation runtime stat calculation to be better suited for
 	 * re-entrance
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public LGPGene[] evaluate(Simulator simulator, LGPGene[] generation, MainView mainView, InfoPanel infoPanel)
+	@SuppressWarnings({ "rawtypes" })
+	public Genome[] evaluate(Simulator simulator, Genome[] generation, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
@@ -84,13 +84,16 @@ public class WorldSimulation
 
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
-			organisms[i] = generation[i].express((World2d) world);
+		{
+			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
+			organisms[i] = generation[i].getRootGene().express((World2d) world);
+			generation[i].getFitnessEvaluator().attach(organisms[i]);
+		}
 
 		synchronized (runLock)
 		{
 			for (int i = 0; running && (i < ROUNDS_PER_GENERATION); i++)
 			{
-
 				while (paused)
 					Thread.yield();
 
@@ -129,14 +132,6 @@ public class WorldSimulation
 
 		// prepare world for next generation
 		world.resetState();
-
-		// update and return evaluated generation
-		for (ExecutionUnit o : organisms)
-		{
-			LGPGene g = (LGPGene) o.getGenome();
-			g.setFitness(o.getFitness());
-			g.setExonSize(o.getProgramSize());
-		}
 
 		return generation;
 	}

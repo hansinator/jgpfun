@@ -148,8 +148,9 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 		g.drawPolygon(p);
 		g.fillPolygon(p);
 
-		g.setColor(Color.green);
-		g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
+		//XXX TODO find a solution for the fitness dependency here
+		//g.setColor(Color.green);
+		//g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
 	}
 
 	@Override

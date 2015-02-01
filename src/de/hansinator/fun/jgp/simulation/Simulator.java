@@ -9,15 +9,20 @@ import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
+import de.hansinator.fun.jgp.genetics.BaseGene;
+import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 public class Simulator
 {
@@ -38,7 +43,7 @@ public class Simulator
 
 	private final WorldSimulation simulation;
 
-	protected LGPGene[] currentGeneration;
+	protected Genome[] currentGeneration;
 
 	private final SelectionStrategy selector;
 
@@ -71,7 +76,7 @@ public class Simulator
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
 		popSize = Settings.getInt("popSize");
-		currentGeneration = new LGPGene[popSize];
+		currentGeneration = new Genome[popSize];
 		genealogyTree = new GenealogyTree();
 		selector = scenario.getSelectionStrategy();
 		crossover = scenario.getCrossoverOperator();
@@ -193,17 +198,17 @@ public class Simulator
 
 			for (int i = 0; i < popSize; i++)
 			{
-				LGPGene g = scenario.randomGenome();
+				Genome g = scenario.randomGenome();
 				currentGeneration[i] = g;
 				genealogyTree.put(g);
 			}
 		}
 	}
 
-	private LGPGene[] newGeneration(LGPGene[] generation, int totalFitness)
+	private Genome[] newGeneration(Genome[] generation, int totalFitness)
 	{
-		LGPGene child1, child2, parent1, parent2;
-		LGPGene[] newAnts = new LGPGene[generation.length];
+		Genome child1, child2, parent1, parent2;
+		Genome[] newAnts = new Genome[generation.length];
 
 		// create new genomes via cloning and mutation or crossover
 		for (int i = 0; i < (generation.length / 2); i++)
@@ -236,11 +241,11 @@ public class Simulator
 		return newAnts;
 	}
 
-	private int calculateTotalFitness(LGPGene[] generation)
+	private int calculateTotalFitness(Genome[] generation)
 	{
 		int totalFit = 0;
-		for (LGPGene g : generation)
-			totalFit += g.getFitness();
+		for (Genome g : generation)
+			totalFit += g.getFitnessEvaluator().getFitness();
 		return totalFit;
 	}
 
@@ -251,12 +256,12 @@ public class Simulator
 	{
 		int avgProgSize = 0, avgRealProgSize = 0;
 
-		for (LGPGene g : currentGeneration)
-			avgProgSize += g.size();
+		for (Genome g : currentGeneration)
+			avgProgSize += g.getRootGene().getSize();
 		avgProgSize /= currentGeneration.length;
 
-		for (LGPGene g : currentGeneration)
-			avgRealProgSize += g.getExonSize();
+		for (Genome g : currentGeneration)
+			avgRealProgSize += g.getRootGene().getExonSize();
 		avgRealProgSize /= currentGeneration.length;
 
 		statisticsHistory

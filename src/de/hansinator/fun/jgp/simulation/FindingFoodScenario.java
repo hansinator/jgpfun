@@ -3,10 +3,7 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.hansinator.fun.jgp.genetics.BaseGene;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
@@ -43,7 +40,7 @@ public class FindingFoodScenario implements Scenario
 	}
 
 	@Override
-	public BaseGene<ExecutionUnit<World2d>, World2d> randomGenome()
+	public Genome randomGenome()
 	{
 		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.children.add(new RadarSense.Gene());
@@ -53,10 +50,10 @@ public class FindingFoodScenario implements Scenario
 		bodyGene.children.add(new WallSense.Gene());
 		bodyGene.children.add(new TankMotor.Gene());
 		
-		LGPGene organismGene = LGPGene.randomGene(new FoodFitnessEvaluator(), progSize);
+		LGPGene organismGene = LGPGene.randomGene(progSize);
 		organismGene.ioGenes.add(bodyGene);
 		
-		return organismGene;
+		return new Genome(organismGene, new FoodFitnessEvaluator());
 	}
 
 	@Override
@@ -75,8 +72,6 @@ public class FindingFoodScenario implements Scenario
 	public class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
 	{
 		private int fitness = 0;
-
-		private List<Body2d> bodies;
 
 		@Override
 		public int getFitness()
@@ -102,12 +97,11 @@ public class FindingFoodScenario implements Scenario
 
 		@SuppressWarnings("rawtypes")
 		@Override
-		public void attach(Body2d organism)
+		public void attach(ExecutionUnit organism)
 		{
-			bodies = new ArrayList<Body2d>();
 			for(IOUnit u : organism.getIOUnits())
 				if(u instanceof Body2d)
-					bodies.add((Body2d)u);
+					((Body2d)u).addCollisionListener(this);
 		}
 	}
 }
