@@ -44,6 +44,7 @@ public class FindingFoodScenario implements Scenario
 	{
 		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.children.add(new RadarSense.Gene());
+		bodyGene.children.add(new RadarSense.Gene());
 		// add body.locator as a gene somehow (internal locator stuff) instead of radargene for LocatorAnts
 		bodyGene.children.add(new OrientationSense.Gene());
 		bodyGene.children.add(new SpeedSense.Gene());

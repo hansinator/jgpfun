@@ -21,7 +21,8 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
  */
 public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>
 {
-
+	private final static double sweepSpeedScaleFactor = 64.0;
+	
 	private final World2dObject origin;
 
 	private World2d world;
@@ -98,7 +99,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	@Override
 	public void set(int value)
 	{
-		direction += (Math.max(-65535, Math.min(value, 65535)) / Simulator.intScaleFactor) / 10.0;
+		direction += ((double)value / (double)Integer.MAX_VALUE) / sweepSpeedScaleFactor;
 		direction -= 2 * Math.PI
 				* (direction < 0.0 ? Math.ceil(direction / (2 * Math.PI)) : (Math.floor(direction / (2 * Math.PI))));
 	}
