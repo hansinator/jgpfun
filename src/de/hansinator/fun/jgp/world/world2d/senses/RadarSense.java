@@ -3,25 +3,28 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
+import java.util.List;
 
-import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
 import de.hansinator.fun.jgp.world.world2d.Food;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
 /**
  * 
  * @author Hansinator
  */
-public class RadarSense implements SensorInput, ActorOutput, DrawablePart
+public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>
 {
 
-	private final Body2d body;
+	private final World2dObject origin;
 
-	private final World world;
+	private World2d world;
 
 	public double direction = 0.0;
 
@@ -29,13 +32,12 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 
 	public Point2D target = null;
 
-	public final SensorInput senseDirection = new SensorInput()
-	{
+	public final SensorInput senseDirection = new SensorInput() {
 
 		@Override
 		public int get()
 		{
-			return (int) (direction * Organism2d.intScaleFactor);
+			return (int) (direction * Simulator.intScaleFactor);
 		}
 	};
 
@@ -43,10 +45,9 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 
 	ActorOutput[] outputs = { this };
 
-	public RadarSense(Body2d body, World world)
+	public RadarSense(World2dObject origin)
 	{
-		this.body = body;
-		this.world = world;
+		this.origin = origin;
 	}
 
 	public boolean pointInLine(double x1, double y1, double x2, double y2, Point2D p)
@@ -73,16 +74,16 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 		double x1, y1, x2, y2, rdir, bdir;
 
 		// line start
-		x1 = Math.floor(body.x);
-		y1 = Math.floor(body.y);
+		x1 = Math.floor(origin.x);
+		y1 = Math.floor(origin.y);
 
 		// line end
 		rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-		bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
-		x2 = Math.floor(body.x + beamLength * Math.sin(rdir + bdir));
-		y2 = Math.floor(body.y - beamLength * Math.cos(rdir + bdir));
+		bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
+		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
+		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
 
-		for (Food f : ((World2d)world).food)
+		for (Food f : world.food)
 			if (pointInLine(x1, y1, x2, y2, f)
 					&& (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength)
 					&& (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x)))
@@ -97,7 +98,7 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 	@Override
 	public void set(int value)
 	{
-		direction += (Math.max(-65535, Math.min(value, 65535)) / Organism2d.intScaleFactor) / 10.0;
+		direction += (Math.max(-65535, Math.min(value, 65535)) / Simulator.intScaleFactor) / 10.0;
 		direction -= 2 * Math.PI
 				* (direction < 0.0 ? Math.ceil(direction / (2 * Math.PI)) : (Math.floor(direction / (2 * Math.PI))));
 	}
@@ -115,34 +116,92 @@ public class RadarSense implements SensorInput, ActorOutput, DrawablePart
 	}
 
 	@Override
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 	}
 
 	@Override
-	public void processOutputs()
+	public void applyOutputs()
 	{
 	}
 
 	@Override
 	public void draw(Graphics g)
 	{
-		final int x_center = Math.round((float) body.x);
-		final int y_center = Math.round((float) body.y);
+		final int x_center = Math.round((float) origin.x);
+		final int y_center = Math.round((float) origin.y);
 
 		if (target == null)
 		{
 			g.setColor(Color.darkGray);
 			double rdir, bdir;
 			rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-			bdir = body.dir - ((double) Math.round(body.dir / (2 * Math.PI)) * 2 * Math.PI);
+			bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
 			g.drawLine(x_center, y_center,
-					Math.round((float) (body.x + RadarSense.beamLength * Math.sin(rdir + bdir))),
-					Math.round((float) (body.y - RadarSense.beamLength * Math.cos(rdir + bdir))));
+					Math.round((float) (origin.x + RadarSense.beamLength * Math.sin(rdir + bdir))),
+					Math.round((float) (origin.y - RadarSense.beamLength * Math.cos(rdir + bdir))));
 		} else if (target != null)
 		{
 			g.setColor(Color.blue);
 			g.drawLine(x_center, y_center, (int) Math.round(target.getX()), (int) Math.round(target.getY()));
+		}
+
+	}
+
+	@Override
+	public void attachEvaluationState(Body2d context)
+	{
+		this.world = context.getWorld();
+	}
+
+	public static class Gene implements IOUnit.Gene<Body2d>
+	{
+
+		@Override
+		public void mutate()
+		{
+		}
+
+		@Override
+		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setMutationChance(int mutationChance)
+		{
+		}
+
+		@Override
+		public int getMutationChance()
+		{
+			return 0;
+		}
+
+		@Override
+		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
+		{
+			return new RadarSense.Gene();
+		}
+
+		@Override
+		public IOUnit<Body2d> express(Body2d context)
+		{
+			return new RadarSense(context);
+		}
+
+		@Override
+		public int getInputCount()
+		{
+			return 2;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 1;
 		}
 
 	}

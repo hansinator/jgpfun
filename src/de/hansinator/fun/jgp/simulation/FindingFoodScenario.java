@@ -3,14 +3,27 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import de.hansinator.fun.jgp.genetics.FoodAntGenome;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.AntBody;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.World2dObject;
+import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
+import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
+import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
+import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
+import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
  * 
@@ -29,7 +42,18 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		return new FoodAntGenome(progSize);
+		AntBody.Gene bodyGene = new AntBody.Gene();
+		bodyGene.children.add(new RadarSense.Gene());
+		// add body.locator as a gene somehow (internal locator stuff) instead of radargene for LocatorAnts
+		bodyGene.children.add(new OrientationSense.Gene());
+		bodyGene.children.add(new SpeedSense.Gene());
+		bodyGene.children.add(new WallSense.Gene());
+		bodyGene.children.add(new TankMotor.Gene());
+		
+		LGPGene organismGene = LGPGene.randomGene(progSize);
+		organismGene.ioGenes.add(bodyGene);
+		
+		return new Genome(organismGene, new FoodFitnessEvaluator());
 	}
 
 	@Override
@@ -41,7 +65,43 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public SelectionStrategy getSelectionStrategy()
 	{
-		// TODO Auto-generated method stub
 		return new TournamentSelector(3);
+	}
+
+
+	public class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
+	{
+		private int fitness = 0;
+
+		@Override
+		public int getFitness()
+		{
+			return fitness;
+		}
+
+		@Override
+		public FitnessEvaluator replicate()
+		{
+			return new FoodFitnessEvaluator();
+		}
+
+		@Override
+		public void onCollision(World2dObject a, World2dObject b)
+		{
+			if (b instanceof Food)
+			{
+				fitness++;
+				((Food) b).randomPosition();
+			}
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public void attach(ExecutionUnit organism)
+		{
+			for(IOUnit u : organism.getIOUnits())
+				if(u instanceof Body2d)
+					((Body2d)u).addCollisionListener(this);
+		}
 	}
 }

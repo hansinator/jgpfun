@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 
@@ -21,8 +20,6 @@ public class World2d implements World
 
 	public final int worldWidth, worldHeight;
 
-	public List<BaseOrganism> curOrganisms;
-
 	public final List<Food> food;
 
 	final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null, Settings.newRandomSource());
@@ -31,12 +28,16 @@ public class World2d implements World
 
 	private final List<World2dObject> objects;
 
+	private final List<AnimatableObject> animatableObjects;
+
+
 	public World2d(int worldWidth, int worldHeight, int foodCount)
 	{
 		rnd = Settings.newRandomSource();
 
 		food = new ArrayList<Food>(foodCount);
 		objects = new ArrayList<World2dObject>();
+		animatableObjects = new ArrayList<AnimatableObject>();
 		resetState();
 
 		this.worldWidth = worldWidth;
@@ -45,36 +46,43 @@ public class World2d implements World
 	}
 
 	@Override
-	public void animate(/* Object worldLock */)
+	public void animate()
 	{
 		// TODO: have a more compex world, add a barrier in the middle of the
 		// screen
 		// TODO: take into account ant size, so it can't hide outside of the
 		// screen
-		for (final BaseOrganism o : curOrganisms)
-			for (final Body2d b : ((Organism2d) o).bodies)
-			{
-				// prevent world wrapping
-				b.x = Math.min(Math.max(b.x, 0), worldWidth - 1);
-				b.y = Math.min(Math.max(b.y, 0), worldHeight - 1);
+		for(AnimatableObject ao : animatableObjects)
+		{
+			// prevent world wrapping
+			ao.x = Math.min(Math.max(ao.x, 0), worldWidth - 1);
+			ao.y = Math.min(Math.max(ao.y, 0), worldHeight - 1);
 
-				// eat food
-				// synchronized (worldLock) {
-				b.postRoundTrigger();
-				// }
-			}
+			//execute collisions
+			int r = ao.getCollisionRadius();
+			for(World2dObject o : objects)
+				if ((o.x >= (ao.x - r)) && (o.x <= (ao.x + r))
+						&& (o.y >= (ao.y - r)) && (o.y <= (ao.y + r)))
+					ao.collision(o);
+		}
 	}
 
 	@Override
 	public final void resetState()
 	{
+		objects.clear();
+		animatableObjects.clear();
+
 		if (food.size() != foodCount)
 		{
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
 				food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
 		} else for (Food f : food)
+		{
 			f.randomPosition();
+			registerObject(f);
+		}
 	}
 
 	public Food findNearestFood(Point.Double p)
@@ -96,53 +104,54 @@ public class World2d implements World
 		}
 		if (indexMinDist > -1)
 			return food.get(indexMinDist);
-		else return World2d.OUT_OF_RANGE_FOOD;
+		else return OUT_OF_RANGE_FOOD;
 	}
 
 	@Override
 	public void clickEvent(int x, int y)
 	{
-		// see if we hit an ant body
-		if (curOrganisms != null)
-			for (BaseOrganism o : curOrganisms)
-				for (Body2d b : ((Organism2d) o).bodies)
-					if (Math.abs(b.x - x) < 10.0 && Math.abs(b.y - y) < 10.0)
-					{
-						// tag it
-						b.tagged = true;
-						return;
-					}
+		// see if we hit an object
+		//XXX create a clickable interface
+		for (World2dObject o : objects)
+			if (Math.abs(o.x - x) < 10.0 && Math.abs(o.y - y) < 10.0)
+			{
+				// tag it
+				//XXX clickable interface!
+				//b.tagged = true;
+				return;
+			}
 	}
 
 	@Override
 	public void draw(Graphics g)
 	{
-		if (curOrganisms != null)
-			for (BaseOrganism o : curOrganisms)
-				for (Body2d b : ((Organism2d) o).bodies)
-					b.draw(g);
+		for (World2dObject o : objects)
+			o.draw(g);
 
 		for (Food f : food)
 			f.draw(g);
 	}
 
-	@Override
-	public void setOrganisms(List<BaseOrganism> organisms)
+
+	public synchronized void registerObject(World2dObject object)
 	{
-		// take new organisms and inform them about being here
-		curOrganisms = organisms;
-		for (BaseOrganism organism : curOrganisms)
-			((Organism2d) organism).addToWorld(this);
+		objects.add(object);
+		if(object instanceof AnimatableObject)
+			animatableObjects.add((AnimatableObject)object);
 	}
-	
-	
-	@Override
+
+	public synchronized void unregisterObject(World2dObject object)
+	{
+		objects.remove(object);
+		if(object instanceof AnimatableObject)
+			animatableObjects.remove(object);
+	}
+
 	public int getWidth()
 	{
 		return worldWidth;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return worldHeight;

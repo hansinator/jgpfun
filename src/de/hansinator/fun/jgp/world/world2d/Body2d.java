@@ -3,81 +3,122 @@ package de.hansinator.fun.jgp.world.world2d;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
-import de.hansinator.fun.jgp.world.world2d.senses.SensorInput;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends World2dObject
+public abstract class Body2d extends AnimatableObject implements DrawablePart<ExecutionUnit<World2d>>
 {
+	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
-	protected final List<Part> parts;
+	protected static final Random rnd = Settings.newRandomSource();
 
-	protected final List<DrawablePart> drawableParts;
+	@SuppressWarnings("unchecked")
+	protected IOUnit<Body2d>[] parts = BodyPart.emptyBodyPartArray;
 
-	protected final SensorInput[] inputs;
+	@SuppressWarnings("unchecked")
+	protected BodyPart.DrawablePart<Body2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
 
-	protected final ActorOutput[] outputs;
+	protected SensorInput[] inputs;
 
-	protected final Organism2d organism;
+	protected ActorOutput[] outputs;
 
-	private int inputNum = 0, outputNum = 0;
+	public final ExecutionUnit<World2d> parent;
 
 	public double lastSpeed = 0.0;
 
-	public double dir;
-
 	public volatile boolean tagged = false;
 
-	public Body2d(Organism2d organism, double x, double y, double dir, SensorInput[] inputs, ActorOutput[] outputs)
+	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
 		// TODO: fix null pointer
-		super(null, x, y);
-		this.organism = organism;
-		this.dir = dir;
-		this.inputs = inputs;
-		this.outputs = outputs;
-		this.parts = new ArrayList<Part>();
-		this.drawableParts = new ArrayList<DrawablePart>();
+		super(null, x, y, dir);
+		this.parent = parent;
 	}
 
-	public void addBodyPart(Part part)
+	@SuppressWarnings("unchecked")
+	public void setParts(IOUnit<Body2d>[] parts)
 	{
-		for (SensorInput i : part.getInputs())
-			inputs[inputNum++] = i;
-		for (ActorOutput o : part.getOutputs())
-			outputs[outputNum++] = o;
-		parts.add(part);
-		if (part instanceof DrawablePart)
-			drawableParts.add((DrawablePart) part);
+		int i, o, d, x;
+
+		this.parts = parts;
+
+		// count I/O and drawable parts
+		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		{
+			i += parts[x].getInputs().length;
+			o += parts[x].getOutputs().length;
+			if (parts[x] instanceof BodyPart.DrawablePart)
+				d++;
+		}
+
+		// create arrays
+		inputs = new SensorInput[i];
+		outputs = new ActorOutput[o];
+		drawableParts = new BodyPart.DrawablePart[d];
+
+		// collect I/O ports and drawable parts
+		for(x = 0, i = 0, o = 0, d = 0; x < parts.length; x++)
+		{
+			// collect inputs
+			for (SensorInput in : parts[x].getInputs())
+				inputs[i++] = in;
+
+			// collect outputs
+			for (ActorOutput out : parts[x].getOutputs())
+				outputs[o++] = out;
+
+			// collect drawable parts
+			if (parts[x] instanceof BodyPart.DrawablePart)
+				drawableParts[d++]= (BodyPart.DrawablePart<Body2d>) parts[x];
+		}
 	}
 
+	@Override
+	public void attachEvaluationState(ExecutionUnit<World2d> context)
+	{
+		world = context.getExecutionContext();
+		
+		for(IOUnit<Body2d> part : parts)
+			part.attachEvaluationState(this);
+		
+		x = rnd.nextInt(world.getWidth());
+		y = rnd.nextInt(world.getHeight());
+		dir = rnd.nextDouble() * 2 * Math.PI;
+		world.registerObject(this);
+	}
+
+	@Override
 	public SensorInput[] getInputs()
 	{
 		return inputs;
 	}
 
+	@Override
 	public ActorOutput[] getOutputs()
 	{
 		return outputs;
 	}
 
-	public void prepareInputs()
+	@Override
+	public void sampleInputs()
 	{
-		for (Part p : parts)
-			p.prepareInputs();
+		for (IOUnit<Body2d> p : parts)
+			p.sampleInputs();
 	}
 
-	public void processOutputs()
+	@Override
+	public void applyOutputs()
 	{
-		for (Part p : parts)
-			p.processOutputs();
+		for (IOUnit<Body2d> p : parts)
+			p.applyOutputs();
 	}
-
-	public abstract void postRoundTrigger();
-
-	public abstract void collision(World2dObject object);
 
 	@Override
 	public void draw(Graphics g)
@@ -91,108 +132,35 @@ public abstract class Body2d extends World2dObject
 		final double x_bottom = x - x_len_displace;
 		final double y_bottom = y + y_len_displace;
 
-		for (DrawablePart part : drawableParts)
+		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
 			part.draw(g);
 
 		Polygon p = new Polygon();
 		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top
-																										// of
-																										// triangle
+		// of
+		// triangle
 		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right
-																															// wing
+		// wing
 		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left
-																															// wing
+		// wing
 
 		g.setColor(tagged ? Color.magenta : Color.red);
 		g.drawPolygon(p);
 		g.fillPolygon(p);
 
-		g.setColor(Color.green);
-		g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
+		//XXX TODO find a solution for the fitness dependency here
+		//g.setColor(Color.green);
+		//g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
 	}
 
-	public class OrientationSense implements SensorInput, Part
+	@Override
+	public int getCollisionRadius()
 	{
-
-		SensorInput[] inputs = { this };
-
-		@Override
-		public int get()
-		{
-			// could also be sin
-			return (int) (Math.cos(dir) * Organism2d.intScaleFactor);
-		}
-
-		@Override
-		public SensorInput[] getInputs()
-		{
-			return inputs;
-		}
-
-		@Override
-		public ActorOutput[] getOutputs()
-		{
-			return ActorOutput.emptyActorOutputArray;
-		}
-
-		@Override
-		public void prepareInputs()
-		{
-		}
-
-		@Override
-		public void processOutputs()
-		{
-		}
+		return bodyCollisionRadius;
 	}
-
-	public class SpeedSense implements SensorInput, Part
+	
+	public World2d getWorld()
 	{
-
-		SensorInput[] inputs = { this };
-
-		@Override
-		public int get()
-		{
-			return (int) (lastSpeed * Organism2d.intScaleFactor);
-		}
-
-		@Override
-		public SensorInput[] getInputs()
-		{
-			return inputs;
-		}
-
-		@Override
-		public ActorOutput[] getOutputs()
-		{
-			return ActorOutput.emptyActorOutputArray;
-		}
-
-		@Override
-		public void prepareInputs()
-		{
-		}
-
-		@Override
-		public void processOutputs()
-		{
-		}
-	}
-
-	public interface Part
-	{
-		public SensorInput[] getInputs();
-
-		public ActorOutput[] getOutputs();
-
-		public void prepareInputs();
-
-		public void processOutputs();
-	}
-
-	public interface DrawablePart extends Part
-	{
-		public void draw(Graphics g);
+		return world;
 	}
 }

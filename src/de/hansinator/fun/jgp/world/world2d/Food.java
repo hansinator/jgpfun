@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.world.World;
-
 /**
  * 
  * @author hansinator
@@ -15,10 +13,12 @@ public class Food extends World2dObject
 
 	private final Random rnd;
 
-	public Food(double x, double y, World world, Random rnd)
+	public Food(double x, double y, World2d world, Random rnd)
 	{
-		super(world, x, y);
+		super(world, x, y, 0.0);
 		this.rnd = rnd;
+		if(world != null)
+			world.registerObject(this);
 	}
 
 	public void randomPosition()

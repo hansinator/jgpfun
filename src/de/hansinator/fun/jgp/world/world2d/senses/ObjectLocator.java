@@ -2,13 +2,18 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.List;
 
-import de.hansinator.fun.jgp.world.World;
-import de.hansinator.fun.jgp.world.world2d.Body2d.DrawablePart;
+import de.hansinator.fun.jgp.life.ActorOutput;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
-import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 /**
  * Sensory input to locate objects in world. Currently only locates food
@@ -17,11 +22,11 @@ import de.hansinator.fun.jgp.world.world2d.actors.ActorOutput;
  * @author Hansinator
  * 
  */
-public class ObjectLocator implements DrawablePart
+public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 {
 
-	private final World world;
-	
+	private World2d world;
+
 	private final World2dObject origin;
 
 	public Food target;
@@ -34,7 +39,7 @@ public class ObjectLocator implements DrawablePart
 		@Override
 		public int get()
 		{
-			return (int) (((target.x - origin.x) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.x - origin.x) / objDist) * Simulator.intScaleFactor);
 		}
 
 	};
@@ -45,7 +50,7 @@ public class ObjectLocator implements DrawablePart
 		@Override
 		public int get()
 		{
-			return (int) (((target.y - origin.y) / objDist) * Organism2d.intScaleFactor);
+			return (int) (((target.y - origin.y) / objDist) * Simulator.intScaleFactor);
 		}
 
 	};
@@ -56,7 +61,7 @@ public class ObjectLocator implements DrawablePart
 		@Override
 		public int get()
 		{
-			return (int) (objDist * Organism2d.intScaleFactor);
+			return (int) (objDist * Simulator.intScaleFactor);
 		}
 
 	};
@@ -73,15 +78,14 @@ public class ObjectLocator implements DrawablePart
 	};
 
 	SensorInput[] inputs = { senseDirX, senseDirY, senseDist, senseDist2 }; // senseDist
-																			// or
-																			// senseDist
-																			// or
-																			// both2
-																			// fix??
+	// or
+	// senseDist
+	// or
+	// both2
+	// fix??
 
-	public ObjectLocator(World world, World2dObject origin)
+	public ObjectLocator(World2dObject origin)
 	{
-		this.world = world;
 		this.origin = origin;
 	}
 
@@ -104,13 +108,13 @@ public class ObjectLocator implements DrawablePart
 	}
 
 	@Override
-	public void prepareInputs()
+	public void sampleInputs()
 	{
 		locate();
 	}
 
 	@Override
-	public void processOutputs()
+	public void applyOutputs()
 	{
 	}
 
@@ -123,5 +127,64 @@ public class ObjectLocator implements DrawablePart
 			g.drawLine(Math.round((float) origin.x), Math.round((float) origin.y), (int) Math.round(target.x),
 					(int) Math.round(target.y));
 		}
+	}
+
+	@Override
+	public void attachEvaluationState(Body2d context)
+	{
+		this.world = context.getWorld();
+	}
+	
+	
+	public class Gene implements IOUnit.Gene<Body2d>
+	{
+
+		@Override
+		public void mutate()
+		{
+		}
+
+		@Override
+		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setMutationChance(int mutationChance)
+		{
+		}
+
+		@Override
+		public int getMutationChance()
+		{
+			return 0;
+		}
+
+		@Override
+		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
+		{
+			return new ObjectLocator.Gene();
+		}
+
+		@Override
+		public IOUnit<Body2d> express(Body2d context)
+		{
+			return new ObjectLocator(context);
+		}
+
+		@Override
+		public int getInputCount()
+		{
+			return 4;
+		}
+
+		@Override
+		public int getOutputCount()
+		{
+			return 0;
+		}
+
 	}
 }

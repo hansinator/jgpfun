@@ -2,11 +2,9 @@
  */
 package de.hansinator.fun.jgp.genetics.selection;
 
-import java.security.SecureRandom;
-import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -26,14 +24,14 @@ public class TournamentSelector implements SelectionStrategy
 	}
 
 	@Override
-	public BaseOrganism select(List<BaseOrganism> organisms, int totalFitness)
+	public Genome select(Genome[] pool, int totalFitness)
 	{
 		int maxFit = -1;
 		int size;
-		BaseOrganism fittest = null;
+		Genome fittest = null;
 
-		if (organisms.size() < tournamentSize)
-			size = organisms.size();
+		if (pool.length < tournamentSize)
+			size = pool.length;
 		else size = tournamentSize;
 
 		if (size == 0)
@@ -41,11 +39,11 @@ public class TournamentSelector implements SelectionStrategy
 
 		for (int i = 0; i < size; i++)
 		{
-			BaseOrganism candidate = organisms.get(rnd.nextInt(organisms.size()));
+			Genome candidate = pool[rnd.nextInt(pool.length)];
 
-			if (candidate.getFitness() > maxFit)
+			if (candidate.getFitnessEvaluator().getFitness() > maxFit)
 			{
-				maxFit = candidate.getFitness();
+				maxFit = candidate.getFitnessEvaluator().getFitness();
 				fittest = candidate;
 			}
 		}

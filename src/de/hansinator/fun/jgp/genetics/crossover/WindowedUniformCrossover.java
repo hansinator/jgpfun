@@ -3,7 +3,7 @@ package de.hansinator.fun.jgp.genetics.crossover;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.lgp.OpCode;
+import de.hansinator.fun.jgp.life.lgp.OpCode;
 
 /**
  * 

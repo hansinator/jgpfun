@@ -4,6 +4,9 @@ import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 
+/*
+ * maybe create a line following scenario
+ */
 public interface Scenario
 {
 

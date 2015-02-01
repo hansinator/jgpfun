@@ -1,16 +1,17 @@
 package de.hansinator.fun.jgp.simulation;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainView;
-import de.hansinator.fun.jgp.life.BaseOrganism;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
@@ -47,6 +48,8 @@ public class WorldSimulation
 
 	public static final int ROUNDS_PER_GENERATION = 4000;
 
+	// XXX distinguish only between generational and continuous simulation, not
+	// world and mona lisa; mona lisa needs to be implemented by a scenario only
 	public WorldSimulation(World world)
 	{
 		this.world = world;
@@ -71,20 +74,26 @@ public class WorldSimulation
 	 * re-think generation runtime stat calculation to be better suited for
 	 * re-entrance
 	 */
-	public List<BaseOrganism> evaluate(Simulator simulator, List<BaseOrganism> organisms, MainView mainView, InfoPanel infoPanel)
+	@SuppressWarnings({ "rawtypes" })
+	public Genome[] evaluate(Simulator simulator, Genome[] generation, MainView mainView, InfoPanel infoPanel)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
+		ExecutionUnit[] organisms = new ExecutionUnit[generation.length];
 
-		// put organisms into world
-		world.setOrganisms(organisms);
+		// synthesize organisms
+		for (int i = 0; i < generation.length; i++)
+		{
+			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
+			organisms[i] = generation[i].getRootGene().express((World2d) world);
+			generation[i].getFitnessEvaluator().attach(organisms[i]);
+		}
 
 		synchronized (runLock)
 		{
 			for (int i = 0; running && (i < ROUNDS_PER_GENERATION); i++)
 			{
-
 				while (paused)
 					Thread.yield();
 
@@ -124,8 +133,7 @@ public class WorldSimulation
 		// prepare world for next generation
 		world.resetState();
 
-		// return evaluated generation
-		return organisms;
+		return generation;
 	}
 
 	/**
@@ -141,13 +149,39 @@ public class WorldSimulation
 	 * 
 	 * @param organisms
 	 */
-	private void singleStep(List<BaseOrganism> organisms)
+	@SuppressWarnings("rawtypes")
+	private void singleStep(ExecutionUnit[] organisms)
 	{
-		final CountDownLatch cb = new CountDownLatch(organisms.size());
+		final CountDownLatch cb = new CountDownLatch(organisms.length);
 
-		// evaluate each organism
-		for (final BaseOrganism organism : organisms)
-			organism.evaluate(cb, pool);
+		/*
+		 * Evaluate each organism non-blocking as a thread using an
+		 * ExecutorService. The count-down latch will be count down when the
+		 * organism is done living one round.
+		 * 
+		 * Use an anonymous runnable here to decouple threading logic from
+		 * the unit under evaluation. It doesn't make me happy but it's not
+		 * as ugly as having each organism implement runnable.
+		 */
+		for (final ExecutionUnit unit : organisms)
+		{
+			pool.execute(new Runnable() {
+				
+				@Override
+				public void run()
+				{
+					try
+					{
+						unit.execute();
+					} catch (Exception ex)
+					{
+						Logger.getLogger(ExecutionUnit.class.getName()).log(Level.SEVERE, null, ex);
+					}
+
+					cb.countDown();
+				}
+			});
+		}
 
 		// wait for all organisms to finish
 		try

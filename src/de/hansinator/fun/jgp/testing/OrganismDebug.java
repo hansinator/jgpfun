@@ -2,16 +2,16 @@ package de.hansinator.fun.jgp.testing;
 
 import java.io.IOException;
 
-import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.lgp.BaseMachine;
-import de.hansinator.fun.jgp.world.world2d.Organism2d;
+import de.hansinator.fun.jgp.genetics.AntGenome;
+import de.hansinator.fun.jgp.life.Organism;
+import de.hansinator.fun.jgp.life.lgp.ExecutionUnit;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
  * @author hansinator
  */
-public class OrganismDebug extends Organism2d
+public class OrganismDebug extends Organism
 {
 
 	public boolean showdebug = false;
@@ -19,12 +19,12 @@ public class OrganismDebug extends Organism2d
 	// speed profiling helper vars
 	// public long vmrun, allrun, comp;
 
-	public OrganismDebug(Genome genome, BaseMachine brain, int numBodies, int numInputs, int numOutputs, World2d world)
+	public OrganismDebug(AntGenome genome, ExecutionUnit brain, int numBodies, int numInputs, int numOutputs, World2d world)
 			throws IOException
-	{
-		super(genome, brain, numBodies, numInputs, numOutputs);
+			{
+		super(genome);
 		addToWorld(world);
-	}
+			}
 
 	/*
 	 * //NOTE: this only works with precisionbodys! //old experimentally
