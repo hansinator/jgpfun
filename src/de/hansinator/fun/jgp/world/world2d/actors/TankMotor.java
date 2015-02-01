@@ -37,7 +37,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public void set(int value)
 		{
-			left = Math.max(0, Math.min(value, 65535)) / Simulator.intScaleFactor;
+			left = value / (double)Integer.MAX_VALUE;
 		}
 	};
 
@@ -47,7 +47,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public void set(int value)
 		{
-			right = Math.max(0, Math.min(value, 65535)) / Simulator.intScaleFactor;
+			right = value / (double)Integer.MAX_VALUE;
 		}
 	};
 
@@ -79,14 +79,14 @@ public class TankMotor implements BodyPart<Body2d>
 		body.dir += (right - left) * (maxSteerForce / 100.0);
 		body.dir -= 2 * Math.PI
 				* (body.dir < 0.0 ? Math.ceil(body.dir / (2 * Math.PI)) : (Math.floor(body.dir / (2 * Math.PI))));
-		// max speed is just a tweaking parameter; don't get confused by it
-		// try varying it in simulation
+
+		// calculate speed
 		speed = (right + left) / 2.0;
 		body.lastSpeed = speed;
 		
 		// apply movement
-		body.x += Math.sin(body.dir) * maxSpeed * speed / 10.0;
-		body.y -= Math.cos(body.dir) * maxSpeed * speed / 10.0;
+		body.x += Math.sin(body.dir) * maxSpeed * speed;
+		body.y -= Math.cos(body.dir) * maxSpeed * speed;
 	}
 
 	@Override

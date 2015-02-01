@@ -157,7 +157,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 			OpCode curop = program[i];
 
 			curop.src1.setValue(Math.abs(curop.src1.getValue()) % numRegs);
-			curop.src2.setValue(curop.immediate.getValue() ? (curop.src2.getValue() / (int) Simulator.intScaleFactor)
+			curop.src2.setValue(curop.immediate.getValue() ? curop.src2.getValue()
 					: (Math.abs(curop.src2.getValue()) % numRegs));
 			curop.trg.setValue(Math.abs(curop.trg.getValue()) % numRegs);
 			curop.op.setValue(Math.abs(curop.op.getValue()) % ops.length);
