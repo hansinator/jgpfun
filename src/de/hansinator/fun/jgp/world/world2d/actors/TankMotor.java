@@ -5,13 +5,9 @@ import java.util.List;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 public class TankMotor implements BodyPart<Body2d>
 {
