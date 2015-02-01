@@ -35,7 +35,7 @@ public class AntBody extends Body2d
 		}
 
 		@Override
-		public List<de.hansinator.fun.jgp.genetics.Gene<?, ?>> getChildren()
+		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			return null;
 		}

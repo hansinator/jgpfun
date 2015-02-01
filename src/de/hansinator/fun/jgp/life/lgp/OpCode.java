@@ -113,7 +113,7 @@ public class OpCode implements Gene<OpCode, LGPMachine<World2d>> {
 	}
 
 	@Override
-	public List<Gene<?, ?>> getChildren() {
+	public List<Gene> getChildren() {
 		return null;
 	}
 

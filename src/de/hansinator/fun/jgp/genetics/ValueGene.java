@@ -37,7 +37,7 @@ public abstract class ValueGene<V> extends BaseGene<V, Object> {
 	}
 
 	@Override
-	public List<Gene<?, ?>> getChildren() {
+	public List<Gene> getChildren() {
 		return null;
 	}
 

@@ -14,7 +14,7 @@ public interface Gene<T, E>
 
 	T express(E context);
 	
-	List<Gene<?,?>> getChildren();
+	List<Gene> getChildren();
 	
 	void setMutationChance(int mutationChance);
 	

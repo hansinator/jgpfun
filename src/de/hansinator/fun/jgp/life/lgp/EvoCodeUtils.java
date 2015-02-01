@@ -67,11 +67,11 @@ class EvoCodeUtils
 			 */
 
 			// see if target register is in effective registers
-			if (effectiveRegisters.containsKey(memVal.trg))
+			if (effectiveRegisters.containsKey(memVal.trg.getValue()))
 			{
 				// now we should remove the target register from the set
 				// and add the source operands
-				effectiveRegisters.remove(memVal.trg);
+				effectiveRegisters.remove(memVal.trg.getValue());
 
 				// if operation has sources
 				if (!(memVal.operation instanceof NoSourceOperation))

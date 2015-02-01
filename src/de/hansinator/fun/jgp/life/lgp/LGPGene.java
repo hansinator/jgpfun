@@ -161,10 +161,11 @@ public class LGPGene extends ExecutionUnit.Gene<World2d>
 			program.set(loc, OpCode.randomOpCode(rnd));
 	}
 
-	@Override
-	public List<Gene<?, ?>> getChildren() {
-		//return program;
-		return null; //XXX fix this
+
+	public List<Gene> getChildren() {
+		List<Gene> list = new ArrayList<Gene>();
+		list.addAll(program);
+		return list;
 	}
 
 

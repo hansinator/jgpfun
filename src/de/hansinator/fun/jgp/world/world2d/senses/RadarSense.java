@@ -163,7 +163,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		}
 
 		@Override
-		public List<de.hansinator.fun.jgp.genetics.Gene<?, ?>> getChildren()
+		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;

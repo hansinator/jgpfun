@@ -84,7 +84,7 @@ public class GpsSense implements BodyPart<Body2d>
 		}
 
 		@Override
-		public List<de.hansinator.fun.jgp.genetics.Gene<?, ?>> getChildren()
+		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
