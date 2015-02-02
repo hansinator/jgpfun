@@ -9,6 +9,7 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
+import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
@@ -136,7 +137,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	}
 	
 	
-	public class Gene implements IOUnit.Gene<Body2d>
+	public static class Gene implements IOUnit.Gene<Body2d>
 	{
 
 		@Override
