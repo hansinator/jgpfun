@@ -27,19 +27,20 @@ public class RouletteWheelSelector implements SelectionStrategy
 		int stopPoint = 0;
 		int fitnessSoFar = 0;
 
+		// drop the ball
 		if (totalFitness > 0)
 			stopPoint = rnd.nextInt(totalFitness);
 		else return pool[rnd.nextInt(pool.length)];
 
 		/*
-		 * Shuffle the organism list to make roulettewheel work better. In case
+		 * Shuffle the organism list to make roulette wheel work better. In case
 		 * this method is called multiple times on the same list, the same
 		 * organisms with a huge fitness values at the beginning of the list
-		 * would have a greater chance of being selected. This shuffle hopefully
-		 * eliminates this problem, if it does exist.
+		 * would have a greater chance of being selected.
 		 */
 		Collections.shuffle(Arrays.asList(pool));
 
+		// spin the wheel
 		for (int i = 0; i < pool.length; i++)
 		{
 			fitnessSoFar += pool[i].getSelectionChance();
@@ -48,6 +49,8 @@ public class RouletteWheelSelector implements SelectionStrategy
 				return pool[i];
 		}
 
+		// if got here ball must have escaped rhoulette wheel
+		// (or all ants have zero fitness)
 		return pool[rnd.nextInt(pool.length)];
 	}
 

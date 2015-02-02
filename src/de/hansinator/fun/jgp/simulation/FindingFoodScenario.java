@@ -53,7 +53,7 @@ public class FindingFoodScenario implements Scenario
 		LGPGene organismGene = LGPGene.randomGene(progSize);
 		organismGene.addIOGene(bodyGene);
 		
-		return new Genome(organismGene, new FoodFitnessEvaluator());
+		return new Genome(organismGene, new FoodFitnessEvaluator(), getSelectionStrategy());
 	}
 
 	@Override

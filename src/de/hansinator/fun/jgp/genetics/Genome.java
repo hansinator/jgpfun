@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.selection.Selectable;
+import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
+import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
@@ -25,10 +27,13 @@ public class Genome implements Selectable
 	//XXX make this something like "addEvaluation" to add an evaluation with world parameter reference and datetime and stuff so a genome is multi-evaluatable
 	private final FitnessEvaluator fitnessEvaluator;
 	
-	public Genome(ExecutionUnit.Gene<World2d> rootGene, FitnessEvaluator fitnessEvaluator)
+	private final SelectionStrategy mutationSelector;
+	
+	public Genome(ExecutionUnit.Gene<World2d> rootGene, FitnessEvaluator fitnessEvaluator, SelectionStrategy mutationSelector)
 	{
 		this.rootGene = rootGene;
 		this.fitnessEvaluator = fitnessEvaluator;
+		this.mutationSelector = mutationSelector;
 	}
 	
 	public FitnessEvaluator getFitnessEvaluator()
@@ -49,52 +54,25 @@ public class Genome implements Selectable
 	
 	public Genome replicate()
 	{
-		return new Genome(rootGene.replicate(), fitnessEvaluator.replicate());
+		return new Genome(rootGene.replicate(), fitnessEvaluator.replicate(), mutationSelector);
 	}
 	
 	public void mutate(int mutationCount)
 	{
-		int totalFitness = 0;
-		
 		// walk the gene tree and collect possible mutations in a list
 		List<Mutation> mutations = new ArrayList<Mutation>();
 		collectMutations(rootGene, mutations);
 
-		// sum up chances
-		for (Mutation mutation : mutations)
-			totalFitness += mutation.getMutationChance();
-		
-		// use a roulette-wheel selector to select mutations
-		// TODO: de-duplicate roulette-wheel logic such that we can use selectors in general on this problem
+		// select given amount of mutations
 		for(int i = 0; i < mutationCount; i++)
 		{
-			// drop the ball
-			int stopPoint = rnd.nextInt(totalFitness);
-
-			/*
-			 * Shuffle the organism list to make roulette wheel work better. In case
-			 * this method is called multiple times on the same list, the same
-			 * organisms with a huge fitness values at the beginning of the list
-			 * would have a greater chance of being selected.
-			 */
-			Collections.shuffle(mutations);
-
-			// spin the wheel
-			for (int x = 0, fitnessSoFar = 0; x < mutations.size(); x++)
-			{
-				fitnessSoFar += mutations.get(x).getMutationChance();
-				// this way zero fitness ants are omitted
-				if (fitnessSoFar > stopPoint)
-				{
-					// execute mutation and continue
-					mutations.get(x).mutate();
-					continue;
-				}
-			}
-
-			// if got here ball must have escaped rhoulette wheel
-			// (or all ants have zero fitness)
-			mutations.get(rnd.nextInt(mutations.size())).mutate();
+			// always sum up chances anew because they might change during runs
+			int totalFitness = 0;
+			for (Mutation mutation : mutations)
+				totalFitness += mutation.getMutationChance();
+			
+			// use our selector to select a mutation and execute it
+			mutationSelector.select(mutations.toArray(new Mutation[mutations.size()]), totalFitness).mutate();
 		}
 	}
 	
