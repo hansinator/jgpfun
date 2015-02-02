@@ -44,7 +44,7 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	public static class IntegerGene extends ValueGene<Integer> {
 		private static final Random rnd = Settings.newRandomSource();
 
-		protected Integer value;
+		protected Integer value = new Integer(0);
 
 		public IntegerGene(int mutationChance) {
 			super(mutationChance);
@@ -59,7 +59,7 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	public static class BooleanGene extends ValueGene<Boolean> {
 		private static final Random rnd = Settings.newRandomSource();
 
-		protected Boolean value;
+		protected Boolean value = new Boolean(false);
 
 		public BooleanGene(int mutationChance) {
 			super(mutationChance);
