@@ -76,6 +76,11 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 				drawableParts[d++]= (BodyPart.DrawablePart<Body2d>) parts[x];
 		}
 	}
+	
+	public IOUnit<Body2d>[] getParts()
+	{
+		return parts;
+	}
 
 	@Override
 	public void attachEvaluationState(ExecutionUnit<World2d> context)

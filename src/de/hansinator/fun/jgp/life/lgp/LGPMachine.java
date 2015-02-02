@@ -6,6 +6,8 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.life.lgp.operations.OpAbs;
 import de.hansinator.fun.jgp.life.lgp.operations.OpAdd;
+import de.hansinator.fun.jgp.life.lgp.operations.OpBranchGt;
+import de.hansinator.fun.jgp.life.lgp.operations.OpBranchLt;
 import de.hansinator.fun.jgp.life.lgp.operations.OpCmp;
 import de.hansinator.fun.jgp.life.lgp.operations.OpDiv;
 import de.hansinator.fun.jgp.life.lgp.operations.OpMax;
@@ -53,7 +55,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 			new OpMov(), //
 	// new OpInc(),
 	// new OpDec(),
-	// new OpBranchLt(), new OpBranchGt()
+	 new OpBranchLt(), new OpBranchGt()
 	// new JumpOp(),
 	// new JumpTarg()
 	};

@@ -131,7 +131,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		ActorOutput[] outputs = (outputCount==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[outputCount];
 		
 		// create ExecutionUnit
-		EvoVM<World2d> eu = new EvoVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
+		LGPMachine<World2d> eu = new BranchVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
 		
 		// update exon size
 		exonSize = eu.getProgramSize();
