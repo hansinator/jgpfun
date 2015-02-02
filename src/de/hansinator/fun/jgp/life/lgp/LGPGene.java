@@ -1,6 +1,5 @@
 package de.hansinator.fun.jgp.life.lgp;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -45,9 +44,13 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 
 	private final int maxLength;
 	
-	public final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
+	private final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
 	
 	private int exonSize = 0;
+	
+	private int inputCount = 0;
+	
+	private int outputCount = 0;
 	
 	// insert a random instruction at a random location
 	private final Mutation mutationInsert = new AbstractMutation(mutateIns) {
@@ -110,6 +113,8 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 
 		LGPGene lg = new LGPGene(p, maxLength);
 		
+		lg.inputCount = inputCount;
+		lg.outputCount = outputCount;
 		for(IOUnit.Gene<ExecutionUnit<World2d>> bg : ioGenes)
 			lg.ioGenes.add(bg.replicate());
 		
@@ -119,18 +124,11 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	@Override
 	public ExecutionUnit<World2d> express(World2d context)
 	{
-		int i = 0, o = 0, x;
-
-		// count I/O ports
-		for(IOUnit.Gene<ExecutionUnit<World2d>> ioGene : ioGenes)
-		{
-			i += ioGene.getInputCount();
-			o += ioGene.getOutputCount();
-		}
+		int i, o, x;
 		
 		// create IO port arrays
-		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
-		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
+		SensorInput[] inputs = (inputCount==0)?SensorInput.emptySensorInputArray:new SensorInput[inputCount];
+		ActorOutput[] outputs = (outputCount==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[outputCount];
 		
 		// create ExecutionUnit
 		EvoVM<World2d> eu = new EvoVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
@@ -212,6 +210,13 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 				
 		return mutations;
 	}
+	
+	public void addIOGene(IOUnit.Gene<ExecutionUnit<World2d>> gene)
+	{
+		ioGenes.add(gene);
+		inputCount += gene.getInputCount();
+		outputCount += gene.getOutputCount();
+	}
 
 
 	@Override
@@ -231,8 +236,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 			String[] columns = new String[]{"loc", "op", "src1", "src2", "trg", "immediate"};
 			DefaultTableModel tableModel = new DefaultTableModel(0, columns.length);
 			tableModel.setColumnIdentifiers(columns);
-			// XXX this has the input register count hardcoded!
-			for(OpCode o : EvoCodeUtils.stripStructuralIntronCode(EvoVM.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), registerCount, 7))
+			for(OpCode o : EvoCodeUtils.stripStructuralIntronCode(EvoVM.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), registerCount, inputCount))
 				tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
 			
 			// create table 
@@ -246,6 +250,8 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 			scrollPane.setPreferredSize(new Dimension(800, 600));
 			Container contentPane = getContentPane();
 			contentPane.add(scrollPane);
+			
+			pack();
 		}
 	}
 }

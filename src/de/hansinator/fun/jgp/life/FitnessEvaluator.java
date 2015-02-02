@@ -1,6 +1,8 @@
 package de.hansinator.fun.jgp.life;
 
-public interface FitnessEvaluator
+import de.hansinator.fun.jgp.genetics.selection.Selectable;
+
+public interface FitnessEvaluator extends Selectable
 {
 	int getFitness();
 

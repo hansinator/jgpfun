@@ -21,6 +21,7 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
+import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
@@ -41,16 +42,16 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(true);
-		//bodyGene.children.add(new RadarSense.Gene());
-		//bodyGene.children.add(new RadarSense.Gene());
-		bodyGene.children.add(new OrientationSense.Gene());
-		bodyGene.children.add(new SpeedSense.Gene());
-		bodyGene.children.add(new WallSense.Gene());
-		bodyGene.children.add(new TankMotor.Gene());
+		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
+		bodyGene.addBodyPartGene(new OrientationSense.Gene());
+		bodyGene.addBodyPartGene(new SpeedSense.Gene());
+		bodyGene.addBodyPartGene(new WallSense.Gene());
+		bodyGene.addBodyPartGene(new TankMotor.Gene());
 		
 		LGPGene organismGene = LGPGene.randomGene(progSize);
-		organismGene.ioGenes.add(bodyGene);
+		organismGene.addIOGene(bodyGene);
 		
 		return new Genome(organismGene, new FoodFitnessEvaluator());
 	}
@@ -76,6 +77,12 @@ public class FindingFoodScenario implements Scenario
 		public int getFitness()
 		{
 			return fitness;
+		}
+		
+		@Override
+		public int getSelectionChance()
+		{
+			return getFitness();
 		}
 
 		@Override

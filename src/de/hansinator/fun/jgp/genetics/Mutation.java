@@ -1,5 +1,7 @@
 package de.hansinator.fun.jgp.genetics;
 
+import de.hansinator.fun.jgp.genetics.selection.Selectable;
+
 /**
  * This describes a mutation that has a possibility to happen and can
  * be applied. Mutations are "offered" by Gene-instances and may be
@@ -10,7 +12,7 @@ package de.hansinator.fun.jgp.genetics;
  * @author hansinator
  *
  */
-public interface Mutation
+public interface Mutation extends Selectable
 {
 	public static Mutation[] emptyMutationArray = { };
 	

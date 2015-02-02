@@ -15,4 +15,9 @@ public abstract class AbstractMutation implements Mutation
 	public int getMutationChance() {
 		return mutationChance;
 	}
+	
+	public int getSelectionChance()
+	{
+		return getMutationChance();
+	}
 }

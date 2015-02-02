@@ -33,6 +33,8 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	public static final double beamLength = 200.0;
 
 	public Point2D target = null;
+	
+	public static Color beamColor = new Color(24, 24, 24);
 
 	public final SensorInput senseDirection = new SensorInput() {
 
@@ -135,7 +137,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 		if (target == null)
 		{
-			g.setColor(Color.darkGray);
+			g.setColor(beamColor);
 			double rdir, bdir;
 			rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
 			bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
