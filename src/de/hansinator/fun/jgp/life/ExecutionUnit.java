@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.life;
 
 import de.hansinator.fun.jgp.genetics.BaseGene;
-import de.hansinator.fun.jgp.genetics.Genome;
 
 public interface ExecutionUnit<E>
 {

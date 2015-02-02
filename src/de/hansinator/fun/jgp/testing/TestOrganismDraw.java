@@ -15,7 +15,6 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.hansinator.fun.jgp.life.Organism;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 

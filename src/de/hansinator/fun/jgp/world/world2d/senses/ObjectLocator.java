@@ -9,12 +9,10 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 /**
  * Sensory input to locate objects in world. Currently only locates food

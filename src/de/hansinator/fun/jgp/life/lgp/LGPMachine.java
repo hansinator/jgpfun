@@ -1,9 +1,7 @@
 package de.hansinator.fun.jgp.life.lgp;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.life.lgp.operations.OpAbs;
@@ -18,7 +16,6 @@ import de.hansinator.fun.jgp.life.lgp.operations.OpNeg;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
-import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.World;
 
 /**

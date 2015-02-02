@@ -8,8 +8,6 @@ import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 public class SpeedSense implements SensorInput, BodyPart<Body2d>
 {

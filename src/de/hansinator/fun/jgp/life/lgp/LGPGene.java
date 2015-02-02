@@ -7,7 +7,6 @@ import java.util.Random;
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;

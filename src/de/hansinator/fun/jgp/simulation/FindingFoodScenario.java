@@ -20,9 +20,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
-import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
 import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
-import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 

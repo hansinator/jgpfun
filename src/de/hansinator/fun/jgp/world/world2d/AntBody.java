@@ -75,7 +75,7 @@ public class AntBody extends Body2d
 		{
 			AntBody body = new AntBody(context);
 			@SuppressWarnings("unchecked")
-			IOUnit<Body2d>[] parts = new IOUnit[children.size()+ (useInternalLocator?1:0)];
+			IOUnit<Body2d>[] parts = new IOUnit[children.size() + (useInternalLocator?1:0)];
 			int i = 0;
 			
 			for(IOUnit.Gene<Body2d> gene : children)

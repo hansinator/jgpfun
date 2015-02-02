@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.life.OrganismGene;
-
 /**
  * 
  * @author hansinator
