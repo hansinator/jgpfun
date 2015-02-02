@@ -13,9 +13,9 @@ import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
-import de.hansinator.fun.jgp.gui.InfoPanel;
+import de.hansinator.fun.jgp.gui.SimulationInfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
-import de.hansinator.fun.jgp.gui.MainView;
+import de.hansinator.fun.jgp.gui.WorldSimulationView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.util.Settings;
 
@@ -91,7 +91,7 @@ public class Simulator
 	 * @param mainView
 	 * @param infoPanel
 	 */
-	synchronized public void start(final MainView mainView, final InfoPanel infoPanel)
+	synchronized public void start(final SimulationInfoPanel infoPanel)
 	{
 		new Thread(new Runnable()
 		{
@@ -99,12 +99,12 @@ public class Simulator
 			@Override
 			public void run()
 			{
-				Simulator.this.run(mainView, infoPanel);
+				Simulator.this.run(infoPanel);
 			}
 		}, "SimulationThread" + this).start();
 	}
 
-	private void run(MainView mainView, InfoPanel infoPanel)
+	private void run(SimulationInfoPanel infoPanel)
 	{
 		long now, evaluationsPerMinuteAverage = 0, evaluationsPerMinuteCount = 0;
 		long startTime = System.currentTimeMillis();
@@ -123,7 +123,7 @@ public class Simulator
 			while (running)
 			{
 				// evaluate organisms
-				currentGeneration = simulation.evaluate(this, currentGeneration, mainView, infoPanel);
+				currentGeneration = simulation.evaluate(currentGeneration);
 				totalFitness = calculateTotalFitness(currentGeneration);
 				evaluationCount++;
 
@@ -136,7 +136,7 @@ public class Simulator
 
 				// statistics
 				System.out.println("GEN: " + evaluationCount);
-				infoPanel.updateInfo(evaluationCount + 1);
+				infoPanel.updateInfo();
 				now = System.currentTimeMillis();
 				if ((now - lastStatsTime) >= 3000)
 				{
@@ -169,7 +169,7 @@ public class Simulator
 		simulation.stop();
 	}
 
-	public void restart(MainView mainView, InfoPanel infoPanel)
+	public void restart(WorldSimulationView mainView, SimulationInfoPanel infoPanel)
 	{
 		simulation.stop();
 		reset();
@@ -268,6 +268,11 @@ public class Simulator
 	public WorldSimulation getSimulation()
 	{
 		return simulation;
+	}
+	
+	public int getEvaluationCount()
+	{
+		return evaluationCount;
 	}
 
 	/**

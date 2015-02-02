@@ -37,8 +37,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 
 	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
-		// TODO: fix null pointer
-		super(null, x, y, dir);
+		super(parent.getExecutionContext(), x, y, dir);
 		this.parent = parent;
 	}
 

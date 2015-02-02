@@ -106,9 +106,8 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		return lg;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public ExecutionUnit express(World2d context)
+	public ExecutionUnit<World2d> express(World2d context)
 	{
 		int i = 0, o = 0, x;
 
@@ -162,6 +161,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	}
 
 
+	@SuppressWarnings("rawtypes")
 	public List<Gene> getChildren() {
 		List<Gene> list = new ArrayList<Gene>();
 		list.addAll(program);
