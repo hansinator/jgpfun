@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 
@@ -127,6 +128,19 @@ public class TestRadarSense extends JPanel
 
 	public static void main(String[] args) throws IOException
 	{
+		Point p = new Point(10,10);
+		Point p1 = new Point(10,10);
+		Point p2 = new Point(20,10);
+		Point p3 = new Point(10,20);
+		
+		double alpha = ((p2.y - p3.y) * (p.x - p3.x) + (p3.x - p2.x) * (p.y - p3.y)) /
+				(double)((p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
+		double beta = ((p3.y - p1.y) * (p.x - p3.x) + (p1.x - p3.x) * (p.y - p3.y)) /
+				(double)((p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
+		double gamma = 1.0f - alpha - beta;
+		
+		System.out.println("alpha: " + alpha + " beta: " + beta + " gamma: " + gamma);
+		
 		Settings.load(new File("default.properties"));
 		JFrame frame = new JFrame("test");
 		TestRadarSense testOrganismDraw = new TestRadarSense();
