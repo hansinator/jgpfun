@@ -31,6 +31,8 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	public Food target;
 
 	private double objDist;
+	
+	private static Color beamColor = new Color(32, 32, 32);
 
 	public final SensorInput senseDirX = new SensorInput()
 	{
@@ -122,7 +124,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	{
 		if (target != null)
 		{
-			g.setColor(Color.darkGray);
+			g.setColor(beamColor);
 			g.drawLine(Math.round((float) origin.x), Math.round((float) origin.y), (int) Math.round(target.x),
 					(int) Math.round(target.y));
 		}

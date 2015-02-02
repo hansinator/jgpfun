@@ -33,8 +33,6 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 
 	public double lastSpeed = 0.0;
 
-	public volatile boolean tagged = false;
-
 	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
 		super(parent.getExecutionContext(), x, y, dir);
@@ -139,7 +137,7 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right wing
 		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left wing
 
-		g.setColor(tagged ? Color.magenta : Color.red);
+		g.setColor(selected ? Color.magenta : Color.red);
 		g.drawPolygon(p);
 		g.fillPolygon(p);
 	}

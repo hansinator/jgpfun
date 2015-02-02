@@ -1,5 +1,7 @@
 package de.hansinator.fun.jgp.life;
 
+import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
+
 
 public interface ExecutionUnit<E>
 {
@@ -30,5 +32,7 @@ public interface ExecutionUnit<E>
 		public int getExonSize();
 
 		public int getSize();
+		
+		public ExecutionUnitGeneView getView();
 	}
 }

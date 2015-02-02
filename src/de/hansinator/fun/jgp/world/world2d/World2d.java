@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
@@ -17,6 +18,11 @@ import de.hansinator.fun.jgp.world.World;
 /**
  * 
  * @author hansinator
+ */
+/*
+ * TODO decouple draw and click stuff completely out of this class into a worldview
+ * TODO this class should only hold its data and offer methods to change them in various ways (such as animate)
+ * TODO as a data class it should expose enough getters and setters to let a worldview display all of it
  */
 public class World2d implements World
 {
@@ -117,16 +123,27 @@ public class World2d implements World
 	{
 		Point p = e.getPoint();
 		
+		// TODO probably create a selectable interface in the future, but for now coupling of world2d and other 2d objects is ok
 		// see if we hit an object
-		//XXX create a clickable interface
 		for (World2dObject o : objects)
 			if (Math.abs(o.x - p.x) < 10.0 && Math.abs(o.y - p.y) < 10.0)
 			{
-				// tag it
-				//XXX clickable interface!
-				//b.tagged = true;
-				return;
+				// TODO add an object inspector view that shows info about the selected object
+				if(e.getClickCount() == 1)
+					o.selected = true;
+				else if((e.getClickCount() == 2) && (o instanceof Body2d))
+				{
+					// show a gene viewer
+					Genome genome = generation.get(((Body2d)o).parent);
+					if(genome != null)
+					{
+						ExecutionUnitGeneView view = genome.getRootGene().getView();
+						if(view != null)
+							view.show();
+					}
+				}
 			}
+			else if(e.getClickCount() == 1) o.selected = false;
 	}
 
 	@Override

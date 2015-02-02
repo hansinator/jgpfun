@@ -58,7 +58,7 @@ public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 	BooleanGene immediate = new BooleanGene(20);
 	
 	@SuppressWarnings("rawtypes")
-	Gene[] children = {op, src1, src2, trg, immediate };
+	Gene[] children = { op, src1, src2, trg, immediate };
 
 	Operation operation;
 

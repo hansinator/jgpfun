@@ -13,6 +13,8 @@ public abstract class World2dObject extends Point.Double
 	public double dir;
 
 	protected World2d world;
+	
+	public volatile boolean selected = false;
 
 	public World2dObject(World2d world, double x, double y, double dir)
 	{

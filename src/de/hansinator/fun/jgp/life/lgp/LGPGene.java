@@ -1,12 +1,22 @@
 package de.hansinator.fun.jgp.life.lgp;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 import de.hansinator.fun.jgp.genetics.AbstractMutation;
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -202,5 +212,40 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 				
 		return mutations;
 	}
+
+
+	@Override
+	public ExecutionUnitGeneView getView()
+	{
+		return new View();
+	}
 	
+	
+	private class View extends JDialog implements ExecutionUnitGeneView
+	{
+		public View()
+		{	
+			int i = 0;
+			
+			// make a tabke model for the program
+			String[] columns = new String[]{"loc", "op", "src1", "src2", "trg", "immediate"};
+			DefaultTableModel tableModel = new DefaultTableModel(0, columns.length);
+			tableModel.setColumnIdentifiers(columns);
+			// XXX this has the input register count hardcoded!
+			for(OpCode o : EvoCodeUtils.stripStructuralIntronCode(EvoVM.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), registerCount, 7))
+				tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
+			
+			// create table 
+			JTable programTable = new JTable(tableModel);
+			programTable.setFillsViewportHeight(true);
+			programTable.setColumnSelectionAllowed(false);
+			programTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			
+			// add table to view
+			JScrollPane scrollPane = new JScrollPane(programTable);
+			scrollPane.setPreferredSize(new Dimension(800, 600));
+			Container contentPane = getContentPane();
+			contentPane.add(scrollPane);
+		}
+	}
 }
