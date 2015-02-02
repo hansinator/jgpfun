@@ -1,10 +1,12 @@
 package de.hansinator.fun.jgp.life.lgp;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.ImmutableGene;
+import de.hansinator.fun.jgp.genetics.ValueGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.BooleanGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.IntegerGene;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
@@ -54,6 +56,9 @@ public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 	};
 
 	BooleanGene immediate = new BooleanGene(20);
+	
+	@SuppressWarnings("rawtypes")
+	Gene[] children = { op, src1, src2, trg, immediate };
 
 	Operation operation;
 
@@ -115,6 +120,6 @@ public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 
 	@Override
 	public List<Gene> getChildren() {
-		return null;
+		return Arrays.asList(children);
 	}
 }

@@ -17,9 +17,9 @@ public class AntBody extends Body2d
 	public final ObjectLocator locator;
 
 
-	public AntBody(ExecutionUnit<World2d> organism)
+	public AntBody(ExecutionUnit<World2d> context)
 	{
-		super(organism, 0.0, 0.0, 0.0);
+		super(context, 0.0, 0.0, 0.0);
 
 		// init locator sense
 		locator = new ObjectLocator(this);
@@ -29,19 +29,26 @@ public class AntBody extends Body2d
 	{
 		public static int locatorInputCount = new ObjectLocator.Gene().getInputCount();
 				
-		public List<IOUnit.Gene<Body2d>> children = new ArrayList<IOUnit.Gene<Body2d>>();
+		private List<IOUnit.Gene<Body2d>> children = new ArrayList<IOUnit.Gene<Body2d>>();
 		
 		boolean useInternalLocator;
+		
+		int inputCount = 0;
+		
+		int outputCount = 0;
 		
 		public Gene(boolean useInternalLocator)
 		{
 			this.useInternalLocator = useInternalLocator;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
-			return null;
+			List<de.hansinator.fun.jgp.genetics.Gene> list = new ArrayList<de.hansinator.fun.jgp.genetics.Gene>();
+			list.addAll(children);
+			return list;
 		}
 
 		@Override
@@ -49,6 +56,8 @@ public class AntBody extends Body2d
 		{
 			AntBody.Gene gene = new AntBody.Gene(useInternalLocator);
 			
+			gene.inputCount = inputCount;
+			gene.outputCount = outputCount;
 			for(IOUnit.Gene<Body2d> child : children)
 				gene.children.add(child.replicate());
 			
@@ -63,10 +72,11 @@ public class AntBody extends Body2d
 			IOUnit<Body2d>[] parts = new IOUnit[children.size() + (useInternalLocator?1:0)];
 			int i = 0;
 			
-			for(IOUnit.Gene<Body2d> gene : children)
-				parts[i++] = gene.express(body);
 			if(useInternalLocator)
 				parts[i++] = body.locator;
+			
+			for(IOUnit.Gene<Body2d> gene : children)
+				parts[i++] = gene.express(body);
 			
 			body.setParts(parts);
 			
@@ -76,23 +86,13 @@ public class AntBody extends Body2d
 		@Override
 		public int getInputCount()
 		{
-			int i = 0;
-			
-			for(IOUnit.Gene<Body2d> child : children)
-				i += child.getInputCount();
-			
-			return i + (useInternalLocator?locatorInputCount:0);
+			return inputCount + (useInternalLocator?locatorInputCount:0);
 		}
 
 		@Override
 		public int getOutputCount()
 		{
-			int o = 0;
-			
-			for(IOUnit.Gene<Body2d> child : children)
-				o += child.getOutputCount();
-			
-			return o;
+			return outputCount;
 		}
 
 		@Override
@@ -101,5 +101,11 @@ public class AntBody extends Body2d
 			return Mutation.emptyMutationArray;
 		}
 
+		public void addBodyPartGene(IOUnit.Gene<Body2d> gene)
+		{
+			children.add(gene);
+			inputCount += gene.getInputCount();
+			outputCount += gene.getOutputCount();
+		}
 	}
 }

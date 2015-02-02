@@ -33,12 +33,9 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 
 	public double lastSpeed = 0.0;
 
-	public volatile boolean tagged = false;
-
 	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
-		// TODO: fix null pointer
-		super(null, x, y, dir);
+		super(parent.getExecutionContext(), x, y, dir);
 		this.parent = parent;
 	}
 
@@ -78,6 +75,11 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 			if (parts[x] instanceof BodyPart.DrawablePart)
 				drawableParts[d++]= (BodyPart.DrawablePart<Body2d>) parts[x];
 		}
+	}
+	
+	public IOUnit<Body2d>[] getParts()
+	{
+		return parts;
 	}
 
 	@Override
@@ -136,21 +138,13 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 			part.draw(g);
 
 		Polygon p = new Polygon();
-		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top
-		// of
-		// triangle
-		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right
-		// wing
-		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left
-		// wing
+		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top of triangle
+		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right wing
+		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left wing
 
-		g.setColor(tagged ? Color.magenta : Color.red);
+		g.setColor(selected ? Color.magenta : Color.red);
 		g.drawPolygon(p);
 		g.fillPolygon(p);
-
-		//XXX TODO find a solution for the fitness dependency here
-		//g.setColor(Color.green);
-		//g.drawString("" + organism.getFitness(), Math.round((float) x) + 8, Math.round((float) y) + 8);
 	}
 
 	@Override

@@ -19,13 +19,13 @@ import javax.swing.JScrollPane;
 import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
- * 
+ * MainFrame is some sort of a view for a Simulator instance
  * @author hansinator
  */
 public class MainFrame extends JFrame implements WindowListener
 {
 
-	private MainView mainView;
+	private WorldSimulationView simulationClientView;
 
 	private final JScrollPane centerPane;
 
@@ -40,17 +40,19 @@ public class MainFrame extends JFrame implements WindowListener
 		super("BAH! Bonn!!1!11!!!");
 		this.simulator = simulator;
 
-		// create all direct clients
+		// create all sub views
 		centerPane = new JScrollPane();
 		sidePaneLeft = new JPanel();
 		sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
 		bottomPane = new BottomPanel(simulator);
+		
+		// init simulation client view
+		simulationClientView = new WorldSimulationView(simulator.getSimulation());
+		simulationClientView.setPreferredSize(new Dimension(width, height));
 
-		// set default center pane size properties
+		// init centerPane
 		centerPane.setPreferredSize(new Dimension(800, 600));
-
-		// init application specific content
-		initClientViews(width, height);
+		centerPane.setViewportView(simulationClientView);
 
 		// add the menu bar
 		setJMenuBar(createMenuBar());
@@ -90,7 +92,7 @@ public class MainFrame extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				simulator.restart(mainView, bottomPane.infoPanel);
+				simulator.restart();
 			}
 
 		});
@@ -100,26 +102,15 @@ public class MainFrame extends JFrame implements WindowListener
 		return menuBar;
 	}
 
-	private void initClientViews(int width, int height)
-	{
-		// to be put elsewhere
-		mainView = new MainView(simulator.getSimulation().world);
-		mainView.setPreferredSize(new Dimension(width, height));
-
-		setCenterPaneView(mainView);
-	}
-
-	public void setCenterPaneView(Component view)
-	{
-		centerPane.setViewportView(view);
-	}
-
 	public void startSimulation()
 	{
-		System.out.println("MainView size: " + mainView.getWidth() + "x" + mainView.getHeight());
+		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
+		
 		// TODO: to be put somewhere else
 		addWindowListener(this);
-		simulator.start(mainView, bottomPane.infoPanel);
+		
+		// run simulator
+		simulator.start();
 	}
 
 	public void stopSimulation()

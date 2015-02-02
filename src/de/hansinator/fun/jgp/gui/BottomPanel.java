@@ -25,10 +25,12 @@ import de.hansinator.fun.jgp.simulation.Simulator;
 public class BottomPanel extends JPanel
 {
 
-	public final InfoPanel infoPanel = new InfoPanel();
+	public final SimulationInfoPanel infoPanel;
 
 	public BottomPanel(Simulator simulator)
 	{
+		infoPanel = new SimulationInfoPanel(simulator);
+		
 		/*
 		 * Food chart
 		 */

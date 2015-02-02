@@ -16,20 +16,16 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import de.hansinator.fun.jgp.world.World;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
+import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
 /**
  * 
  * @author hansinator
  */
-public class MainView extends javax.swing.JPanel
+public class WorldSimulationView extends javax.swing.JPanel
 {
-
-	private int rps;
-
-	private int progress;
-
-	private final World world;
+	private final WorldSimulation simulation;
 
 	/*
 	 * TODO: add setters for things to draw or make a worldmodel including all
@@ -37,10 +33,19 @@ public class MainView extends javax.swing.JPanel
 	 * and food
 	 */
 	/** Creates new form MainView */
-	public MainView(final World world)
+	public WorldSimulationView(final WorldSimulation simulation)
 	{
-		this.world = world;
+		this.simulation = simulation;
 		initComponents();
+		
+		simulation.addViewUpdateListener( new SimulationViewUpdateListener() {
+			
+			@Override
+			public void onViewUpdate()
+			{
+				repaint();
+			}
+		});
 
 		addMouseListener(new MouseListener()
 		{
@@ -48,8 +53,7 @@ public class MainView extends javax.swing.JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				Point p = e.getPoint();
-				world.clickEvent(p.x, p.y);
+				simulation.world.clickEvent(e, simulation.getOrganismsByGenomeMap());
 				// fixme: only repaint if necessary
 				repaint();
 			}
@@ -104,25 +108,20 @@ public class MainView extends javax.swing.JPanel
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-		world.draw(g);
+		simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
 
-		if (rps != 0)
+		if (simulation.getRPS() != 0)
 		{
 			g.setColor(Color.yellow);
-			g.drawString("RPS: " + rps, 10, 15);
+			g.drawString("RPS: " + simulation.getRPS(), 10, 15);
 		}
 
+		int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
 		if (progress != 0)
 		{
 			g.setColor(Color.yellow);
 			g.drawString("" + progress + "%", 10, 30);
 		}
-	}
-
-	public void drawStuff(int rps, int progress)
-	{
-		this.rps = rps;
-		this.progress = progress;
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables

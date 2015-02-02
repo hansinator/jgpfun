@@ -8,33 +8,38 @@ import javax.swing.SpringLayout;
 import javax.swing.plaf.BorderUIResource;
 
 import util.SpringUtilities;
+import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
+import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
 /**
  * 
  * @author Hansinator
  */
-public class InfoPanel extends JPanel
+public class SimulationInfoPanel extends JPanel
 {
-
+	private final Simulator simulator;
+	
 	private final JLabel labelRPS;
 
 	private final JLabel labelProgress;
 
 	private final JLabel labelGeneration;
 
-	public void updateInfo(Integer rps, Integer progress)
+	
+	public SimulationInfoPanel(final Simulator simulator)
 	{
-		labelRPS.setText(rps.toString());
-		labelProgress.setText(progress.toString());
-	}
-
-	public void updateInfo(Integer generation)
-	{
-		labelGeneration.setText(generation.toString());
-	}
-
-	public InfoPanel()
-	{
+		this.simulator = simulator;
+		
+		simulator.getSimulation().addViewUpdateListener( new SimulationViewUpdateListener() {
+			
+			@Override
+			public void onViewUpdate()
+			{
+				updateInfo();
+			}
+		});
+		
 		JLabel labelRPSText = new JLabel("RPS:");
 		JLabel labelProgessText = new JLabel("Progress:");
 		JLabel labelGenerationText = new JLabel("Generation:");
@@ -64,4 +69,10 @@ public class InfoPanel extends JPanel
 				6, 6); // xPad, yPad
 	}
 
+	private void updateInfo()
+	{
+		labelRPS.setText("" + simulator.getSimulation().getRPS());
+		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION);
+		labelGeneration.setText("" + (simulator.getEvaluationCount() + 1));
+	}
 }

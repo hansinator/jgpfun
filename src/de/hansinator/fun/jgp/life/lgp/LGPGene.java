@@ -1,12 +1,21 @@
 package de.hansinator.fun.jgp.life.lgp;
 
+import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 import de.hansinator.fun.jgp.genetics.AbstractMutation;
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -35,9 +44,13 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 
 	private final int maxLength;
 	
-	public final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
+	private final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
 	
 	private int exonSize = 0;
+	
+	private int inputCount = 0;
+	
+	private int outputCount = 0;
 	
 	// insert a random instruction at a random location
 	private final Mutation mutationInsert = new AbstractMutation(mutateIns) {
@@ -100,31 +113,25 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 
 		LGPGene lg = new LGPGene(p, maxLength);
 		
+		lg.inputCount = inputCount;
+		lg.outputCount = outputCount;
 		for(IOUnit.Gene<ExecutionUnit<World2d>> bg : ioGenes)
 			lg.ioGenes.add(bg.replicate());
 		
 		return lg;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public ExecutionUnit express(World2d context)
+	public ExecutionUnit<World2d> express(World2d context)
 	{
-		int i = 0, o = 0, x;
-
-		// count I/O ports
-		for(IOUnit.Gene<ExecutionUnit<World2d>> ioGene : ioGenes)
-		{
-			i += ioGene.getInputCount();
-			o += ioGene.getOutputCount();
-		}
+		int i, o, x;
 		
 		// create IO port arrays
-		SensorInput[] inputs = (i==0)?SensorInput.emptySensorInputArray:new SensorInput[i];
-		ActorOutput[] outputs = (o==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[o];
+		SensorInput[] inputs = (inputCount==0)?SensorInput.emptySensorInputArray:new SensorInput[inputCount];
+		ActorOutput[] outputs = (outputCount==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[outputCount];
 		
 		// create ExecutionUnit
-		EvoVM<World2d> eu = new EvoVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
+		LGPMachine<World2d> eu = new BranchVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
 		
 		// update exon size
 		exonSize = eu.getProgramSize();
@@ -162,6 +169,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	}
 
 
+	@SuppressWarnings("rawtypes")
 	public List<Gene> getChildren() {
 		List<Gene> list = new ArrayList<Gene>();
 		list.addAll(program);
@@ -203,4 +211,47 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		return mutations;
 	}
 	
+	public void addIOGene(IOUnit.Gene<ExecutionUnit<World2d>> gene)
+	{
+		ioGenes.add(gene);
+		inputCount += gene.getInputCount();
+		outputCount += gene.getOutputCount();
+	}
+
+
+	@Override
+	public ExecutionUnitGeneView getView()
+	{
+		return new View();
+	}
+	
+	
+	private class View extends JDialog implements ExecutionUnitGeneView
+	{
+		public View()
+		{	
+			int i = 0;
+			
+			// make a tabke model for the program
+			String[] columns = new String[]{"loc", "op", "src1", "src2", "trg", "immediate"};
+			DefaultTableModel tableModel = new DefaultTableModel(0, columns.length);
+			tableModel.setColumnIdentifiers(columns);
+			for(OpCode o : EvoCodeUtils.stripStructuralIntronCode(EvoVM.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), registerCount, inputCount))
+				tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
+			
+			// create table 
+			JTable programTable = new JTable(tableModel);
+			programTable.setFillsViewportHeight(true);
+			programTable.setColumnSelectionAllowed(false);
+			programTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			
+			// add table to view
+			JScrollPane scrollPane = new JScrollPane(programTable);
+			scrollPane.setPreferredSize(new Dimension(800, 600));
+			Container contentPane = getContentPane();
+			contentPane.add(scrollPane);
+			
+			pack();
+		}
+	}
 }

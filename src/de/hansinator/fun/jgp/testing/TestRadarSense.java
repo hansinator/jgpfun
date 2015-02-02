@@ -2,51 +2,108 @@
  */
 package de.hansinator.fun.jgp.testing;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.life.FitnessEvaluator;
+import de.hansinator.fun.jgp.life.IOUnit;
+import de.hansinator.fun.jgp.life.lgp.LGPGene;
+import de.hansinator.fun.jgp.simulation.FindingFoodScenario.FoodFitnessEvaluator;
+import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.AntBody;
+import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
+import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
+import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
+import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
+import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
  * 
  * @author Hansinator
  */
+@SuppressWarnings("serial")
 public class TestRadarSense extends JPanel
 {
 
-	private final Organism organism;
+	private final ExecutionUnit<World2d> organism;
+	
+	private final AntBody body;
+	
+	private RadarSense sense;
 
-	private final JSlider slider;
+	private final JSlider sliderBody;
+	
+	private final JSlider sliderBeam;
 
 	private final World2d world;
+
+	public LGPGene randomGenome()
+	{
+		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
+
+		LGPGene organismGene = LGPGene.randomGene(256);
+		organismGene.addIOGene(bodyGene);
+
+		return organismGene;
+	}
 
 	public TestRadarSense() throws IOException
 	{
 		setPreferredSize(new Dimension(800, 600));
 		world = new World2d(800, 600, 23);
 		world.resetState();
-		this.organism = RadarAntGenome.randomGenome(256).synthesize();
-		this.organism.addToWorld(world);
-		this.organism.bodies[0].x = 400.0;
-		this.organism.bodies[0].y = 300.0;
-		this.organism.bodies[0].sampleInputs();
+		organism = randomGenome().express(world);
+		organism.setExecutionContext(world);
 
-		slider = new JSlider(0, 360);
-		slider.addChangeListener(new ChangeListener()
-		{
+		body = ((AntBody) organism.getIOUnits()[0]);
+		body.x = 400.0;
+		body.y = 300.0;
+		body.sampleInputs();
+		
+		for(IOUnit<Body2d> part : body.getParts())
+			if(part instanceof RadarSense)
+				sense = (RadarSense) part;
+		
+		sense.get();
+
+		sliderBody = new JSlider(0, 360);
+		sliderBody.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				organism.bodies[0].dir = slider.getValue() * (Math.PI / 180.0);
-				((RadarAntBody) organism.bodies[0]).radarSense.get();
+				body.dir = sliderBody.getValue() * (Math.PI / 180.0);
+				sense.get();
+				repaint();
+			}
+
+		});
+		
+		sliderBeam = new JSlider(0, 360);
+		sliderBeam.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				sense.direction = sliderBeam.getValue() * (Math.PI / 180.0);
+				sense.get();
 				repaint();
 			}
 
@@ -59,51 +116,39 @@ public class TestRadarSense extends JPanel
 		super.paint(g);
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		/*
-		 * organism.draw(g); g.setColor(Color.yellow); g.drawString("Dir: " +
-		 * String.format("%.2f", organism.bodies[0].dir), 10, 15);
-		 */
+		
+		for (Food f : world.food)
+			f.draw(g);
+		
+		body.draw(g);
+		g.setColor(Color.yellow);
+		g.drawString("BodyDir: " + String.format("%.2f", body.dir), 10, 15);
+		g.drawString("BeamDir: " + String.format("%.2f", sense.direction), 10, 25);
 	}
 
 	public static void main(String[] args) throws IOException
 	{
-		/*
-		 * Settings.load(new File("default.properties")); JFrame frame = new
-		 * JFrame("test"); TestRadarSense testOrganismDraw = new
-		 * TestRadarSense(); frame.setLayout(new BorderLayout());
-		 * frame.add(testOrganismDraw, BorderLayout.CENTER);
-		 * frame.add(testOrganismDraw.slider, BorderLayout.PAGE_END);
-		 * frame.pack(); frame.setVisible(true);
-		 */
-		double x1, x2, x3, y1, y2, y3;
-
-		x1 = 10;
-		y1 = 10;
-		x2 = 200;
-		y2 = 200;
-		x3 = 15;
-		y3 = 15;
-		x3 = Math.floor(x3);
-		y3 = Math.floor(y3);
-
-		System.out.println(((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)) == 0);
-		System.out.println((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
-
-		double m, b;
-		m = (y2 - y1) / (x2 - x1);
-		b = y1 - m * x1;
-
-		double y = m * x3 + b;
-
-		if (Math.abs(y - y3) < 10.0)
-		{
-			System.out.println(y);
-			System.out.println(y3);
-			System.out.println(y - y3);
-			System.out.println("");
-		}
-		System.out.println(y);
-		System.out.println(y3);
+		Point p = new Point(10,10);
+		Point p1 = new Point(10,10);
+		Point p2 = new Point(20,10);
+		Point p3 = new Point(10,20);
+		
+		double alpha = ((p2.y - p3.y) * (p.x - p3.x) + (p3.x - p2.x) * (p.y - p3.y)) /
+				(double)((p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
+		double beta = ((p3.y - p1.y) * (p.x - p3.x) + (p1.x - p3.x) * (p.y - p3.y)) /
+				(double)((p2.y - p3.y) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
+		double gamma = 1.0f - alpha - beta;
+		
+		System.out.println("alpha: " + alpha + " beta: " + beta + " gamma: " + gamma);
+		
+		Settings.load(new File("default.properties"));
+		JFrame frame = new JFrame("test");
+		TestRadarSense testOrganismDraw = new TestRadarSense();
+		frame.setLayout(new BorderLayout());
+		frame.add(testOrganismDraw, BorderLayout.CENTER);
+		frame.add(testOrganismDraw.sliderBody, BorderLayout.PAGE_START);
+		frame.add(testOrganismDraw.sliderBeam, BorderLayout.PAGE_END);
+		frame.pack();
+		frame.setVisible(true);
 	}
-
 }

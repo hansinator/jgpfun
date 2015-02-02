@@ -5,13 +5,16 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public abstract class World2dObject extends Point.Double
 {
 	final List<CollisionListener> collisionListeners = new ArrayList<CollisionListener>();
-
+	
 	public double dir;
 
 	protected World2d world;
+	
+	public volatile boolean selected = false;
 
 	public World2dObject(World2d world, double x, double y, double dir)
 	{

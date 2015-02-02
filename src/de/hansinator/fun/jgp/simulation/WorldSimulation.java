@@ -1,5 +1,9 @@
 package de.hansinator.fun.jgp.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -7,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.gui.InfoPanel;
-import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.World2d;
@@ -39,6 +41,8 @@ public class WorldSimulation
 	private volatile boolean paused = false;
 
 	private volatile boolean slowMode = false;
+	
+	private volatile int currentRound;
 
 	private final Object runLock = new Object();
 
@@ -47,6 +51,12 @@ public class WorldSimulation
 	public final World world;
 
 	public static final int ROUNDS_PER_GENERATION = 4000;
+	
+	private int rps;
+	
+	private final ConcurrentHashMap<ExecutionUnit<? extends World>, Genome> organismsByGenome = new ConcurrentHashMap<ExecutionUnit<? extends World>, Genome>();
+	
+	final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
 
 	// XXX distinguish only between generational and continuous simulation, not
 	// world and mona lisa; mona lisa needs to be implemented by a scenario only
@@ -64,23 +74,23 @@ public class WorldSimulation
 			world.resetState();
 			running = true;
 			paused = false;
+			rps = 0;
 		}
 	}
 
 	/*
-	 * FIXME: add events to the simulation, so that a main view can draw upon an
-	 * event
-	 * 
-	 * re-think generation runtime stat calculation to be better suited for
-	 * re-entrance
+	 * TODO re-think generation runtime stat calculation to be better suited for re-entrance
 	 */
-	@SuppressWarnings({ "rawtypes" })
-	public Genome[] evaluate(Simulator simulator, Genome[] generation, MainView mainView, InfoPanel infoPanel)
+	@SuppressWarnings({"unchecked" })
+	public Genome[] evaluate(Genome[] generation)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		ExecutionUnit[] organisms = new ExecutionUnit[generation.length];
+		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[generation.length];
+		
+		// clear organism map for each new round
+		organismsByGenome.clear();
 
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
@@ -88,11 +98,14 @@ public class WorldSimulation
 			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
 			organisms[i] = generation[i].getRootGene().express((World2d) world);
 			generation[i].getFitnessEvaluator().attach(organisms[i]);
+			
+			// record organism genome relationship
+			organismsByGenome.put(organisms[i], generation[i]);
 		}
 
 		synchronized (runLock)
 		{
-			for (int i = 0; running && (i < ROUNDS_PER_GENERATION); i++)
+			for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
 			{
 				while (paused)
 					Thread.yield();
@@ -101,19 +114,17 @@ public class WorldSimulation
 
 				// calc stats and draw stuff
 				// TODO: try to decouple this from pure generation running
-				if (slowMode || (i % roundsMod) == 0)
+				if (slowMode || (currentRound % roundsMod) == 0)
 				{
 					final long time = System.currentTimeMillis() - lastStatTime;
 					lastStatTime = System.currentTimeMillis();
-					final int rps = time > 0 ? (int) (((i - lastStatRound) * 1000) / time) : 1;
-					final int progress = (i * 100) / ROUNDS_PER_GENERATION;
-					lastStatRound = i;
+					this.rps = time > 0 ? (int) (((currentRound - lastStatRound) * 1000) / time) : 1;
+					lastStatRound = currentRound;
 
 					// update views
-					infoPanel.updateInfo(rps, progress);
-					mainView.drawStuff(rps, progress);
-					mainView.repaint();
+					updateSimulationViews();
 
+					// slow down things artificially
 					if (slowMode && (time < (1000 / fpsMax)))
 						try
 						{
@@ -234,5 +245,42 @@ public class WorldSimulation
 	public boolean isPaused()
 	{
 		return paused;
+	}
+	
+	public int getCurrentRound()
+	{
+		return currentRound;
+	}
+	
+	public int getRPS()
+	{
+		return rps;
+	}
+	
+	
+	final synchronized public boolean addViewUpdateListener(SimulationViewUpdateListener listener)
+	{
+		return viewUpdateListeners.add(listener);
+	}
+
+	final synchronized public boolean removeViewUpdateListener(SimulationViewUpdateListener listener)
+	{
+		return viewUpdateListeners.remove(listener);
+	}
+
+	final void updateSimulationViews()
+	{
+		for(SimulationViewUpdateListener listener : viewUpdateListeners)
+			listener.onViewUpdate();
+	}
+
+	public static interface SimulationViewUpdateListener
+	{
+		public void onViewUpdate();
+	}
+	
+	public Map<ExecutionUnit<? extends World>, Genome> getOrganismsByGenomeMap()
+	{
+		return java.util.Collections.unmodifiableMap(organismsByGenome);
 	}
 }

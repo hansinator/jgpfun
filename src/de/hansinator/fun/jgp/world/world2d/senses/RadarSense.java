@@ -33,6 +33,10 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	public static final double beamLength = 200.0;
 
 	public Point2D target = null;
+	
+	public static Color beamColor = new Color(24, 24, 24);
+	
+	private double oldBeamX, oldBeamY;
 
 	public final SensorInput senseDirection = new SensorInput() {
 
@@ -69,6 +73,21 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		// real match
 		// return Math.round(y) == Math.round(y3);
 	}
+	
+	// see http://stackoverflow.com/questions/13300904/determine-whether-point-lies-inside-triangle
+	public boolean pointInTriangle(double x1, double y1, double x2, double y2, double x3, double y3, Point2D p)
+	{
+		double alpha = ((y2 - y3) * (p.getX() - x3) + (x3 - x2) * (p.getY() - y3)) /
+				(double)((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+		double beta = ((y3 - y1) * (p.getX() - x3) + (x1 - x3) * (p.getY() - y3)) /
+				(double)((y2 - y3) * (x1 - x3) + (x3 - x2) * (x1 - y3));
+		double gamma = 1.0f - alpha - beta;
+
+		return ((alpha > 0.0) && (beta > 0.0) && (gamma > 0.0)) ||
+				((alpha == 1.0) && (beta == 0.0) && (gamma == 0.0)) ||
+				((alpha == 0.0) && (beta == 1.0) && (gamma == 0.0)) ||
+				((alpha == 0.0) && (beta == 0.0) && (gamma == 1.0));
+	}
 
 	@Override
 	public int get()
@@ -84,16 +103,29 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
 		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
 		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
-
+		
 		for (Food f : world.food)
-			if (pointInLine(x1, y1, x2, y2, f)
+		{
+			boolean hit = false;
+			// see if this is a triangle or a line
+			if(!(oldBeamX == x2) && (oldBeamY == y2)) hit = pointInTriangle(x1, y1, x2, y2, oldBeamX, oldBeamY, f);
+			else hit = pointInLine(x1, y1, x2, y2, f)
+					// test if distance to point is within beamLength
 					&& (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength)
-					&& (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x)))
+					&& (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x));
+			if(hit)
 			{
 				target = f;
+				oldBeamX = x2;
+				oldBeamY = y2;
 				return Integer.MAX_VALUE;
 			}
+		}
 		target = null;
+		
+		oldBeamX = x2;
+		oldBeamY = y2;
+		
 		return 0;
 	}
 
@@ -135,13 +167,13 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 		if (target == null)
 		{
-			g.setColor(Color.darkGray);
-			double rdir, bdir;
+			g.setColor(beamColor);
+			double rdir, bdir, x, y;
 			rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
 			bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
-			g.drawLine(x_center, y_center,
-					Math.round((float) (origin.x + RadarSense.beamLength * Math.sin(rdir + bdir))),
-					Math.round((float) (origin.y - RadarSense.beamLength * Math.cos(rdir + bdir))));
+			x = origin.x + RadarSense.beamLength * Math.sin(rdir + bdir);
+			y = origin.y - RadarSense.beamLength * Math.cos(rdir + bdir);
+			g.fillPolygon(new int[]{x_center, Math.round((float)x), Math.round((float)oldBeamX)}, new int[]{y_center, Math.round((float)y), Math.round((float)oldBeamY)} , 3);
 		} else if (target != null)
 		{
 			g.setColor(Color.blue);

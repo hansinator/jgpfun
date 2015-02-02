@@ -13,14 +13,14 @@ import de.hansinator.fun.jgp.world.World;
 public class BranchVM<E extends World> extends LGPMachine<E>
 {
 
-	public BranchVM(OrganismGene<E> genome, FitnessEvaluator evaluator, int numRegs, int numInputRegs, OpCode[] program)
+	public BranchVM(int numRegs, int numInputRegs, OpCode[] program)
 	{
 		// normalize program and strip strctural intron code portions
-		super(genome, evaluator, numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
+		super(numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
 	}
 
 	@Override
-	public void execute()
+	protected void step()
 	{
 		int reg = 0, pc = 0;
 
@@ -34,11 +34,11 @@ public class BranchVM<E extends World> extends LGPMachine<E>
 
 			if (curop instanceof BranchOperation)
 			{
-				if (curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2])) != 1)
+				if (curop.operation.execute(regs[curop.src1.getValue()], (curop.immediate.getValue() ? curop.src2.getValue() : regs[curop.src2.getValue()])) != 1)
 					pc++;
 			} else // execute the operation
-				regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2
-						: regs[curop.src2]));
+				regs[curop.trg.getValue()] = curop.operation.execute(regs[curop.src1.getValue()], (curop.immediate.getValue() ? curop.src2.getValue()
+						: regs[curop.src2.getValue()]));
 		}
 
 		// write output values
