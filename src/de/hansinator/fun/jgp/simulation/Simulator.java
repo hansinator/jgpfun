@@ -13,9 +13,7 @@ import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
-import de.hansinator.fun.jgp.gui.SimulationInfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
-import de.hansinator.fun.jgp.gui.WorldSimulationView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.util.Settings;
 
@@ -91,7 +89,7 @@ public class Simulator
 	 * @param mainView
 	 * @param infoPanel
 	 */
-	synchronized public void start(final SimulationInfoPanel infoPanel)
+	synchronized public void start()
 	{
 		new Thread(new Runnable()
 		{
@@ -99,12 +97,12 @@ public class Simulator
 			@Override
 			public void run()
 			{
-				Simulator.this.run(infoPanel);
+				Simulator.this.run();
 			}
 		}, "SimulationThread" + this).start();
 	}
 
-	private void run(SimulationInfoPanel infoPanel)
+	private void run()
 	{
 		long now, evaluationsPerMinuteAverage = 0, evaluationsPerMinuteCount = 0;
 		long startTime = System.currentTimeMillis();
@@ -136,7 +134,6 @@ public class Simulator
 
 				// statistics
 				System.out.println("GEN: " + evaluationCount);
-				infoPanel.updateInfo();
 				now = System.currentTimeMillis();
 				if ((now - lastStatsTime) >= 3000)
 				{
@@ -169,11 +166,11 @@ public class Simulator
 		simulation.stop();
 	}
 
-	public void restart(WorldSimulationView mainView, SimulationInfoPanel infoPanel)
+	public void restart()
 	{
 		simulation.stop();
 		reset();
-		start(mainView, infoPanel);
+		start();
 	}
 
 	private void reset()

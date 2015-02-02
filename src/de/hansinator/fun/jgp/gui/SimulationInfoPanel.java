@@ -10,6 +10,7 @@ import javax.swing.plaf.BorderUIResource;
 import util.SpringUtilities;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
+import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
 /**
  * 
@@ -29,6 +30,15 @@ public class SimulationInfoPanel extends JPanel
 	public SimulationInfoPanel(final Simulator simulator)
 	{
 		this.simulator = simulator;
+		
+		simulator.getSimulation().addViewUpdateListener( new SimulationViewUpdateListener() {
+			
+			@Override
+			public void onViewUpdate()
+			{
+				updateInfo();
+			}
+		});
 		
 		JLabel labelRPSText = new JLabel("RPS:");
 		JLabel labelProgessText = new JLabel("Progress:");
@@ -59,7 +69,7 @@ public class SimulationInfoPanel extends JPanel
 				6, 6); // xPad, yPad
 	}
 
-	public void updateInfo()
+	private void updateInfo()
 	{
 		labelRPS.setText("" + simulator.getSimulation().getRPS());
 		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION);

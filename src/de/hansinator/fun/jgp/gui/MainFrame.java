@@ -92,7 +92,7 @@ public class MainFrame extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				simulator.restart(simulationClientView, bottomPane.infoPanel);
+				simulator.restart();
 			}
 
 		});
@@ -100,11 +100,6 @@ public class MainFrame extends JFrame implements WindowListener
 		menuBar.add(simulationMenu);
 
 		return menuBar;
-	}
-
-	public void setCenterPaneView(Component view)
-	{
-		
 	}
 
 	public void startSimulation()
@@ -115,7 +110,7 @@ public class MainFrame extends JFrame implements WindowListener
 		addWindowListener(this);
 		
 		// run simulator
-		simulator.start(bottomPane.infoPanel);
+		simulator.start();
 	}
 
 	public void stopSimulation()
