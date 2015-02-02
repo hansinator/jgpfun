@@ -2,6 +2,8 @@ package de.hansinator.fun.jgp.simulation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -52,6 +54,8 @@ public class WorldSimulation
 	
 	private int rps;
 	
+	private final ConcurrentHashMap<ExecutionUnit<? extends World>, Genome> organismsByGenome = new ConcurrentHashMap<ExecutionUnit<? extends World>, Genome>();
+	
 	final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
 
 	// XXX distinguish only between generational and continuous simulation, not
@@ -75,19 +79,18 @@ public class WorldSimulation
 	}
 
 	/*
-	 * FIXME: add events to the simulation, so that a main view can draw upon an
-	 * event
-	 * 
-	 * re-think generation runtime stat calculation to be better suited for
-	 * re-entrance
+	 * TODO re-think generation runtime stat calculation to be better suited for re-entrance
 	 */
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings({"unchecked" })
 	public Genome[] evaluate(Genome[] generation)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		ExecutionUnit[] organisms = new ExecutionUnit[generation.length];
+		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[generation.length];
+		
+		// clear organism map for each new round
+		organismsByGenome.clear();
 
 		// synthesize organisms
 		for (int i = 0; i < generation.length; i++)
@@ -95,6 +98,9 @@ public class WorldSimulation
 			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
 			organisms[i] = generation[i].getRootGene().express((World2d) world);
 			generation[i].getFitnessEvaluator().attach(organisms[i]);
+			
+			// record organism genome relationship
+			organismsByGenome.put(organisms[i], generation[i]);
 		}
 
 		synchronized (runLock)
@@ -271,5 +277,10 @@ public class WorldSimulation
 	public static interface SimulationViewUpdateListener
 	{
 		public void onViewUpdate();
+	}
+	
+	public Map<ExecutionUnit<? extends World>, Genome> getOrganismsByGenomeMap()
+	{
+		return java.util.Collections.unmodifiableMap(organismsByGenome);
 	}
 }

@@ -53,8 +53,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				Point p = e.getPoint();
-				simulation.world.clickEvent(p.x, p.y);
+				simulation.world.clickEvent(e, simulation.getOrganismsByGenomeMap());
 				// fixme: only repaint if necessary
 				repaint();
 			}
@@ -109,7 +108,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-		simulation.world.draw(g);
+		simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
 
 		if (simulation.getRPS() != 0)
 		{
