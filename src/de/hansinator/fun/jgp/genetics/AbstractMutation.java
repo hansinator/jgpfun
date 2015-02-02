@@ -1,9 +1,10 @@
 package de.hansinator.fun.jgp.genetics;
 
-public abstract class BaseGene<T, E> implements Gene<T, E> {
+public abstract class AbstractMutation implements Mutation
+{
 	protected int mutationChance;
 
-	public BaseGene(int mutationChance) {
+	public AbstractMutation(int mutationChance) {
 		setMutationChance(mutationChance);
 	}
 

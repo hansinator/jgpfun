@@ -1,5 +1,7 @@
 package de.hansinator.fun.jgp.life;
 
+import de.hansinator.fun.jgp.genetics.ImmutableGene;
+
 
 
 public interface IOUnit<E>
@@ -17,16 +19,16 @@ public interface IOUnit<E>
 
 	public ActorOutput[] getOutputs();
 
-	public interface Gene<E> extends de.hansinator.fun.jgp.genetics.Gene<IOUnit<E>, E>
+	public abstract class Gene<E> extends ImmutableGene<IOUnit<E>, E>
 	{
 		@Override
-		public Gene<E> replicate();
+		public abstract Gene<E> replicate();
 
 		@Override
-		public IOUnit<E> express(E context);
+		public abstract IOUnit<E> express(E context);
 		
-		public int getInputCount();
+		public abstract int getInputCount();
 
-		public int getOutputCount();
+		public abstract int getOutputCount();
 	}
 }

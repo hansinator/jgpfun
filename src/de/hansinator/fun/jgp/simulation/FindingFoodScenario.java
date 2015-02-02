@@ -21,7 +21,6 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
-import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
@@ -42,9 +41,9 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene();
-		bodyGene.children.add(new RadarSense.Gene());
-		// add body.locator as a gene somehow (internal locator stuff) instead of radargene for LocatorAnts
+		AntBody.Gene bodyGene = new AntBody.Gene(true);
+		//bodyGene.children.add(new RadarSense.Gene());
+		//bodyGene.children.add(new RadarSense.Gene());
 		bodyGene.children.add(new OrientationSense.Gene());
 		bodyGene.children.add(new SpeedSense.Gene());
 		bodyGene.children.add(new WallSense.Gene());

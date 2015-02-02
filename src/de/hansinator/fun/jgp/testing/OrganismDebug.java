@@ -2,9 +2,7 @@ package de.hansinator.fun.jgp.testing;
 
 import java.io.IOException;
 
-import de.hansinator.fun.jgp.genetics.AntGenome;
-import de.hansinator.fun.jgp.life.Organism;
-import de.hansinator.fun.jgp.life.lgp.ExecutionUnit;
+import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**

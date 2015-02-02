@@ -2,7 +2,6 @@ package de.hansinator.fun.jgp.life.lgp;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
-import de.hansinator.fun.jgp.life.OrganismGene;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.life.lgp.operations.BranchOperation;
 import de.hansinator.fun.jgp.world.World;

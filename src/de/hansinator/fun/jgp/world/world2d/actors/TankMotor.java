@@ -5,13 +5,9 @@ import java.util.List;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense.Gene;
 
 public class TankMotor implements BodyPart<Body2d>
 {
@@ -37,7 +33,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public void set(int value)
 		{
-			left = Math.max(0, Math.min(value, 65535)) / Simulator.intScaleFactor;
+			left = value / (double)Integer.MAX_VALUE;
 		}
 	};
 
@@ -47,7 +43,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public void set(int value)
 		{
-			right = Math.max(0, Math.min(value, 65535)) / Simulator.intScaleFactor;
+			right = value / (double)Integer.MAX_VALUE;
 		}
 	};
 
@@ -79,14 +75,14 @@ public class TankMotor implements BodyPart<Body2d>
 		body.dir += (right - left) * (maxSteerForce / 100.0);
 		body.dir -= 2 * Math.PI
 				* (body.dir < 0.0 ? Math.ceil(body.dir / (2 * Math.PI)) : (Math.floor(body.dir / (2 * Math.PI))));
-		// max speed is just a tweaking parameter; don't get confused by it
-		// try varying it in simulation
+
+		// calculate speed
 		speed = (right + left) / 2.0;
 		body.lastSpeed = speed;
 		
 		// apply movement
-		body.x += Math.sin(body.dir) * maxSpeed * speed / 10.0;
-		body.y -= Math.cos(body.dir) * maxSpeed * speed / 10.0;
+		body.x += Math.sin(body.dir) * maxSpeed * speed;
+		body.y -= Math.cos(body.dir) * maxSpeed * speed;
 	}
 
 	@Override
@@ -95,30 +91,13 @@ public class TankMotor implements BodyPart<Body2d>
 		
 	}
 	
-	public static class Gene implements IOUnit.Gene<Body2d>
+	public static class Gene extends IOUnit.Gene<Body2d>
 	{
-
-		@Override
-		public void mutate()
-		{
-		}
-
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
-		}
-
-		@Override
-		public void setMutationChance(int mutationChance)
-		{
-		}
-
-		@Override
-		public int getMutationChance()
-		{
-			return 0;
 		}
 
 		@Override

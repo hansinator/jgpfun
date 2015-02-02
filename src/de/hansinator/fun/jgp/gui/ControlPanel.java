@@ -13,8 +13,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
-import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
  * 

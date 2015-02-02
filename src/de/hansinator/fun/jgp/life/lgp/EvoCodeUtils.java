@@ -27,9 +27,8 @@ class EvoCodeUtils
 		OpCode memVal;
 
 		// add the output and temporary registers to the effective registers
-		// temporaty registers are necessary to compute temporary values that
-		// survive
-		// from round to round
+		// temporary registers are necessary to compute temporary values that
+		// survive from round to round
 		// all registers after the input registers are effective, meaning
 		// all registers that are not output are temp registers
 		// (even though output registers also retain their values...)

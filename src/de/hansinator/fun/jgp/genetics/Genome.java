@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.genetics;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -48,35 +47,33 @@ public class Genome
 	
 	public void mutate(int mutationCount)
 	{
+		int totalFitness = 0;
+		
+		// walk the gene tree and collect possible mutations in a list
+		List<Mutation> mutations = new ArrayList<Mutation>();
+		collectMutations(rootGene, mutations);
+
+		// sum up chances
+		for (Mutation mutation : mutations)
+			totalFitness += mutation.getMutationChance();
+		
+		// use a roulette-wheel selector to select mutations
+		// TODO: de-duplicate roulette-wheel logic such that we can use selectors in general on this problem
 		for(int i = 0; i < mutationCount; i++)
 		{
-			// walk the gene tree and collect possible mutations in a list
-			List<Gene> mutations = new ArrayList<Gene>();
-			collectMutations(rootGene, mutations);
-			
-			// use a rhoulette-wheel selector to select a mutation
-			// TODO: deduplicate rhoulette-wheel logic such that we can use selectors in general on this problem
-			
-			int stopPoint = 0;
-			int fitnessSoFar = 0;
-			int totalFitness = 0;
-
-			// sum up chances
-			for (Gene mutation : mutations)
-				totalFitness += mutation.getMutationChance();
-			
-			stopPoint = rnd.nextInt(totalFitness);
+			// drop the ball
+			int stopPoint = rnd.nextInt(totalFitness);
 
 			/*
-			 * Shuffle the organism list to make roulettewheel work better. In case
+			 * Shuffle the organism list to make roulette wheel work better. In case
 			 * this method is called multiple times on the same list, the same
 			 * organisms with a huge fitness values at the beginning of the list
-			 * would have a greater chance of being selected. This shuffle hopefully
-			 * eliminates this problem, if it does exist.
+			 * would have a greater chance of being selected.
 			 */
 			Collections.shuffle(mutations);
 
-			for (int x = 0; x < mutations.size(); x++)
+			// spin the wheel
+			for (int x = 0, fitnessSoFar = 0; x < mutations.size(); x++)
 			{
 				fitnessSoFar += mutations.get(x).getMutationChance();
 				// this way zero fitness ants are omitted
@@ -88,18 +85,30 @@ public class Genome
 				}
 			}
 
-			// if we got here execute a random mutation
+			// if got here ball must have escaped rhoulette wheel
+			// (or all ants have zero fitness)
 			mutations.get(rnd.nextInt(mutations.size())).mutate();
 		}
 	}
 	
-	private void collectMutations(Gene gene, List<Gene> mutations)
+	/**
+	 * Recursively collect mutations from a Gene-tree
+	 * 
+	 * @param gene root of tree
+	 * @param mutations list for storage of collected mutations
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void collectMutations(Gene gene, List<Mutation> mutations)
 	{
-		mutations.add(gene);
-		List<Gene> children = gene.getChildren(); 
+		// add this node's mutations
+		for(Mutation m : gene.getMutations())
+			if(m.getMutationChance() > 0)
+				mutations.add(m);
+		
+		// recurse through children
+		List<Gene> children = gene.getChildren();
 		if(children != null)
 			for(Gene child : children)
-				if(child.getMutationChance() > 0)
-					collectMutations(child, mutations);
+				collectMutations(child, mutations);
 	}
 }

@@ -9,6 +9,7 @@ import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Food;
@@ -21,7 +22,8 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
  */
 public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>
 {
-
+	private final static double sweepSpeedScaleFactor = Settings.getDouble("radarSweepSpeedScaleFactor");
+	
 	private final World2dObject origin;
 
 	private World2d world;
@@ -98,7 +100,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	@Override
 	public void set(int value)
 	{
-		direction += (Math.max(-65535, Math.min(value, 65535)) / Simulator.intScaleFactor) / 10.0;
+		direction += ((double)value / (double)Integer.MAX_VALUE) / sweepSpeedScaleFactor;
 		direction -= 2 * Math.PI
 				* (direction < 0.0 ? Math.ceil(direction / (2 * Math.PI)) : (Math.floor(direction / (2 * Math.PI))));
 	}
@@ -154,30 +156,13 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		this.world = context.getWorld();
 	}
 
-	public static class Gene implements IOUnit.Gene<Body2d>
+	public static class Gene extends IOUnit.Gene<Body2d>
 	{
-
-		@Override
-		public void mutate()
-		{
-		}
-
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
-		}
-
-		@Override
-		public void setMutationChance(int mutationChance)
-		{
-		}
-
-		@Override
-		public int getMutationChance()
-		{
-			return 0;
 		}
 
 		@Override

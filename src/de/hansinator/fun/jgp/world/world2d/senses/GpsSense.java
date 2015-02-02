@@ -7,7 +7,6 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
  * 
@@ -75,30 +74,13 @@ public class GpsSense implements BodyPart<Body2d>
 	}
 	
 	
-	public class Gene implements IOUnit.Gene<Body2d>
+	public class Gene extends IOUnit.Gene<Body2d>
 	{
-
-		@Override
-		public void mutate()
-		{
-		}
-
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
-		}
-
-		@Override
-		public void setMutationChance(int mutationChance)
-		{
-		}
-
-		@Override
-		public int getMutationChance()
-		{
-			return 0;
 		}
 
 		@Override

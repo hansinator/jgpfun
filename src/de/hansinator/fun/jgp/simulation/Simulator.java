@@ -9,8 +9,6 @@ import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
 
-import de.hansinator.fun.jgp.genetics.BaseGene;
-import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
@@ -19,10 +17,7 @@ import de.hansinator.fun.jgp.gui.InfoPanel;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.MainView;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.World2d;
 
 public class Simulator
 {
