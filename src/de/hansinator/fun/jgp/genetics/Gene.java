@@ -9,14 +9,10 @@ import java.util.List;
 public interface Gene<T, E>
 {
 	Gene<T, E> replicate();
-	
-	void mutate();
 
 	T express(E context);
 	
 	List<Gene> getChildren();
 	
-	void setMutationChance(int mutationChance);
-	
-	int getMutationChance();
+	Mutation[] getMutations();
 }

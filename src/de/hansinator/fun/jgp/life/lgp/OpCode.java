@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
+import de.hansinator.fun.jgp.genetics.ImmutableGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.BooleanGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.IntegerGene;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
@@ -11,7 +12,7 @@ import de.hansinator.fun.jgp.life.lgp.operations.UnaryOperation;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
-public class OpCode implements Gene<OpCode, LGPMachine<World2d>> {
+public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 
 	private static final Random rnd = Settings.newRandomSource();
 
@@ -116,21 +117,4 @@ public class OpCode implements Gene<OpCode, LGPMachine<World2d>> {
 	public List<Gene> getChildren() {
 		return null;
 	}
-
-	@Override
-	public void mutate() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setMutationChance(int mutationChance) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public int getMutationChance() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

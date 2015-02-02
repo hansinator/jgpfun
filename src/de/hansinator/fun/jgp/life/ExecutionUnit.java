@@ -1,6 +1,5 @@
 package de.hansinator.fun.jgp.life;
 
-import de.hansinator.fun.jgp.genetics.BaseGene;
 
 public interface ExecutionUnit<E>
 {
@@ -20,21 +19,16 @@ public interface ExecutionUnit<E>
 	
 	public E getExecutionContext();
 	
-	public abstract class Gene<E> extends BaseGene<ExecutionUnit<E>, E>
+	public interface Gene<E> extends de.hansinator.fun.jgp.genetics.Gene<ExecutionUnit<E>, E>
 	{
-		public Gene(int mutationChance)
-		{
-			super(mutationChance);
-		}
+		@Override
+		public Gene<E> replicate();
 
 		@Override
-		public abstract Gene<E> replicate();
-
-		@Override
-		public abstract ExecutionUnit<E> express(E context);
+		public ExecutionUnit<E> express(E context);
 		
-		public abstract int getExonSize();
+		public int getExonSize();
 
-		public abstract int getSize();
+		public int getSize();
 	}
 }

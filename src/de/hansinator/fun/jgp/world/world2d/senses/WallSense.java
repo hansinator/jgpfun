@@ -80,30 +80,13 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		this.worldHeight = Math.floor(context.getWorld().getHeight());
 	}
 	
-	public static class Gene implements IOUnit.Gene<Body2d>
+	public static class Gene extends IOUnit.Gene<Body2d>
 	{
-
-		@Override
-		public void mutate()
-		{
-		}
-
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			// TODO Auto-generated method stub
 			return null;
-		}
-
-		@Override
-		public void setMutationChance(int mutationChance)
-		{
-		}
-
-		@Override
-		public int getMutationChance()
-		{
-			return 0;
 		}
 
 		@Override

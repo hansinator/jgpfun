@@ -45,21 +45,20 @@ public class Genome
 		return new Genome(rootGene.replicate(), fitnessEvaluator.replicate());
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public void mutate(int mutationCount)
 	{
 		int totalFitness = 0;
 		
 		// walk the gene tree and collect possible mutations in a list
-		List<Gene> mutations = new ArrayList<Gene>();
+		List<Mutation> mutations = new ArrayList<Mutation>();
 		collectMutations(rootGene, mutations);
 
 		// sum up chances
-		for (Gene mutation : mutations)
+		for (Mutation mutation : mutations)
 			totalFitness += mutation.getMutationChance();
 		
-		// use a rhoulette-wheel selector to select mutations
-		// TODO: deduplicate rhoulette-wheel logic such that we can use selectors in general on this problem
+		// use a roulette-wheel selector to select mutations
+		// TODO: de-duplicate roulette-wheel logic such that we can use selectors in general on this problem
 		for(int i = 0; i < mutationCount; i++)
 		{
 			// drop the ball
@@ -92,14 +91,24 @@ public class Genome
 		}
 	}
 	
+	/**
+	 * Recursively collect mutations from a Gene-tree
+	 * 
+	 * @param gene root of tree
+	 * @param mutations list for storage of collected mutations
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void collectMutations(Gene gene, List<Gene> mutations)
+	private void collectMutations(Gene gene, List<Mutation> mutations)
 	{
-		mutations.add(gene);
+		// add this node's mutations
+		for(Mutation m : gene.getMutations())
+			if(m.getMutationChance() > 0)
+				mutations.add(m);
+		
+		// recurse through children
 		List<Gene> children = gene.getChildren();
 		if(children != null)
 			for(Gene child : children)
-				if(child.getMutationChance() > 0)
-					collectMutations(child, mutations);
+				collectMutations(child, mutations);
 	}
 }

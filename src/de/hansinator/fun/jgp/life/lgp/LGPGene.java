@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.hansinator.fun.jgp.genetics.AbstractMutation;
 import de.hansinator.fun.jgp.genetics.Gene;
+import de.hansinator.fun.jgp.genetics.Mutation;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -12,24 +14,63 @@ import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
-public class LGPGene extends ExecutionUnit.Gene<World2d>
+/**
+ * Genetic representation of an LGP program. Supports mutations
+ * for insertion, removal and replacement of OpCodes to the program.
+ * 
+ * @author hansinator
+ *
+ */
+public class LGPGene implements ExecutionUnit.Gene<World2d>
 {
 	private static final Random rnd = Settings.newRandomSource();
+	
+	// define chances for what mutation could happen in some sort of
+	// percentage
+	private static final int mutateIns = 22, mutateRem = 18, mutateRep = 20;
+	
+	static final int registerCount = Settings.getInt("registerCount");
 
 	private final List<OpCode> program;
 
 	private final int maxLength;
 	
 	public final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
-
-	static final int registerCount = Settings.getInt("registerCount");
 	
 	private int exonSize = 0;
 	
-
-	// define chances for what mutation could happen in some sort of
-	// percentage
-	private static int mutateIns = 22, mutateRem = 18, mutateRep = 20;
+	// insert a random instruction at a random location
+	private final Mutation mutationInsert = new AbstractMutation(mutateIns) {
+		
+		@Override
+		public void mutate()
+		{
+			program.add(rnd.nextInt(program.size()), OpCode.randomOpCode(rnd));
+		}
+	};
+	
+	// remove a random instruction
+	private final Mutation mutationRemove = new AbstractMutation(mutateRem) {
+		
+		@Override
+		public void mutate()
+		{
+			program.remove(rnd.nextInt(program.size()));
+		}
+	};
+	
+	// replace a random instruction
+	private final Mutation mutationReplace = new AbstractMutation(mutateRep) {
+		
+		@Override
+		public void mutate()
+		{
+			program.set(rnd.nextInt(program.size()), OpCode.randomOpCode(rnd));
+		}
+	};
+	
+	private final Mutation[] mutations = { mutationInsert, mutationRemove, mutationReplace };
+	
 
 	public static LGPGene randomGene(int maxLength)
 	{
@@ -39,13 +80,12 @@ public class LGPGene extends ExecutionUnit.Gene<World2d>
 		for (int i = 0; i < size; i++)
 			program.add(OpCode.randomOpCode(rnd));
 
-		return new LGPGene(program, maxLength, mutateIns + mutateRem + mutateRep);
+		return new LGPGene(program, maxLength);
 	}
 
 
-	private LGPGene(List<OpCode> program, int maxLength, int mutationChance)
+	private LGPGene(List<OpCode> program, int maxLength)
 	{
-		super(mutationChance);
 		this.program = program;
 		this.maxLength = maxLength;
 	}
@@ -58,7 +98,7 @@ public class LGPGene extends ExecutionUnit.Gene<World2d>
 		for (OpCode oc : program)
 			p.add(oc.replicate());
 
-		LGPGene lg = new LGPGene(p, maxLength, mutationChance);
+		LGPGene lg = new LGPGene(p, maxLength);
 		
 		for(IOUnit.Gene<ExecutionUnit<World2d>> bg : ioGenes)
 			lg.ioGenes.add(bg.replicate());
@@ -120,45 +160,6 @@ public class LGPGene extends ExecutionUnit.Gene<World2d>
 		// return assembled organism
 		return eu;
 	}
-	
-	@Override
-	public void mutate() {
-		int mutationChoice;
-		int loc = rnd.nextInt(program.size());
-		int mutateIns = LGPGene.mutateIns;
-		int mutateRem = LGPGene.mutateRem;
-
-		// now see what to do
-		// either delete an opcode, add a new or mutate an existing one
-
-		// first determine which mutations are possible and add up all the
-		// chances
-		// if we have the max possible opcodes, we can't add a new one
-		if (program.size() >= maxLength)
-			mutateIns = 0;
-		// if we have only 4 opcodes left, don't delete more
-		else if (program.size() < 5)
-		{
-			mutateRem = 0;
-
-			// higher ins chance test: when prog is too small, mutation tends to vary the same loc multiple times, so insert some more
-			mutateIns = 100;
-		}
-
-		// choose mutation
-		mutationChoice = rnd.nextInt(mutateRep + mutateIns + mutateRem);
-
-		// see which one has been chosen
-		// insert a random instruction at a random location
-		if (mutationChoice < mutateIns)
-			program.add(loc, OpCode.randomOpCode(rnd));
-		// remove a random instruction
-		else if (mutationChoice < (mutateIns + mutateRem))
-			program.remove(loc);
-		// replace a random instruction
-		else
-			program.set(loc, OpCode.randomOpCode(rnd));
-	}
 
 
 	public List<Gene> getChildren() {
@@ -179,6 +180,27 @@ public class LGPGene extends ExecutionUnit.Gene<World2d>
 	public int getSize()
 	{
 		return program.size();
+	}
+
+	@Override
+	public Mutation[] getMutations()
+	{
+		// if we have the max possible opcodes, we can't add a new one,
+		// so adjust insert mutation chance accordingly
+		mutationInsert.setMutationChance((program.size() >= maxLength)?0:mutateIns);
+		
+		// if we have only 4 opcodes left, don't delete more
+		if (program.size() < 5)
+		{
+			mutationRemove.setMutationChance(0);
+			
+			// higher ins chance test: when prog is too small, mutation tends to vary the same loc multiple times,
+			// so insert some more
+			mutationInsert.setMutationChance(100);
+		}
+		else mutationRemove.setMutationChance(mutateRem);
+				
+		return mutations;
 	}
 	
 }

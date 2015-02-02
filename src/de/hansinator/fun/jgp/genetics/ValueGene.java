@@ -5,7 +5,7 @@ import java.util.Random;
 
 import de.hansinator.fun.jgp.util.Settings;
 
-public abstract class ValueGene<V> extends BaseGene<V, Object> {
+public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	protected V value;
 
 	public ValueGene(int mutationChance) {

@@ -3,6 +3,7 @@ package de.hansinator.fun.jgp.world.world2d;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
@@ -24,7 +25,7 @@ public class AntBody extends Body2d
 		locator = new ObjectLocator(this);
 	}
 	
-	public static class Gene implements IOUnit.Gene<ExecutionUnit<World2d>>
+	public static class Gene extends IOUnit.Gene<ExecutionUnit<World2d>>
 	{
 		public static int locatorInputCount = new ObjectLocator.Gene().getInputCount();
 				
@@ -38,25 +39,9 @@ public class AntBody extends Body2d
 		}
 
 		@Override
-		public void mutate()
-		{
-		}
-
-		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
 			return null;
-		}
-
-		@Override
-		public void setMutationChance(int mutationChance)
-		{
-		}
-
-		@Override
-		public int getMutationChance()
-		{
-			return 0;
 		}
 
 		@Override
@@ -108,6 +93,12 @@ public class AntBody extends Body2d
 				o += child.getOutputCount();
 			
 			return o;
+		}
+
+		@Override
+		public Mutation[] getMutations()
+		{
+			return Mutation.emptyMutationArray;
 		}
 
 	}
