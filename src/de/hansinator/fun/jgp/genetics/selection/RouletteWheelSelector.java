@@ -22,7 +22,7 @@ public class RouletteWheelSelector implements SelectionStrategy
 	 * fitness proportionate selection
 	 */
 	@Override
-	public Genome select(Genome[] pool, int totalFitness)
+	public <T extends Selectable> T select(T[] pool, int totalFitness)
 	{
 		int stopPoint = 0;
 		int fitnessSoFar = 0;
@@ -42,7 +42,7 @@ public class RouletteWheelSelector implements SelectionStrategy
 
 		for (int i = 0; i < pool.length; i++)
 		{
-			fitnessSoFar += pool[i].getFitnessEvaluator().getFitness();
+			fitnessSoFar += pool[i].getSelectionChance();
 			// this way zero fitness ants are omitted
 			if (fitnessSoFar > stopPoint)
 				return pool[i];

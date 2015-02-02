@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import de.hansinator.fun.jgp.genetics.selection.Selectable;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
@@ -15,7 +16,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * @author hansinator
  *
  */
-public class Genome
+public class Genome implements Selectable
 {
 	private final Random rnd = Settings.newRandomSource();
 	
@@ -33,6 +34,12 @@ public class Genome
 	public FitnessEvaluator getFitnessEvaluator()
 	{
 		return fitnessEvaluator;
+	}
+	
+	@Override
+	public int getSelectionChance()
+	{
+		return fitnessEvaluator.getFitness();
 	}
 	
 	public ExecutionUnit.Gene<World2d> getRootGene()

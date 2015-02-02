@@ -78,12 +78,6 @@ public class FindingFoodScenario implements Scenario
 		{
 			return fitness;
 		}
-		
-		@Override
-		public int getSelectionChance()
-		{
-			return getFitness();
-		}
 
 		@Override
 		public FitnessEvaluator replicate()
