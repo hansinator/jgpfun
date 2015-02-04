@@ -4,7 +4,6 @@ package de.hansinator.fun.jgp.genetics.selection;
 
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
