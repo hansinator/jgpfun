@@ -8,10 +8,6 @@ import de.hansinator.fun.jgp.util.Settings;
 public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	protected V value;
 
-	public ValueGene(int mutationChance) {
-		super(mutationChance);
-	}
-
 	public ValueGene(V value, int mutationChance) {
 		super(mutationChance);
 		this.value = value;
@@ -44,10 +40,8 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	public static class IntegerGene extends ValueGene<Integer> {
 		private static final Random rnd = Settings.newRandomSource();
 
-		protected Integer value = new Integer(0);
-
 		public IntegerGene(int mutationChance) {
-			super(mutationChance);
+			super(0, mutationChance);
 		}
 
 		@Override
@@ -59,10 +53,8 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	public static class BooleanGene extends ValueGene<Boolean> {
 		private static final Random rnd = Settings.newRandomSource();
 
-		protected Boolean value = new Boolean(false);
-
 		public BooleanGene(int mutationChance) {
-			super(mutationChance);
+			super(false, mutationChance);
 		}
 
 		@Override
