@@ -3,7 +3,6 @@
 
 package de.hansinator.fun.jgp.genetics.selection;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 
 
 /**
@@ -13,5 +12,5 @@ import de.hansinator.fun.jgp.genetics.Genome;
 public interface SelectionStrategy
 {
 
-	public Genome select(Genome[] pool, int totalFitness);
+	public <T extends Selectable> T select(T[] pool, int totalFitness);
 }

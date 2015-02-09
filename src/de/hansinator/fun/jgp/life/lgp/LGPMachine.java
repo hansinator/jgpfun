@@ -16,6 +16,7 @@ import de.hansinator.fun.jgp.life.lgp.operations.OpMod;
 import de.hansinator.fun.jgp.life.lgp.operations.OpMov;
 import de.hansinator.fun.jgp.life.lgp.operations.OpMul;
 import de.hansinator.fun.jgp.life.lgp.operations.OpNeg;
+import de.hansinator.fun.jgp.life.lgp.operations.OpSin;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
@@ -51,16 +52,16 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 	// extended instruction set
 	static Operation[] ops = new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(),
 			new OpSqrt(), new OpNeg(), new OpMin(), new OpMax(), new OpAbs(), new OpCmp(),
-			// new OpSin(),
+			//new OpSin(),
 			new OpMov(), //
 	// new OpInc(),
 	// new OpDec(),
-	 new OpBranchLt(), new OpBranchGt()
+	// new OpBranchLt(), new OpBranchGt()
 	// new JumpOp(),
 	// new JumpTarg()
 	};
 
-	protected final OpCode[] program;
+	protected final Instruction[] program;
 
 	public int[] regs;
 	
@@ -73,11 +74,32 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 	
 	private E executionContext;
 	
+	protected static class Instruction
+	{
+		int op, src1, src2, trg;
+		boolean immediate;
+		Operation operation;
+		
+		public Instruction(int op, int src1, int src2, int trg, boolean immediate)
+		{
+			this.op = op;
+			this.src1 = src1;
+			this.src2 = src2;
+			this.trg = trg;
+			this.immediate = immediate;
+			operation = ops[op];
+		}
+	}
+	
 
 	public LGPMachine(int numRegs, OpCode[] program)
 	{
 		this.regs = new int[numRegs];
-		this.program = program;
+		this.program = new Instruction[program.length];
+		
+		int i = 0;
+		for(OpCode op : program)
+			this.program[i++] = new Instruction(op.op.getValue(), op.src1.getValue(), op.src2.getValue(), op.trg.getValue(), op.immediate.getValue());
 	}
 	
 	protected abstract void step();
@@ -150,7 +172,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 		return executionContext;
 	}
 	
-	protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
+	public static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
 	{
 		for (int i = 0; i < program.length; i++)
 		{

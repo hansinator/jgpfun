@@ -10,10 +10,9 @@ import de.hansinator.fun.jgp.world.World;
  */
 public class EvoVM<E extends World> extends LGPMachine<E>
 {
-	public EvoVM(int numRegs, int numInputRegs, OpCode[] program)
+	public EvoVM(int numRegs, OpCode[] program)
 	{
-		// normalize program and strip strctural intron code portions
-		super(numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
+		super(numRegs, program);
 	}
 
 	@Override
@@ -27,8 +26,8 @@ public class EvoVM<E extends World> extends LGPMachine<E>
 
 		while (pc < program.length)
 		{
-			OpCode curop = program[pc++];
-			regs[curop.trg.getValue()] = curop.operation.execute(regs[curop.src1.getValue()], (curop.immediate.getValue() ? curop.src2.getValue() : regs[curop.src2.getValue()]));
+			Instruction curop = program[pc++];
+			regs[curop.trg] = curop.operation.execute(regs[curop.src1], (curop.immediate ? curop.src2 : regs[curop.src2]));
 		}
 
 		// write output values

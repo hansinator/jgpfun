@@ -36,11 +36,13 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	
 	// define chances for what mutation could happen in some sort of
 	// percentage
-	private static final int mutateIns = 22, mutateRem = 18, mutateRep = 20;
+	private static final int mutateIns = 2200, mutateRem = 1800, mutateRep = 2000;
 	
 	static final int registerCount = Settings.getInt("registerCount");
 
 	private final List<OpCode> program;
+	
+	private OpCode[] strippedProgram = null;
 
 	private final int maxLength;
 	
@@ -130,8 +132,11 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		SensorInput[] inputs = (inputCount==0)?SensorInput.emptySensorInputArray:new SensorInput[inputCount];
 		ActorOutput[] outputs = (outputCount==0)?ActorOutput.emptyActorOutputArray:new ActorOutput[outputCount];
 		
+		// create stripped program
+		strippedProgram = EvoCodeUtils.stripStructuralIntronCode(LGPMachine.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), inputCount, outputCount);
+		
 		// create ExecutionUnit
-		LGPMachine<World2d> eu = new BranchVM<World2d>(registerCount, inputs.length, program.toArray(new OpCode[program.size()]));
+		LGPMachine<World2d> eu = new EvoVM<World2d>(registerCount, strippedProgram);
 		
 		// update exon size
 		exonSize = eu.getProgramSize();
@@ -236,8 +241,9 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 			String[] columns = new String[]{"loc", "op", "src1", "src2", "trg", "immediate"};
 			DefaultTableModel tableModel = new DefaultTableModel(0, columns.length);
 			tableModel.setColumnIdentifiers(columns);
-			for(OpCode o : EvoCodeUtils.stripStructuralIntronCode(EvoVM.normalizeProgram(program.toArray(new OpCode[program.size()]), registerCount), registerCount, inputCount))
-				tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
+			if(strippedProgram != null)
+				for(OpCode o : strippedProgram )
+					tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
 			
 			// create table 
 			JTable programTable = new JTable(tableModel);

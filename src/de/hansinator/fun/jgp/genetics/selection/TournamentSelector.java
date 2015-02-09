@@ -4,7 +4,6 @@ package de.hansinator.fun.jgp.genetics.selection;
 
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -24,11 +23,11 @@ public class TournamentSelector implements SelectionStrategy
 	}
 
 	@Override
-	public Genome select(Genome[] pool, int totalFitness)
+	public <T extends Selectable> T select(T[] pool, int totalFitness)
 	{
 		int maxFit = -1;
 		int size;
-		Genome fittest = null;
+		T fittest = null;
 
 		if (pool.length < tournamentSize)
 			size = pool.length;
@@ -39,11 +38,11 @@ public class TournamentSelector implements SelectionStrategy
 
 		for (int i = 0; i < size; i++)
 		{
-			Genome candidate = pool[rnd.nextInt(pool.length)];
+			T candidate = pool[rnd.nextInt(pool.length)];
 
-			if (candidate.getFitnessEvaluator().getFitness() > maxFit)
+			if (candidate.getSelectionChance() > maxFit)
 			{
-				maxFit = candidate.getFitnessEvaluator().getFitness();
+				maxFit = candidate.getSelectionChance();
 				fittest = candidate;
 			}
 		}

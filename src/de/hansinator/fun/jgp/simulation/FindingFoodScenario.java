@@ -6,6 +6,7 @@ package de.hansinator.fun.jgp.simulation;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
+import de.hansinator.fun.jgp.genetics.selection.RouletteWheelSelector;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -42,9 +43,9 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(false);
-		bodyGene.addBodyPartGene(new RadarSense.Gene());
-		bodyGene.addBodyPartGene(new RadarSense.Gene());
+		AntBody.Gene bodyGene = new AntBody.Gene(true);
+		//bodyGene.addBodyPartGene(new RadarSense.Gene());
+		//bodyGene.addBodyPartGene(new RadarSense.Gene());
 		bodyGene.addBodyPartGene(new OrientationSense.Gene());
 		bodyGene.addBodyPartGene(new SpeedSense.Gene());
 		bodyGene.addBodyPartGene(new WallSense.Gene());
@@ -53,7 +54,7 @@ public class FindingFoodScenario implements Scenario
 		LGPGene organismGene = LGPGene.randomGene(progSize);
 		organismGene.addIOGene(bodyGene);
 		
-		return new Genome(organismGene, new FoodFitnessEvaluator());
+		return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelector());
 	}
 
 	@Override
@@ -77,12 +78,6 @@ public class FindingFoodScenario implements Scenario
 		public int getFitness()
 		{
 			return fitness;
-		}
-		
-		@Override
-		public int getSelectionChance()
-		{
-			return getFitness();
 		}
 
 		@Override
