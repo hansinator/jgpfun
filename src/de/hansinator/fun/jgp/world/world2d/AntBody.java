@@ -14,7 +14,7 @@ import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
  */
 public class AntBody extends Body2d
 {
-	public final ObjectLocator locator;
+	protected final ObjectLocator locator;
 
 
 	public AntBody(ExecutionUnit<World2d> context)
@@ -70,10 +70,10 @@ public class AntBody extends Body2d
 			AntBody body = new AntBody(context);
 			@SuppressWarnings("unchecked")
 			IOUnit<Body2d>[] parts = new IOUnit[children.size() + (useInternalLocator?1:0)];
-			int i = 0;
+			int i = 1;
 			
 			if(useInternalLocator)
-				parts[i++] = body.locator;
+				parts[0] = body.locator;
 			
 			for(IOUnit.Gene<Body2d> gene : children)
 				parts[i++] = gene.express(body);

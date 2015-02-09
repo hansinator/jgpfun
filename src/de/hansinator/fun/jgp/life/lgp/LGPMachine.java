@@ -52,7 +52,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 	// extended instruction set
 	static Operation[] ops = new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(),
 			new OpSqrt(), new OpNeg(), new OpMin(), new OpMax(), new OpAbs(), new OpCmp(),
-			new OpSin(),
+			//new OpSin(),
 			new OpMov(), //
 	// new OpInc(),
 	// new OpDec(),
