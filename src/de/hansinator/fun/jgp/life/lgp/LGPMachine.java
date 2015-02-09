@@ -16,6 +16,7 @@ import de.hansinator.fun.jgp.life.lgp.operations.OpMod;
 import de.hansinator.fun.jgp.life.lgp.operations.OpMov;
 import de.hansinator.fun.jgp.life.lgp.operations.OpMul;
 import de.hansinator.fun.jgp.life.lgp.operations.OpNeg;
+import de.hansinator.fun.jgp.life.lgp.operations.OpSin;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSqrt;
 import de.hansinator.fun.jgp.life.lgp.operations.OpSub;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
@@ -51,11 +52,11 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 	// extended instruction set
 	static Operation[] ops = new Operation[] { new OpAdd(), new OpSub(), new OpMul(), new OpDiv(), new OpMod(),
 			new OpSqrt(), new OpNeg(), new OpMin(), new OpMax(), new OpAbs(), new OpCmp(),
-			// new OpSin(),
+			new OpSin(),
 			new OpMov(), //
 	// new OpInc(),
 	// new OpDec(),
-	 new OpBranchLt(), new OpBranchGt()
+	// new OpBranchLt(), new OpBranchGt()
 	// new JumpOp(),
 	// new JumpTarg()
 	};
@@ -150,7 +151,7 @@ public abstract class LGPMachine<E extends World> implements ExecutionUnit<E>
 		return executionContext;
 	}
 	
-	protected static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
+	public static OpCode[] normalizeProgram(OpCode[] program, int numRegs)
 	{
 		for (int i = 0; i < program.length; i++)
 		{

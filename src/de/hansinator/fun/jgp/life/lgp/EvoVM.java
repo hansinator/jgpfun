@@ -10,10 +10,10 @@ import de.hansinator.fun.jgp.world.World;
  */
 public class EvoVM<E extends World> extends LGPMachine<E>
 {
-	public EvoVM(int numRegs, int numInputRegs, OpCode[] program)
+	public EvoVM(int numRegs, OpCode[] program)
 	{
-		// normalize program and strip strctural intron code portions
-		super(numRegs, EvoCodeUtils.stripStructuralIntronCode(normalizeProgram(program, numRegs), numRegs, numInputRegs));
+		// normalize program
+		super(numRegs, normalizeProgram(program, numRegs));
 	}
 
 	@Override
