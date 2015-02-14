@@ -25,11 +25,11 @@ import de.hansinator.fun.jgp.life.lgp.operations.Operation;
 public class EvoCompiler
 {
 
-	static final String CLASS_NAME = CompiledVM.class.getName() + "-";
+	//static final String CLASS_NAME = CompiledVM.class.getName() + "-";
 
-	static final String INTERNAL_NAME = CLASS_NAME.replace('.', '/');
+	//static final String INTERNAL_NAME = CLASS_NAME.replace('.', '/');
 
-	static final String SUPER_INTERNAL_NAME = CompiledVM.class.getName().replace('.', '/');
+	//static final String SUPER_INTERNAL_NAME = CompiledVM.class.getName().replace('.', '/');
 
 	static final Type OP_TYPE = Type.getType(Operation.class);
 
@@ -46,7 +46,7 @@ public class EvoCompiler
 		final OpCode[] prg = EvoCodeUtils.stripStructuralIntronCode(LGPMachine.normalizeProgram(program, numRegs), numRegs, 0);
 
 		// begin class
-		final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");
+		/*final Type owner = Type.getType("L" + INTERNAL_NAME + ii + ";");
 		final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
 		cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, INTERNAL_NAME + ii, null, SUPER_INTERNAL_NAME, null);
 
@@ -102,21 +102,21 @@ public class EvoCompiler
 		for (OpCode op : prg)
 		{
 			// get operator
-			mg.loadLocal(lops[op.op]);
+			mg.loadLocal(lops[op.op.getValue()]);
 
 			// get src 2 value
-			if (op.immediate)
-				mg.push(op.src2);
-			else mg.loadLocal(lregs[op.src2]);
+			if (op.immediate.getValue())
+				mg.push(op.src2.getValue());
+			else mg.loadLocal(lregs[op.src2.getValue()]);
 
 			// get src 1 value
-			mg.loadLocal(lregs[op.src1]);
+			mg.loadLocal(lregs[op.src1.getValue()]);
 
 			// invoke operations
 			mg.invokeInterface(OP_TYPE, EXECUTE_METHOD);
 
 			// store trg
-			mg.storeLocal(lregs[op.trg]);
+			mg.storeLocal(lregs[op.trg.getValue()]);
 		}
 
 		// store results to register file
@@ -134,9 +134,9 @@ public class EvoCompiler
 		mg.endMethod();
 
 		// end class
-		cw.visitEnd();
+		cw.visitEnd();*/
 
-		try
+/*		try
 		{
 			return (LGPMachine) loadClass(cw.toByteArray(), CLASS_NAME + (ii++)).newInstance();
 		} catch (InstantiationException ex)
@@ -145,7 +145,7 @@ public class EvoCompiler
 		} catch (IllegalAccessException ex)
 		{
 			Logger.getLogger(ExecutionUnit.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		}*/
 		return null;
 	}
 
@@ -178,7 +178,7 @@ public class EvoCompiler
 		return clazz;
 	}
 
-	private static class CompiledVM extends LGPMachine
+/*	private static class CompiledVM extends LGPMachine
 	{
 
 		private SensorInput[] inputs = SensorInput.emptySensorInputArray;
@@ -215,5 +215,5 @@ public class EvoCompiler
 		{
 			return inputs.length;
 		}
-	}
+	}*/
 }

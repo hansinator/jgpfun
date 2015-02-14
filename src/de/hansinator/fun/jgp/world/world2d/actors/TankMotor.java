@@ -2,6 +2,8 @@ package de.hansinator.fun.jgp.world.world2d.actors;
 
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -83,6 +85,16 @@ public class TankMotor implements BodyPart<Body2d>
 		// apply movement
 		body.x += Math.sin(body.dir) * maxSpeed * speed;
 		body.y -= Math.cos(body.dir) * maxSpeed * speed;
+		
+		// box2d physics left
+		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 10.0f)));
+		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(-.2f, 2.0f)));
+		body.getBody().applyForce(f, p);
+		
+		// box2d physics right
+		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 10.0f)));
+		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(.2f, 2.0f)));
+		body.getBody().applyForce(f, p);
 	}
 
 	@Override

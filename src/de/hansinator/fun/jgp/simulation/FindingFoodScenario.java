@@ -43,9 +43,9 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(true);
-		//bodyGene.addBodyPartGene(new RadarSense.Gene());
-		//bodyGene.addBodyPartGene(new RadarSense.Gene());
+		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
 		bodyGene.addBodyPartGene(new OrientationSense.Gene());
 		bodyGene.addBodyPartGene(new SpeedSense.Gene());
 		bodyGene.addBodyPartGene(new WallSense.Gene());

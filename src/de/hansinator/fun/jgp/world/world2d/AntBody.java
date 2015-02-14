@@ -70,7 +70,7 @@ public class AntBody extends Body2d
 			AntBody body = new AntBody(context);
 			@SuppressWarnings("unchecked")
 			IOUnit<Body2d>[] parts = new IOUnit[children.size() + (useInternalLocator?1:0)];
-			int i = 1;
+			int i = useInternalLocator?1:0;
 			
 			if(useInternalLocator)
 				parts[0] = body.locator;

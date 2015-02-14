@@ -5,6 +5,18 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Random;
 
+import javax.swing.JButton;
+
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.joints.WheelJoint;
+import org.jbox2d.dynamics.joints.WheelJointDef;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -32,6 +44,13 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	public final ExecutionUnit<World2d> parent;
 
 	public double lastSpeed = 0.0;
+	
+	private org.jbox2d.dynamics.Body body;
+
+	public org.jbox2d.dynamics.Body getBody()
+	{
+		return body;
+	}
 
 	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
 	{
@@ -94,6 +113,29 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
 		world.registerObject(this);
+		
+	    // box2d body
+	    {
+	      PolygonShape chassis = new PolygonShape();
+	      Vec2 vertices[] = new Vec2[3];
+	      vertices[0] = new Vec2(0.0f, -6.0f); // top of triangle
+	      vertices[1] = new Vec2(-4.0f, 6.0f); // left wing
+	      vertices[2] = new Vec2(4.0f, 6.0f); // right wing
+	      chassis.set(vertices, 3);
+
+	      FixtureDef fd = new FixtureDef();
+	      fd.shape = chassis;
+	      fd.density = 1.0f;
+	      fd.friction = 0.9f;
+
+	      BodyDef bd = new BodyDef();
+	      bd.type = BodyType.DYNAMIC;
+	      bd.angularDamping = 5.0f;
+	      bd.linearDamping = 0.1f;
+	      bd.position.set((float)x, (float)y);
+	      body = world.getWorld().createBody(bd);
+	      body.createFixture(fd);
+	    }
 	}
 
 	@Override
@@ -120,6 +162,12 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	{
 		for (IOUnit<Body2d> p : parts)
 			p.applyOutputs();
+		
+		dir = body.getAngle();
+		
+		Vec2 pos = body.getPosition();
+		x = pos.x;
+		y = pos.y;
 	}
 
 	@Override

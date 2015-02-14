@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.testbed.framework.TestbedSettings;
+
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -40,7 +46,24 @@ public class World2d implements World
 	private final List<World2dObject> objects;
 
 	private final List<AnimatableObject> animatableObjects;
+	
+	private org.jbox2d.dynamics.World world;
+	
+	public org.jbox2d.dynamics.World getWorld()
+	{
+		return world;
+	}
 
+	private Body groundBody;
+
+	de.hansinator.fun.jgp.gui.DebugDrawJ2D draw;
+
+	public void setDraw(de.hansinator.fun.jgp.gui.DebugDrawJ2D draw)
+	{
+		this.draw = draw;
+		world.setDebugDraw(draw);
+		setCamera(new Vec2(1024, 768), -1);
+	}
 
 	public World2d(int worldWidth, int worldHeight, int foodCount)
 	{
@@ -55,10 +78,34 @@ public class World2d implements World
 		this.worldHeight = worldHeight;
 		this.foodCount = foodCount;
 	}
+	
+	public void setCamera(Vec2 argPos, float scale) {
+	    draw.setCamera(argPos.x, argPos.y, scale);
+	  }
 
 	@Override
 	public void animate()
 	{
+		/*
+			m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
+		    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
+		    m_world.setSubStepping(settings.getSetting(TestbedSettings.SubStepping).enabled);
+		    m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
+		 */
+		int flags = 0;
+	    flags += DebugDraw.e_shapeBit;
+	    flags += DebugDraw.e_jointBit;
+	    //flags += DebugDraw.e_aabbBit;
+	    //flags += DebugDraw.e_centerOfMassBit;
+	    //flags += DebugDraw.e_dynamicTreeBit;
+	    draw.setFlags(flags);
+	    
+		// physics, baby!
+		float hz = 60;
+	    float timeStep = hz > 0f ? 1f / hz : 0;
+		world.step(timeStep, 8, 3);
+		
+		
 		// TODO: have a more compex world, add a barrier in the middle of the
 		// screen
 		// TODO: take into account ant size, so it can't hide outside of the
@@ -77,6 +124,7 @@ public class World2d implements World
 					ao.collision(o);
 		}
 	}
+	
 
 	@Override
 	public final void resetState()
@@ -94,6 +142,16 @@ public class World2d implements World
 			f.randomPosition();
 			registerObject(f);
 		}
+		
+		Vec2 gravity = new Vec2(0, 0);
+	    world = new org.jbox2d.dynamics.World(gravity);
+	    
+	    BodyDef bodyDef = new BodyDef();
+	    groundBody = world.createBody(bodyDef);
+	    
+	    //world.setDestructionListener(destructionListener);
+	    //world.setContactListener(this);
+	    world.setDebugDraw(draw);
 	}
 
 	public Food findNearestFood(Point.Double p)
@@ -195,5 +253,11 @@ public class World2d implements World
 	public int getHeight()
 	{
 		return worldHeight;
+	}
+
+	@Override
+	public void debugDraw()
+	{
+		world.drawDebugData();
 	}
 }

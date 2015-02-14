@@ -16,6 +16,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.jbox2d.common.Vec2;
+
 import de.hansinator.fun.jgp.simulation.Simulator;
 
 /**
@@ -68,6 +70,8 @@ public class MainFrame extends JFrame implements WindowListener
 		// get ready for action
 		pack();
 		setVisible(true);
+		
+		
 	}
 
 	private JMenuBar createMenuBar()
