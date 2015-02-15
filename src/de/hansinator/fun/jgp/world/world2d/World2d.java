@@ -9,11 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.testbed.framework.TestbedSettings;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.contacts.Contact;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.ExecutionUnitGeneView;
@@ -30,16 +37,18 @@ import de.hansinator.fun.jgp.world.World;
  * TODO this class should only hold its data and offer methods to change them in various ways (such as animate)
  * TODO as a data class it should expose enough getters and setters to let a worldview display all of it
  */
-public class World2d implements World
+public class World2d implements World, ContactListener
 {
 
+	public final static Object FOOD_TAG = new Object();
+	
 	private final Random rnd;
 
 	public final int worldWidth, worldHeight;
 
-	public final List<Food> food;
+	public final List<Body> food;
 
-	final static Food OUT_OF_RANGE_FOOD = new Food(Integer.MAX_VALUE, Integer.MAX_VALUE, null, Settings.newRandomSource());
+	final static Vec2 OUT_OF_RANGE_FOOD = new Vec2(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
 
 	private final int foodCount;
 
@@ -58,6 +67,11 @@ public class World2d implements World
 
 	de.hansinator.fun.jgp.gui.DebugDrawJ2D draw;
 
+	public de.hansinator.fun.jgp.gui.DebugDrawJ2D getDraw()
+	{
+		return draw;
+	}
+
 	public void setDraw(de.hansinator.fun.jgp.gui.DebugDrawJ2D draw)
 	{
 		this.draw = draw;
@@ -69,7 +83,7 @@ public class World2d implements World
 	{
 		rnd = Settings.newRandomSource();
 
-		food = new ArrayList<Food>(foodCount);
+		food = new ArrayList<Body>(foodCount);
 		objects = new ArrayList<World2dObject>();
 		animatableObjects = new ArrayList<AnimatableObject>();
 		resetState();
@@ -104,25 +118,6 @@ public class World2d implements World
 		float hz = 60;
 	    float timeStep = hz > 0f ? 1f / hz : 0;
 		world.step(timeStep, 8, 3);
-		
-		
-		// TODO: have a more compex world, add a barrier in the middle of the
-		// screen
-		// TODO: take into account ant size, so it can't hide outside of the
-		// screen
-		for(AnimatableObject ao : animatableObjects)
-		{
-			// prevent world wrapping
-			ao.x = Math.min(Math.max(ao.x, 0), worldWidth - 1);
-			ao.y = Math.min(Math.max(ao.y, 0), worldHeight - 1);
-
-			//execute collisions
-			int r = ao.getCollisionRadius();
-			for(World2dObject o : objects)
-				if ((o.x >= (ao.x - r)) && (o.x <= (ao.x + r))
-						&& (o.y >= (ao.y - r)) && (o.y <= (ao.y + r)))
-					ao.collision(o);
-		}
 	}
 	
 
@@ -131,17 +126,6 @@ public class World2d implements World
 	{
 		objects.clear();
 		animatableObjects.clear();
-
-		if (food.size() != foodCount)
-		{
-			food.clear();
-			for (int i = 0; i < foodCount; i++)
-				food.add(new Food(rnd.nextInt(worldWidth), rnd.nextInt(worldHeight), this, rnd));
-		} else for (Food f : food)
-		{
-			f.randomPosition();
-			registerObject(f);
-		}
 		
 		Vec2 gravity = new Vec2(0, 0);
 	    world = new org.jbox2d.dynamics.World(gravity);
@@ -150,18 +134,74 @@ public class World2d implements World
 	    groundBody = world.createBody(bodyDef);
 	    
 	    //world.setDestructionListener(destructionListener);
-	    //world.setContactListener(this);
+	    world.setContactListener(this);
 	    world.setDebugDraw(draw);
+	   
+	    {
+	    	final float k_restitution = 0.4f;
+	    	/*
+	      Body ground;
+	      BodyDef bd = new BodyDef();
+	      bd.position.set(0.0f, 20.0f);
+	      ground = getWorld().createBody(bd);
+*/
+	      EdgeShape shape = new EdgeShape();
+
+	      FixtureDef sd = new FixtureDef();
+	      sd.shape = shape;
+	      sd.density = 0.0f;
+	      sd.restitution = k_restitution;
+	      
+	      // left wall
+	      shape.set(new Vec2(2048.0f, 0), new Vec2(2048.0f, 1535.0f));
+	      groundBody.createFixture(sd);
+
+	      // right wall
+	      shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, 1535.0f));
+	      groundBody.createFixture(sd);
+
+	      // top wall
+	      shape.set(new Vec2(1.0f, 0.0f), new Vec2(2048.0f, 0.0f));
+	      groundBody.createFixture(sd);
+
+	      // bottom wall
+	      shape.set(new Vec2(1.0f, 1535.0f), new Vec2(2048.0f, 1535.0f));
+	      groundBody.createFixture(sd);
+	    }
+	    
+	    {
+		    CircleShape circle = new CircleShape();
+		    circle.m_radius = 1.6f;
+		    FixtureDef fd = new FixtureDef();
+		    fd.shape = circle;
+		    fd.density = 1.0f;
+		    fd.friction = 0.9f;
+		    
+		    BodyDef bd = new BodyDef();
+		    bd.type = BodyType.DYNAMIC;
+	
+			food.clear();
+			for (int i = 0; i < foodCount; i++)
+			{
+				bd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
+				Body f = world.createBody(bd);
+				f.createFixture(fd);
+				f.setUserData(FOOD_TAG);
+				food.add(f);
+			}
+	    }
 	}
 
-	public Food findNearestFood(Point.Double p)
+	public Vec2 findNearestFood(Point.Double p)
 	{
 		double minDist = 1000000;
 		double curDist;
 		int indexMinDist = -1;
 		for (int i = 0; i < food.size(); i++)
 		{
-			curDist = World2dObject.distance(food.get(i), p);
+			Vec2 f = food.get(i).getPosition();			
+			curDist = Math.sqrt(((p.x - f.x) * (p.x - f.x)) + ((p.y - f.y) * (p.y - f.y)));
+
 			// limit visible range to 200
 			// if (curDist > 200)
 			// continue;
@@ -172,7 +212,7 @@ public class World2d implements World
 			}
 		}
 		if (indexMinDist > -1)
-			return food.get(indexMinDist);
+			return food.get(indexMinDist).getPosition();
 		else return OUT_OF_RANGE_FOOD;
 	}
 
@@ -215,19 +255,18 @@ public class World2d implements World
 			// draw fitness onto bodies
 			if(o instanceof Body2d)
 			{
+				Vec2 screenPos = new Vec2();
 				Body2d b = (Body2d)o;
 				Genome genome = generation.get(b.parent);
+				draw.getViewportTranform().getWorldToScreen(b.getBody().getPosition(), screenPos);
 				
 				if(genome != null)
 				{
 					g.setColor(Color.green);
-					g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round((float) b.x) + 8, Math.round((float) b.y) + 8);
+					g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6), Math.round(screenPos.y - 8));
 				}
 			}
 		}
-
-		for (Food f : food)
-			f.draw(g);
 	}
 
 
@@ -259,5 +298,39 @@ public class World2d implements World
 	public void debugDraw()
 	{
 		world.drawDebugData();
+	}
+
+	@Override
+	public void beginContact(Contact contact)
+	{
+		if(contact.isTouching())
+		{
+			Object o = contact.m_fixtureA.m_body.getUserData();
+			
+			// execute collisions
+			if(o instanceof AnimatableObject)
+				((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
+		}
+	}
+
+	@Override
+	public void endContact(Contact contact)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void preSolve(Contact contact, Manifold oldManifold)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postSolve(Contact contact, ContactImpulse impulse)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

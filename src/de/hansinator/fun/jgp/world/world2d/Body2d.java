@@ -1,21 +1,13 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Polygon;
 import java.util.Random;
 
-import javax.swing.JButton;
-
-import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.joints.WheelJoint;
-import org.jbox2d.dynamics.joints.WheelJointDef;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -23,9 +15,8 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends AnimatableObject implements DrawablePart<ExecutionUnit<World2d>>
+public abstract class Body2d extends AnimatableObject implements BodyPart<ExecutionUnit<World2d>>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
@@ -118,9 +109,9 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	    {
 	      PolygonShape chassis = new PolygonShape();
 	      Vec2 vertices[] = new Vec2[3];
-	      vertices[0] = new Vec2(0.0f, -6.0f); // top of triangle
-	      vertices[1] = new Vec2(-4.0f, 6.0f); // left wing
-	      vertices[2] = new Vec2(4.0f, 6.0f); // right wing
+	      vertices[0] = new Vec2(0.0f, -3.0f); // top of triangle
+	      vertices[1] = new Vec2(-2.0f, 3.0f); // left wing
+	      vertices[2] = new Vec2(2.0f, 3.0f); // right wing
 	      chassis.set(vertices, 3);
 
 	      FixtureDef fd = new FixtureDef();
@@ -132,8 +123,10 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	      bd.type = BodyType.DYNAMIC;
 	      bd.angularDamping = 5.0f;
 	      bd.linearDamping = 0.1f;
+	      bd.allowSleep = false;
 	      bd.position.set((float)x, (float)y);
 	      body = world.getWorld().createBody(bd);
+	      body.setUserData(this);
 	      body.createFixture(fd);
 	    }
 	}
@@ -171,31 +164,6 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	}
 
 	@Override
-	public void draw(Graphics g)
-	{
-		final double sindir = Math.sin(dir);
-		final double cosdir = Math.cos(dir);
-		final double x_len_displace = 6.0 * sindir;
-		final double y_len_displace = 6.0 * cosdir;
-		final double x_width_displace = 4.0 * sindir;
-		final double y_width_displace = 4.0 * cosdir;
-		final double x_bottom = x - x_len_displace;
-		final double y_bottom = y + y_len_displace;
-
-		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
-			part.draw(g);
-
-		Polygon p = new Polygon();
-		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top of triangle
-		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right wing
-		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left wing
-
-		g.setColor(selected ? Color.magenta : Color.red);
-		g.drawPolygon(p);
-		g.fillPolygon(p);
-	}
-
-	@Override
 	public int getCollisionRadius()
 	{
 		return bodyCollisionRadius;
@@ -204,5 +172,12 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	public World2d getWorld()
 	{
 		return world;
+	}
+	
+	@Override
+	public void draw(Graphics g)
+	{
+		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
+			part.draw(g);
 	}
 }

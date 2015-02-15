@@ -5,6 +5,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.dynamics.Body;
+
 @SuppressWarnings("serial")
 public abstract class World2dObject extends Point.Double
 {
@@ -43,7 +45,7 @@ public abstract class World2dObject extends Point.Double
 		return collisionListeners.remove(listener);
 	}
 
-	final void collision(World2dObject object)
+	final void collision(Body object)
 	{
 		for(CollisionListener listener : collisionListeners)
 			listener.onCollision(this, object);
@@ -51,7 +53,7 @@ public abstract class World2dObject extends Point.Double
 
 	public interface CollisionListener
 	{
-		public void onCollision(World2dObject a, World2dObject b);
+		public void onCollision(World2dObject a, Body object);
 	}
 
 	public abstract void draw(Graphics g);

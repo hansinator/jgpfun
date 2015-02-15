@@ -4,13 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
@@ -28,7 +29,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 
 	private final World2dObject origin;
 
-	public Food target;
+	public Vec2 target;
 
 	private double objDist;
 	
@@ -93,7 +94,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	public void locate()
 	{
 		target = world.findNearestFood(origin);
-		objDist = World2dObject.distance(target, Math.round((float) origin.x), Math.round((float) origin.y));
+		objDist = Math.sqrt(((target.x - origin.x) * (target.x - origin.x)) + ((target.y - origin.y) * (target.y - origin.y)));
 	}
 
 	@Override
@@ -124,9 +125,14 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	{
 		if (target != null)
 		{
+			Vec2 t = new Vec2();
+			Vec2 o = new Vec2(Math.round(origin.x), Math.round(origin.y));
+			
+			world.getDraw().getViewportTranform().getWorldToScreen(target, t);
+			world.getDraw().getViewportTranform().getWorldToScreen(o, o);
+			
 			g.setColor(beamColor);
-			g.drawLine(Math.round((float) origin.x), Math.round((float) origin.y), (int) Math.round(target.x),
-					(int) Math.round(target.y));
+			g.drawLine(Math.round(o.x), Math.round(o.y), Math.round(t.x), Math.round(t.y));
 		}
 	}
 

@@ -48,7 +48,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 	 private void updateSize(int argWidth, int argHeight) {
 		    panelWidth = argWidth;
 		    panelHeight = argHeight;
-		    draw.getViewportTranform().setExtents(argWidth , argHeight);
+		    draw.getViewportTranform().setExtents(argWidth / 2, argHeight / 2);
 		  }
 	
 	  public boolean render() {

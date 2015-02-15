@@ -71,28 +71,13 @@ public class TankMotor implements BodyPart<Body2d>
 	@Override
 	public void applyOutputs()
 	{
-		double speed;
-
-		// find the direction
-		body.dir += (right - left) * (maxSteerForce / 100.0);
-		body.dir -= 2 * Math.PI
-				* (body.dir < 0.0 ? Math.ceil(body.dir / (2 * Math.PI)) : (Math.floor(body.dir / (2 * Math.PI))));
-
-		// calculate speed
-		speed = (right + left) / 2.0;
-		body.lastSpeed = speed;
-		
-		// apply movement
-		body.x += Math.sin(body.dir) * maxSpeed * speed;
-		body.y -= Math.cos(body.dir) * maxSpeed * speed;
-		
 		// box2d physics left
-		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 10.0f)));
+		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 30.0f)));
 		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(-.2f, 2.0f)));
 		body.getBody().applyForce(f, p);
 		
 		// box2d physics right
-		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 10.0f)));
+		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 30.0f)));
 		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(.2f, 2.0f)));
 		body.getBody().applyForce(f, p);
 	}

@@ -5,6 +5,9 @@ import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -12,7 +15,6 @@ import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
@@ -32,7 +34,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 	public static final double beamLength = 200.0;
 
-	public Point2D target = null;
+	public Vec2 target = null;
 	
 	public static Color beamColor = new Color(24, 24, 24);
 	
@@ -104,8 +106,9 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
 		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
 		
-		for (Food f : world.food)
+		for (Body b : world.food)
 		{
+			Vec2 f = b.getPosition();
 			boolean hit = false;
 			// see if this is a triangle or a line
 			if(!(oldBeamX == x2) && (oldBeamY == y2)) hit = pointInTriangle(x1, y1, x2, y2, oldBeamX, oldBeamY, f);
