@@ -101,7 +101,9 @@ public class FindingFoodScenario implements Scenario
 			if (b.getUserData() == World2d.FOOD_TAG)
 			{
 				fitness++;
-				b.setTransform(new Vec2((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight)), (float)Math.PI);
+				
+				// set food to eaten to prevent further eating
+				b.setUserData(World2d.EATEN_TAG);
 			}
 		}
 

@@ -42,6 +42,8 @@ public class World2d implements World, ContactListener
 
 	public final static Object FOOD_TAG = new Object();
 	
+	public final static Object EATEN_TAG = new Object();
+	
 	private final Random rnd;
 
 	public final int worldWidth, worldHeight;
@@ -57,6 +59,10 @@ public class World2d implements World, ContactListener
 	private final List<AnimatableObject> animatableObjects;
 	
 	private org.jbox2d.dynamics.World world;
+	
+	private BodyDef foodBd;
+	
+	FixtureDef foodFd;
 	
 	public org.jbox2d.dynamics.World getWorld()
 	{
@@ -76,7 +82,7 @@ public class World2d implements World, ContactListener
 	{
 		this.draw = draw;
 		world.setDebugDraw(draw);
-		setCamera(new Vec2(1024, 768), -1);
+		setCamera(new Vec2(worldWidth / 2, worldHeight / 2), -1);
 	}
 
 	public World2d(int worldWidth, int worldHeight, int foodCount)
@@ -103,8 +109,6 @@ public class World2d implements World, ContactListener
 		/*
 			m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
 		    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
-		    m_world.setSubStepping(settings.getSetting(TestbedSettings.SubStepping).enabled);
-		    m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 		 */
 		int flags = 0;
 	    flags += DebugDraw.e_shapeBit;
@@ -115,9 +119,23 @@ public class World2d implements World, ContactListener
 	    draw.setFlags(flags);
 	    
 		// physics, baby!
-		float hz = 60;
+		float hz = 30;
 	    float timeStep = hz > 0f ? 1f / hz : 0;
 		world.step(timeStep, 8, 3);
+		
+		for(int i = 0; i < food.size(); i++)
+		{
+			Body b = food.get(i);
+			if(b.getUserData() == World2d.EATEN_TAG)
+			{
+				world.destroyBody(b);
+				foodBd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
+				b = world.createBody(foodBd);
+				b.createFixture(foodFd);
+				b.setUserData(FOOD_TAG);
+				food.set(i, b);
+			}
+		}
 	}
 	
 
@@ -133,6 +151,8 @@ public class World2d implements World, ContactListener
 	    BodyDef bodyDef = new BodyDef();
 	    groundBody = world.createBody(bodyDef);
 	    
+	    world.setSubStepping(true);
+	    world.setContinuousPhysics(true);
 	    //world.setDestructionListener(destructionListener);
 	    world.setContactListener(this);
 	    world.setDebugDraw(draw);
@@ -153,39 +173,39 @@ public class World2d implements World, ContactListener
 	      sd.restitution = k_restitution;
 	      
 	      // left wall
-	      shape.set(new Vec2(2048.0f, 0), new Vec2(2048.0f, 1535.0f));
+	      shape.set(new Vec2(worldWidth, 0), new Vec2(worldWidth, worldHeight-1));
 	      groundBody.createFixture(sd);
 
 	      // right wall
-	      shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, 1535.0f));
+	      shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, worldHeight-1));
 	      groundBody.createFixture(sd);
 
 	      // top wall
-	      shape.set(new Vec2(1.0f, 0.0f), new Vec2(2048.0f, 0.0f));
+	      shape.set(new Vec2(1.0f, 0.0f), new Vec2(worldWidth, 0.0f));
 	      groundBody.createFixture(sd);
 
 	      // bottom wall
-	      shape.set(new Vec2(1.0f, 1535.0f), new Vec2(2048.0f, 1535.0f));
+	      shape.set(new Vec2(1.0f, worldHeight-1), new Vec2(worldWidth, worldHeight-1));
 	      groundBody.createFixture(sd);
 	    }
 	    
 	    {
 		    CircleShape circle = new CircleShape();
 		    circle.m_radius = 1.6f;
-		    FixtureDef fd = new FixtureDef();
-		    fd.shape = circle;
-		    fd.density = 1.0f;
-		    fd.friction = 0.9f;
+		    foodFd = new FixtureDef();
+		    foodFd.shape = circle;
+		    foodFd.density = 1.0f;
+		    foodFd.friction = 0.9f;
 		    
-		    BodyDef bd = new BodyDef();
-		    bd.type = BodyType.DYNAMIC;
+		    foodBd = new BodyDef();
+		    foodBd.type = BodyType.DYNAMIC;
 	
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
 			{
-				bd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
-				Body f = world.createBody(bd);
-				f.createFixture(fd);
+				foodBd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
+				Body f = world.createBody(foodBd);
+				f.createFixture(foodFd);
 				f.setUserData(FOOD_TAG);
 				food.add(f);
 			}
@@ -303,14 +323,7 @@ public class World2d implements World, ContactListener
 	@Override
 	public void beginContact(Contact contact)
 	{
-		if(contact.isTouching())
-		{
-			Object o = contact.m_fixtureA.m_body.getUserData();
-			
-			// execute collisions
-			if(o instanceof AnimatableObject)
-				((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
-		}
+
 	}
 
 	@Override
@@ -323,8 +336,18 @@ public class World2d implements World, ContactListener
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold)
 	{
-		// TODO Auto-generated method stub
-		
+		//if(contact.isTouching())
+		//{
+			Object o = contact.m_fixtureA.m_body.getUserData();
+			
+			// execute collisions
+			if(o instanceof AnimatableObject)
+			{
+				((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
+				if(contact.m_fixtureB.m_body.getUserData() == World2d.FOOD_TAG)
+					contact.setEnabled(false);
+			}
+		//}
 	}
 
 	@Override

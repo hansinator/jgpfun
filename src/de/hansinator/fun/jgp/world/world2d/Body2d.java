@@ -121,8 +121,8 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 
 	      BodyDef bd = new BodyDef();
 	      bd.type = BodyType.DYNAMIC;
-	      bd.angularDamping = 5.0f;
-	      bd.linearDamping = 0.1f;
+	      bd.angularDamping = 12.0f;
+	      bd.linearDamping = 0.4f;
 	      bd.allowSleep = false;
 	      bd.position.set((float)x, (float)y);
 	      body = world.getWorld().createBody(bd);
@@ -157,6 +157,7 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 			p.applyOutputs();
 		
 		dir = body.getAngle();
+		lastSpeed = body.getLinearVelocity().length();
 		
 		Vec2 pos = body.getPosition();
 		x = pos.x;
