@@ -178,6 +178,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	public List<Gene> getChildren() {
 		List<Gene> list = new ArrayList<Gene>();
 		list.addAll(program);
+		list.addAll(ioGenes);
 		return list;
 	}
 

@@ -82,7 +82,7 @@ public class World2d implements World, ContactListener
 	{
 		this.draw = draw;
 		world.setDebugDraw(draw);
-		setCamera(new Vec2(worldWidth / 2, worldHeight / 2), -1);
+		setCamera(new Vec2(worldWidth / 2, worldHeight / 2), -2);
 	}
 
 	public World2d(int worldWidth, int worldHeight, int foodCount)
@@ -119,7 +119,7 @@ public class World2d implements World, ContactListener
 	    draw.setFlags(flags);
 	    
 		// physics, baby!
-		float hz = 30;
+		float hz = 60;
 	    float timeStep = hz > 0f ? 1f / hz : 0;
 		world.step(timeStep, 8, 3);
 		
@@ -151,7 +151,7 @@ public class World2d implements World, ContactListener
 	    BodyDef bodyDef = new BodyDef();
 	    groundBody = world.createBody(bodyDef);
 	    
-	    world.setSubStepping(true);
+	    //world.setSubStepping(true);
 	    world.setContinuousPhysics(true);
 	    //world.setDestructionListener(destructionListener);
 	    world.setContactListener(this);
