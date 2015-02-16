@@ -23,7 +23,7 @@ public class SpeedSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public int get()
 	{
-		return (int) (body.lastSpeed * Simulator.intScaleFactor);
+		return (int) (body.getBody().getLinearVelocity().length() * Simulator.intScaleFactor);
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public class AntBody extends Body2d
 		
 		private static float maxHeight = 4.0f;
 		
-		private static float minWidth = 1.0f;
+		private static float minWidth = 2.0f;
 		
 		private static float minHeight = 2.0f;
 		
@@ -88,8 +88,8 @@ public class AntBody extends Body2d
 		@Override
 		public IOUnit<ExecutionUnit<World2d>> express(ExecutionUnit<World2d> context)
 		{
-			float w = (minWidth + bodyWidth.getValue() * (maxWidth - minWidth)) / 2;
-			float h = (minHeight + bodyHeight.getValue() * (maxHeight - minHeight)) / 2;
+			float w = (minWidth + (bodyWidth.getValue() * (maxWidth - minWidth))) / 2;
+			float h = (minHeight + (bodyHeight.getValue() * (maxHeight - minHeight))) / 2;
 			PolygonShape shape = new PolygonShape();
 			Vec2 vertices[] = new Vec2[3];
 			vertices[0] = new Vec2(0.0f, -h); // top of triangle

@@ -106,10 +106,6 @@ public class World2d implements World, ContactListener
 	@Override
 	public void animate()
 	{
-		/*
-			m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
-		    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
-		 */
 		int flags = 0;
 	    flags += DebugDraw.e_shapeBit;
 	    flags += DebugDraw.e_jointBit;
@@ -151,6 +147,7 @@ public class World2d implements World, ContactListener
 	    BodyDef bodyDef = new BodyDef();
 	    groundBody = world.createBody(bodyDef);
 	    
+	    world.setAllowSleep(true);
 	    //world.setSubStepping(true);
 	    world.setContinuousPhysics(true);
 	    //world.setDestructionListener(destructionListener);

@@ -72,14 +72,14 @@ public class TankMotor implements BodyPart<Body2d>
 	public void applyOutputs()
 	{
 		// box2d physics left
-		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 100.0f)));
-		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(-2.0f, 2.0f)));
-		body.getBody().applyForce(f, p);
+		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 5.0f)));
+		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(-1.0f, 2.0f)));
+		body.getBody().applyLinearImpulse(f, p);
 		
 		// box2d physics right
-		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 100.0f)));
-		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(2.0f, 2.0f)));
-		body.getBody().applyForce(f, p);
+		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 5.0f)));
+		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(1.0f, 2.0f)));
+		body.getBody().applyLinearImpulse(f, p);
 	}
 
 	@Override

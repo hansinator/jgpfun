@@ -29,8 +29,6 @@ public class MainFrame extends JFrame implements WindowListener
 
 	private WorldSimulationView simulationClientView;
 
-	private final JScrollPane centerPane;
-
 	public final JPanel sidePaneLeft, sidePaneRight;
 
 	public final BottomPanel bottomPane;
@@ -43,7 +41,6 @@ public class MainFrame extends JFrame implements WindowListener
 		this.simulator = simulator;
 
 		// create all sub views
-		centerPane = new JScrollPane();
 		sidePaneLeft = new JPanel();
 		sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
 		bottomPane = new BottomPanel(simulator);
@@ -52,17 +49,13 @@ public class MainFrame extends JFrame implements WindowListener
 		simulationClientView = new WorldSimulationView(simulator.getSimulation());
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
-		// init centerPane
-		centerPane.setPreferredSize(new Dimension(800, 600));
-		centerPane.setViewportView(simulationClientView);
-
 		// add the menu bar
 		setJMenuBar(createMenuBar());
 
 		// setup and add all stuff to the content pane
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		contentPane.add(centerPane, BorderLayout.CENTER);
+		contentPane.add(simulationClientView, BorderLayout.CENTER);
 		contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
 		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
 		contentPane.add(bottomPane, BorderLayout.PAGE_END);

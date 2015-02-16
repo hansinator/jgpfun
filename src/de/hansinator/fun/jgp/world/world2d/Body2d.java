@@ -34,8 +34,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	protected ActorOutput[] outputs;
 
 	public final ExecutionUnit<World2d> parent;
-
-	public double lastSpeed = 0.0;
 	
 	private org.jbox2d.dynamics.Body body;
 	
@@ -114,12 +112,12 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	      FixtureDef fd = new FixtureDef();
 	      fd.shape = shape;
 	      fd.density = 1.0f;
-	      fd.friction = 0.5f;
+	      fd.friction = 0.9f;
 
 	      BodyDef bd = new BodyDef();
 	      bd.type = BodyType.DYNAMIC;
 	      bd.angularDamping = 12.0f;
-	      bd.linearDamping = 1.6f;
+	      bd.linearDamping = 4.0f;
 	      bd.allowSleep = false;
 	      bd.position.set((float)x, (float)y);
 	      body = world.getWorld().createBody(bd);
@@ -154,7 +152,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 			p.applyOutputs();
 		
 		dir = body.getAngle();
-		lastSpeed = body.getLinearVelocity().length();
 		
 		Vec2 pos = body.getPosition();
 		x = pos.x;

@@ -50,6 +50,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void sampleInputs()
 	{
+		//body.getBody().getContactList().contact.
 	}
 
 	@Override

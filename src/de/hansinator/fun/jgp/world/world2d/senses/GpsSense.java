@@ -5,6 +5,7 @@ import java.util.List;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -23,7 +24,7 @@ public class GpsSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float) body.x);
+			return Math.round((float)(body.x * Simulator.intScaleFactor));
 		}
 	};
 
@@ -33,7 +34,7 @@ public class GpsSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float) body.y);
+			return Math.round((float)(body.y * Simulator.intScaleFactor));
 		}
 	};
 
@@ -79,7 +80,6 @@ public class GpsSense implements BodyPart<Body2d>
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
-			// TODO Auto-generated method stub
 			return null;
 		}
 
