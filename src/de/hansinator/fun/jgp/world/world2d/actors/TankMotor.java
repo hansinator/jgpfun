@@ -18,6 +18,10 @@ public class TankMotor implements BodyPart<Body2d>
 
 	public static final double maxSpeed = Settings.getDouble("maxSpeed");
 	
+	private final Vec2 leftMotorPos = new Vec2(-1.0f, 2.0f);
+	
+	private final Vec2 rightMotorPos = new Vec2(1.0f, 2.0f);
+	
 	//make this a world2dobject in the future
 	private final Body2d body;
 
@@ -71,14 +75,14 @@ public class TankMotor implements BodyPart<Body2d>
 	@Override
 	public void applyOutputs()
 	{
-		// box2d physics left
+		// impulse drive physics left
 		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 5.0f)));
-		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(-1.0f, 2.0f)));
+		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(leftMotorPos));
 		body.getBody().applyLinearImpulse(f, p);
 		
-		// box2d physics right
+		// impulse drive physics right
 		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 5.0f)));
-		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(new Vec2(1.0f, 2.0f)));
+		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(rightMotorPos));
 		body.getBody().applyLinearImpulse(f, p);
 	}
 

@@ -264,6 +264,8 @@ public class World2d implements World, ContactListener
 	@Override
 	public void draw(Graphics g, Map<ExecutionUnit<? extends World>, Genome> generation)
 	{
+		world.drawDebugData();
+		
 		for (World2dObject o : objects)
 		{
 			o.draw(g);
@@ -309,12 +311,6 @@ public class World2d implements World, ContactListener
 	public int getHeight()
 	{
 		return worldHeight;
-	}
-
-	@Override
-	public void debugDraw()
-	{
-		world.drawDebugData();
 	}
 
 	@Override

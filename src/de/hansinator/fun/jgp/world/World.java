@@ -18,6 +18,4 @@ public interface World
 	public void resetState();
 	
 	public void setDraw(de.hansinator.fun.jgp.gui.DebugDrawJ2D draw);
-	
-	public void debugDraw();
 }

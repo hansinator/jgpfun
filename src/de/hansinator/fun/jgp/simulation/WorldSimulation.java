@@ -122,7 +122,6 @@ public class WorldSimulation
 					lastStatRound = currentRound;
 
 					// update views
-					world.debugDraw();
 					updateSimulationViews();
 
 					// slow down things artificially

@@ -34,6 +34,8 @@ public class WorldSimulationView extends javax.swing.JPanel
 	
 	public final de.hansinator.fun.jgp.gui.DebugDrawJ2D draw;
 	
+	private final Object drawLock = new Object();
+	
 	private Graphics2D dbg = null;
 	  private Image dbImage = null;
 	  
@@ -98,29 +100,31 @@ public class WorldSimulationView extends javax.swing.JPanel
 			@Override
 			public void onViewUpdate()
 			{
-				
-				
-				//repaint();
-				if(render()) {
-					Graphics g = dbg;
-					if (simulation.getRPS() != 0)
-					{
-						g.setColor(Color.yellow);
-						g.drawString("RPS: " + simulation.getRPS(), 10, 15);
-					}
+				synchronized(drawLock)
+				{
+					if(render()) {
+						Graphics g = dbg;
+						dbg.setColor(Color.black);
+					    dbg.fillRect(0, 0, panelWidth, panelHeight);
+					    
+					    simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
+					    
+						if (simulation.getRPS() != 0)
+						{
+							g.setColor(Color.yellow);
+							g.drawString("RPS: " + simulation.getRPS(), 10, 15);
+						}
+	
+						int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
+						if (progress != 0)
+						{
+							g.setColor(Color.yellow);
+							g.drawString("" + progress + "%", 10, 30);
+						}
 
-					int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
-					if (progress != 0)
-					{
-						g.setColor(Color.yellow);
-						g.drawString("" + progress + "%", 10, 30);
-					}
-					simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
-			        paintScreen();        
-			      }
-
-			    dbg.setColor(Color.black);
-			    dbg.fillRect(0, 0, panelWidth, panelHeight);
+				        paintScreen();
+				      }
+				}
 			}
 		});
 
@@ -131,7 +135,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 			public void mouseClicked(MouseEvent e)
 			{
 				simulation.world.clickEvent(e, simulation.getOrganismsByGenomeMap());
-				// fixme: only repaint if necessary
+				// FIXME only repaint if necessary
 				repaint();
 			}
 
@@ -161,8 +165,11 @@ public class WorldSimulationView extends javax.swing.JPanel
 		      @Override
 		      public void componentResized(ComponentEvent e) {
 		        updateSize(getWidth(), getHeight());
-		        dbImage = null;
-		        render();
+		        synchronized(drawLock)
+				{
+		        	dbImage = null;
+		        	render();
+				}
 		      }
 		    });
 	}
@@ -190,26 +197,10 @@ public class WorldSimulationView extends javax.swing.JPanel
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-
-		/*g.setColor(Color.black);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-		//simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
-		
-	
-
-		if (simulation.getRPS() != 0)
+		synchronized(drawLock)
 		{
-			g.setColor(Color.yellow);
-			g.drawString("RPS: " + simulation.getRPS(), 10, 15);
+			g.drawImage(dbImage, 0, 0, null);
 		}
-
-		int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
-		if (progress != 0)
-		{
-			g.setColor(Color.yellow);
-			g.drawString("" + progress + "%", 10, 30);
-		}*/
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
