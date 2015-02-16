@@ -191,11 +191,9 @@ public class World2d implements World, ContactListener
 		    circle.m_radius = 1.6f;
 		    foodFd = new FixtureDef();
 		    foodFd.shape = circle;
-		    foodFd.density = 1.0f;
-		    foodFd.friction = 0.9f;
+		    foodFd.isSensor = true;
 		    
 		    foodBd = new BodyDef();
-		    foodBd.type = BodyType.DYNAMIC;
 	
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
@@ -316,37 +314,30 @@ public class World2d implements World, ContactListener
 	@Override
 	public void beginContact(Contact contact)
 	{
-
+		Object o = contact.m_fixtureA.m_body.getUserData();
+		
+		// execute collisions
+		if(o instanceof AnimatableObject)
+		{
+			((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
+		}
 	}
 
 	@Override
 	public void endContact(Contact contact)
 	{
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold)
 	{
-		//if(contact.isTouching())
-		//{
-			Object o = contact.m_fixtureA.m_body.getUserData();
-			
-			// execute collisions
-			if(o instanceof AnimatableObject)
-			{
-				((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
-				if(contact.m_fixtureB.m_body.getUserData() == World2d.FOOD_TAG)
-					contact.setEnabled(false);
-			}
-		//}
+
 	}
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse)
 	{
-		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -18,9 +18,9 @@ public class TankMotor implements BodyPart<Body2d>
 
 	public static final double maxSpeed = Settings.getDouble("maxSpeed");
 	
-	private final Vec2 leftMotorPos = new Vec2(-1.0f, 2.0f);
+	private final Vec2 leftMotorPos;
 	
-	private final Vec2 rightMotorPos = new Vec2(1.0f, 2.0f);
+	private final Vec2 rightMotorPos;
 	
 	//make this a world2dobject in the future
 	private final Body2d body;
@@ -29,8 +29,10 @@ public class TankMotor implements BodyPart<Body2d>
 	private double left, right;
 	
 	
-	public TankMotor(Body2d body) {
+	public TankMotor(Body2d body, Vec2 leftMotorPos, Vec2 rightMotorPos) {
 		this.body = body;
+		this.leftMotorPos = leftMotorPos;
+		this.rightMotorPos = rightMotorPos;
 	}
 
 	public final ActorOutput actorLeft = new ActorOutput()
@@ -93,7 +95,7 @@ public class TankMotor implements BodyPart<Body2d>
 	}
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
-	{
+	{	
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -110,7 +112,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new TankMotor(context);
+			return new TankMotor(context, new Vec2(-1.0f, 2.0f), new Vec2(1.0f, 2.0f));
 		}
 
 		@Override
