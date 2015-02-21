@@ -76,7 +76,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		// trace the beam path using bresenham's line algorithm and query each
 		// intermediate beam pos for any collisions
 		hit = false;
-		rayCastAlongLine(oldBeamPos, beamPos);
+		rayCastAlongLine(oldBeamPos, beamPos, 1.0f);
 
 		// if we hit something compute and return distance
 		if (hit)
@@ -91,7 +91,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	}
 
 	private final Vec2 testPoint = new Vec2();
-	private void rayCastAlongLine(final Vec2 start, final Vec2 end)
+	private void rayCastAlongLine(final Vec2 start, final Vec2 end, final float interval)
 	{
 		float dx1 = 0.0f, dy1 = 0.0f, dx2 = 0.0f, dy2 = 0.0f;
 		
@@ -99,24 +99,11 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		testPoint.set(end);
 		testPoint.subLocal(start);
 	
-		// choose proper step sizes
-		if (testPoint.x < 0.0)
-		{
-			dx1 = -1.0f;
-			dx2 = -1.0f;
-		} else if (testPoint.x > 0.0)
-		{
-			dx1 = 1.0f;
-			dx2 = 1.0f;
-		}
-		
-		// choose proper step sizes
-		if (testPoint.y < 0.0)
-			dy1 = -1.0f;
-		else if (testPoint.y > 0.0)
-			dy1 = 1.0f;
+		// choose proper step directions
+		dx1 = dx2 = Math.signum(testPoint.x) * interval;
+		dy1 = Math.signum(testPoint.y) * interval;
 
-		// choose proper step sizes
+		// compute loop values
 		int longest = Math.abs(Math.round(testPoint.x));
 		int shortest = Math.abs(Math.round(testPoint.y));
 		if (!(longest > shortest))
@@ -126,13 +113,12 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 			longest = shortest;
 			shortest = x;
 			
-			if (testPoint.y < 0.0)
-				dy2 = -1.0f;
-			else if (testPoint.y > 0.0)
-				dy2 = 1.0f;
+			// choose proper step directions
+			dy2 = Math.signum(testPoint.y) * interval;
 			dx2 = 0.0f;
 		}
 
+		// finally "draw" the line
 		testPoint.set(start);
 		for (int i = 0, numerator = longest >> 1; i <= longest; i++)
 		{
