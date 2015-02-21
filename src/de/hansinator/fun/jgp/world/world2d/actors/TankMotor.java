@@ -78,12 +78,12 @@ public class TankMotor implements BodyPart<Body2d>
 	public void applyOutputs()
 	{
 		// impulse drive physics left
-		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 5.0f)));
+		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 7.0f)));
 		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(leftMotorPos));
 		body.getBody().applyLinearImpulse(f, p);
 		
 		// impulse drive physics right
-		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 5.0f)));
+		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 7.0f)));
 		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(rightMotorPos));
 		body.getBody().applyLinearImpulse(f, p);
 	}
@@ -112,7 +112,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new TankMotor(context, new Vec2(-1.0f, 2.0f), new Vec2(1.0f, 2.0f));
+			return new TankMotor(context, new Vec2(-1.0f, 1.0f), new Vec2(1.0f, 1.0f));
 		}
 
 		@Override

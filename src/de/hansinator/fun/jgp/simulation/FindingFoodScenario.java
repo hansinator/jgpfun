@@ -3,9 +3,6 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import java.util.Random;
-
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 import de.hansinator.fun.jgp.genetics.Genome;
@@ -26,7 +23,8 @@ import de.hansinator.fun.jgp.world.world2d.World2dObject;
 import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
 import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
-import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
+import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
+import de.hansinator.fun.jgp.world.world2d.senses.LinearVelocitySense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
@@ -36,8 +34,6 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 public class FindingFoodScenario implements Scenario
 {
 	private final int progSize = Settings.getInt("progSize");
-	
-	private Random rnd = Settings.newRandomSource();
 	
 	private final int worldWidth = Settings.getInt("worldWidth");
 	
@@ -52,11 +48,11 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(true);
-		//bodyGene.addBodyPartGene(new RadarSense.Gene());
+		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		bodyGene.addBodyPartGene(new RadarSense.Gene());
 		//bodyGene.addBodyPartGene(new RadarSense.Gene());
 		bodyGene.addBodyPartGene(new OrientationSense.Gene());
-		bodyGene.addBodyPartGene(new SpeedSense.Gene());
+		bodyGene.addBodyPartGene(new LinearVelocitySense.Gene());
 		bodyGene.addBodyPartGene(new WallSense.Gene());
 		bodyGene.addBodyPartGene(new TankMotor.Gene());
 		

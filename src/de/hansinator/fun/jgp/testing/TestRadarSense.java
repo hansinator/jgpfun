@@ -16,22 +16,16 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.hansinator.fun.jgp.genetics.Genome;
+import org.jbox2d.common.Vec2;
+
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
-import de.hansinator.fun.jgp.simulation.FindingFoodScenario.FoodFitnessEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
-import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
-import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
  * 
@@ -117,15 +111,12 @@ public class TestRadarSense extends JPanel
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
-		for (Food f : world.food)
-			f.draw(g);
-		
 		body.draw(g);
 		g.setColor(Color.yellow);
 		g.drawString("BodyDir: " + String.format("%.2f", body.dir), 10, 15);
 		g.drawString("BeamDir: " + String.format("%.2f", sense.direction), 10, 25);
 	}
-
+	
 	public static void main(String[] args) throws IOException
 	{
 		Point p = new Point(10,10);

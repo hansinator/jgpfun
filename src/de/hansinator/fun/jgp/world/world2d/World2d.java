@@ -18,7 +18,6 @@ import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 
@@ -32,18 +31,13 @@ import de.hansinator.fun.jgp.world.World;
  * 
  * @author hansinator
  */
-/*
- * TODO decouple draw and click stuff completely out of this class into a worldview
- * TODO this class should only hold its data and offer methods to change them in various ways (such as animate)
- * TODO as a data class it should expose enough getters and setters to let a worldview display all of it
- */
 public class World2d implements World, ContactListener
 {
 
 	public final static Object FOOD_TAG = new Object();
-	
+
 	public final static Object EATEN_TAG = new Object();
-	
+
 	private final Random rnd;
 
 	public final int worldWidth, worldHeight;
@@ -57,13 +51,9 @@ public class World2d implements World, ContactListener
 	private final List<World2dObject> objects;
 
 	private final List<AnimatableObject> animatableObjects;
-	
+
 	private org.jbox2d.dynamics.World world;
-	
-	private BodyDef foodBd;
-	
-	FixtureDef foodFd;
-	
+
 	public org.jbox2d.dynamics.World getWorld()
 	{
 		return world;
@@ -98,113 +88,104 @@ public class World2d implements World, ContactListener
 		this.worldHeight = worldHeight;
 		this.foodCount = foodCount;
 	}
-	
-	public void setCamera(Vec2 argPos, float scale) {
-	    draw.setCamera(argPos.x, argPos.y, scale);
-	  }
+
+	public void setCamera(Vec2 argPos, float scale)
+	{
+		draw.setCamera(argPos.x, argPos.y, scale);
+	}
 
 	@Override
 	public void animate()
 	{
 		int flags = 0;
-	    flags += DebugDraw.e_shapeBit;
-	    flags += DebugDraw.e_jointBit;
-	    //flags += DebugDraw.e_aabbBit;
-	    //flags += DebugDraw.e_centerOfMassBit;
-	    //flags += DebugDraw.e_dynamicTreeBit;
-	    draw.setFlags(flags);
-	    
+		flags += DebugDraw.e_shapeBit;
+		flags += DebugDraw.e_jointBit;
+		// flags += DebugDraw.e_aabbBit;
+		// flags += DebugDraw.e_centerOfMassBit;
+		// flags += DebugDraw.e_dynamicTreeBit;
+		draw.setFlags(flags);
+
 		// physics, baby!
 		float hz = 60;
-	    float timeStep = hz > 0f ? 1f / hz : 0;
+		float timeStep = hz > 0f ? 1f / hz : 0;
 		world.step(timeStep, 8, 3);
-		
-		for(int i = 0; i < food.size(); i++)
+
+		for (int i = 0; i < food.size(); i++)
 		{
 			Body b = food.get(i);
-			if(b.getUserData() == World2d.EATEN_TAG)
+			if (b.getUserData() == World2d.EATEN_TAG)
 			{
-				world.destroyBody(b);
-				foodBd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
-				b = world.createBody(foodBd);
-				b.createFixture(foodFd);
 				b.setUserData(FOOD_TAG);
-				food.set(i, b);
+				b.setTransform(new Vec2((float) rnd.nextInt(worldWidth), (float) rnd.nextInt(worldHeight)), 0f);
 			}
 		}
 	}
-	
 
 	@Override
 	public final void resetState()
 	{
 		objects.clear();
 		animatableObjects.clear();
-		
+
 		Vec2 gravity = new Vec2(0, 0);
-	    world = new org.jbox2d.dynamics.World(gravity);
-	    
-	    BodyDef bodyDef = new BodyDef();
-	    groundBody = world.createBody(bodyDef);
-	    
-	    world.setAllowSleep(true);
-	    //world.setSubStepping(true);
-	    world.setContinuousPhysics(true);
-	    //world.setDestructionListener(destructionListener);
-	    world.setContactListener(this);
-	    world.setDebugDraw(draw);
-	   
-	    {
-	    	final float k_restitution = 0.4f;
-	    	/*
-	      Body ground;
-	      BodyDef bd = new BodyDef();
-	      bd.position.set(0.0f, 20.0f);
-	      ground = getWorld().createBody(bd);
-*/
-	      EdgeShape shape = new EdgeShape();
+		world = new org.jbox2d.dynamics.World(gravity);
 
-	      FixtureDef sd = new FixtureDef();
-	      sd.shape = shape;
-	      sd.density = 0.0f;
-	      sd.restitution = k_restitution;
-	      
-	      // left wall
-	      shape.set(new Vec2(worldWidth, 0), new Vec2(worldWidth, worldHeight-1));
-	      groundBody.createFixture(sd);
+		BodyDef bodyDef = new BodyDef();
+		groundBody = world.createBody(bodyDef);
 
-	      // right wall
-	      shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, worldHeight-1));
-	      groundBody.createFixture(sd);
+		world.setAllowSleep(true);
+		// world.setSubStepping(true);
+		world.setContinuousPhysics(true);
+		// world.setDestructionListener(destructionListener);
+		world.setContactListener(this);
+		world.setDebugDraw(draw);
 
-	      // top wall
-	      shape.set(new Vec2(1.0f, 0.0f), new Vec2(worldWidth, 0.0f));
-	      groundBody.createFixture(sd);
+		{
+			final float k_restitution = 0.4f;
 
-	      // bottom wall
-	      shape.set(new Vec2(1.0f, worldHeight-1), new Vec2(worldWidth, worldHeight-1));
-	      groundBody.createFixture(sd);
-	    }
-	    
-	    {
-		    CircleShape circle = new CircleShape();
-		    circle.m_radius = 1.6f;
-		    foodFd = new FixtureDef();
-		    foodFd.shape = circle;
-		    foodFd.isSensor = true;
-		    
-		    foodBd = new BodyDef();
-	
+			EdgeShape shape = new EdgeShape();
+
+			FixtureDef sd = new FixtureDef();
+			sd.shape = shape;
+			sd.density = 0.0f;
+			sd.restitution = k_restitution;
+
+			// left wall
+			shape.set(new Vec2(worldWidth, 0), new Vec2(worldWidth, worldHeight - 1));
+			groundBody.createFixture(sd);
+
+			// right wall
+			shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, worldHeight - 1));
+			groundBody.createFixture(sd);
+
+			// top wall
+			shape.set(new Vec2(1.0f, 0.0f), new Vec2(worldWidth, 0.0f));
+			groundBody.createFixture(sd);
+
+			// bottom wall
+			shape.set(new Vec2(1.0f, worldHeight - 1), new Vec2(worldWidth, worldHeight - 1));
+			groundBody.createFixture(sd);
+		}
+
+		// create food
+		{
+			CircleShape circle = new CircleShape();
+			circle.m_radius = 1.6f;
+			FixtureDef fd = new FixtureDef();
+			fd.shape = circle;
+			fd.isSensor = true;
+			BodyDef bd = new BodyDef();
+
 			food.clear();
 			for (int i = 0; i < foodCount; i++)
 			{
-				foodBd.position.set((float)rnd.nextInt(worldWidth), (float)rnd.nextInt(worldHeight));
-				Body f = world.createBody(foodBd);
-				f.createFixture(foodFd);
+				bd.position.set((float) rnd.nextInt(worldWidth), (float) rnd.nextInt(worldHeight));
+				Body f = world.createBody(bd);
+				f.createFixture(fd);
 				f.setUserData(FOOD_TAG);
 				food.add(f);
 			}
-	    }
+		}
 	}
 
 	public Vec2 findNearestFood(Point.Double p)
@@ -214,7 +195,7 @@ public class World2d implements World, ContactListener
 		int indexMinDist = -1;
 		for (int i = 0; i < food.size(); i++)
 		{
-			Vec2 f = food.get(i).getPosition();			
+			Vec2 f = food.get(i).getPosition();
 			curDist = Math.sqrt(((p.x - f.x) * (p.x - f.x)) + ((p.y - f.y) * (p.y - f.y)));
 
 			// limit visible range to 200
@@ -228,76 +209,92 @@ public class World2d implements World, ContactListener
 		}
 		if (indexMinDist > -1)
 			return food.get(indexMinDist).getPosition();
-		else return OUT_OF_RANGE_FOOD;
+		else
+			return OUT_OF_RANGE_FOOD;
 	}
 
 	@Override
 	public void clickEvent(MouseEvent e, Map<ExecutionUnit<? extends World>, Genome> generation)
 	{
-		Point p = e.getPoint();
+		Vec2 clickPos = new Vec2();
 		
-		// TODO probably create a selectable interface in the future, but for now coupling of world2d and other 2d objects is ok
+		{
+			Point p = e.getPoint();
+			draw.getViewportTranform().getScreenToWorld(new Vec2(p.x, p.y), clickPos);
+		}
+
+		// TODO probably create a selectable interface in the future, but for
+		// now coupling of world2d and other 2d objects is ok
 		// see if we hit an object
 		for (World2dObject o : objects)
-			if (Math.abs(o.x - p.x) < 10.0 && Math.abs(o.y - p.y) < 10.0)
+			if (Math.abs(o.x - clickPos.x) < 10.0 && Math.abs(o.y - clickPos.y) < 10.0)
 			{
-				// TODO add an object inspector view that shows info about the selected object
-				if(e.getClickCount() == 1)
+				// TODO add an object inspector view that shows info about the
+				// selected object
+				if (e.getClickCount() == 1)
 					o.selected = true;
-				else if((e.getClickCount() == 2) && (o instanceof Body2d))
+				else if ((e.getClickCount() == 2) && (o instanceof Body2d))
 				{
 					// show a gene viewer
-					Genome genome = generation.get(((Body2d)o).parent);
-					if(genome != null)
+					Genome genome = generation.get(((Body2d) o).parent);
+					if (genome != null)
 					{
 						ExecutionUnitGeneView view = genome.getRootGene().getView();
-						if(view != null)
+						if (view != null)
 							view.show();
 					}
 				}
-			}
-			else if(e.getClickCount() == 1) o.selected = false;
+			} else if (e.getClickCount() == 1)
+				o.selected = false;
 	}
 
+	private final Vec2 screenPos = new Vec2();
 	@Override
 	public void draw(Graphics g, Map<ExecutionUnit<? extends World>, Genome> generation)
 	{
 		world.drawDebugData();
-		
+
 		for (World2dObject o : objects)
 		{
 			o.draw(g);
-			
-			// TODO find a better solution like a separate BodyView / ObjectView class
+
+			// TODO find a better solution like a separate BodyView / ObjectView
+			// class
 			// draw fitness onto bodies
-			if(o instanceof Body2d)
+			if (o instanceof Body2d)
 			{
-				Vec2 screenPos = new Vec2();
-				Body2d b = (Body2d)o;
+				Body2d b = (Body2d) o;
 				Genome genome = generation.get(b.parent);
 				draw.getViewportTranform().getWorldToScreen(b.getBody().getPosition(), screenPos);
-				
-				if(genome != null)
+
+				if (genome != null)
 				{
 					g.setColor(Color.green);
-					g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6), Math.round(screenPos.y - 8));
+					g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6),
+							Math.round(screenPos.y - 8));
+				}
+				
+				// FIXME hacky implementation here
+				if (b.selected)
+				{
+					g.setColor(Color.cyan);
+					g.drawOval(Math.round(screenPos.x), Math.round(screenPos.y), 5, 5);
 				}
 			}
 		}
 	}
 
-
 	public synchronized void registerObject(World2dObject object)
 	{
 		objects.add(object);
-		if(object instanceof AnimatableObject)
-			animatableObjects.add((AnimatableObject)object);
+		if (object instanceof AnimatableObject)
+			animatableObjects.add((AnimatableObject) object);
 	}
 
 	public synchronized void unregisterObject(World2dObject object)
 	{
 		objects.remove(object);
-		if(object instanceof AnimatableObject)
+		if (object instanceof AnimatableObject)
 			animatableObjects.remove(object);
 	}
 
@@ -315,11 +312,11 @@ public class World2d implements World, ContactListener
 	public void beginContact(Contact contact)
 	{
 		Object o = contact.m_fixtureA.m_body.getUserData();
-		
+
 		// execute collisions
-		if(o instanceof AnimatableObject)
+		if (o instanceof AnimatableObject)
 		{
-			((AnimatableObject)o).collision(contact.m_fixtureB.m_body);
+			((AnimatableObject) o).collision(contact.m_fixtureB.m_body);
 		}
 	}
 

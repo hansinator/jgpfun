@@ -99,9 +99,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	{
 		world = context.getExecutionContext();
 		
-		for(IOUnit<Body2d> part : parts)
-			part.attachEvaluationState(this);
-		
 		x = rnd.nextInt(world.getWidth());
 		y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
@@ -124,6 +121,10 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	      body.setUserData(this);
 	      body.createFixture(fd);
 	    }
+	    
+	    // attach parts after body initialization is done
+		for(IOUnit<Body2d> part : parts)
+			part.attachEvaluationState(this);
 	}
 
 	@Override

@@ -9,13 +9,13 @@ import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
-public class SpeedSense implements SensorInput, BodyPart<Body2d>
+public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 {
 	private final SensorInput[] inputs = { this };
 
 	private final Body2d body;
 
-	public SpeedSense(Body2d body2d)
+	public LinearVelocitySense(Body2d body2d)
 	{
 		body = body2d;
 	}
@@ -65,13 +65,13 @@ public class SpeedSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new SpeedSense.Gene();
+			return new LinearVelocitySense.Gene();
 		}
 
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new SpeedSense(context);
+			return new LinearVelocitySense(context);
 		}
 
 		@Override

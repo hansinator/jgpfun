@@ -13,7 +13,7 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
  * 
  * @author hansinator
  */
-public class GpsSense implements BodyPart<Body2d>
+public class PositionSense implements BodyPart<Body2d>
 {
 
 	private final Body2d body;
@@ -40,7 +40,7 @@ public class GpsSense implements BodyPart<Body2d>
 
 	SensorInput[] inputs = { senseX, senseY };
 
-	public GpsSense(Body2d body)
+	public PositionSense(Body2d body)
 	{
 		this.body = body;
 	}
@@ -86,13 +86,13 @@ public class GpsSense implements BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new GpsSense.Gene();
+			return new PositionSense.Gene();
 		}
 
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new GpsSense(context);
+			return new PositionSense(context);
 		}
 
 		@Override
