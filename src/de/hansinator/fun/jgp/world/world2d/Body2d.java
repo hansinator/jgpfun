@@ -48,9 +48,9 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 		return body;
 	}
 
-	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir, Shape shape)
+	public Body2d(ExecutionUnit<World2d> parent, double dir, Shape shape)
 	{
-		super(parent.getExecutionContext(), x, y, dir);
+		super(parent.getExecutionContext(), dir);
 		this.parent = parent;
 		this.shape = shape;
 	}
@@ -103,8 +103,8 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	{
 		world = context.getExecutionContext();
 		
-		x = rnd.nextInt(world.getWidth());
-		y = rnd.nextInt(world.getHeight());
+		int x = rnd.nextInt(world.getWidth());
+		int y = rnd.nextInt(world.getHeight());
 		dir = rnd.nextDouble() * 2 * Math.PI;
 		world.registerObject(this);
 		
@@ -157,10 +157,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 			p.applyOutputs();
 		
 		dir = body.getAngle();
-		
-		Vec2 pos = body.getPosition();
-		x = pos.x;
-		y = pos.y;
 	}
 
 	/**

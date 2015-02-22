@@ -2,6 +2,9 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -16,7 +19,9 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
 public class PositionSense implements BodyPart<Body2d>
 {
 
-	private final Body2d body;
+	private Body body;
+	
+	private Vec2 position;
 
 	public final SensorInput senseX = new SensorInput()
 	{
@@ -24,7 +29,7 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float)(body.x * Simulator.intScaleFactor));
+			return Math.round((float)(position.x * Simulator.intScaleFactor));
 		}
 	};
 
@@ -34,16 +39,11 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float)(body.y * Simulator.intScaleFactor));
+			return Math.round((float)(position.y * Simulator.intScaleFactor));
 		}
 	};
 
 	SensorInput[] inputs = { senseX, senseY };
-
-	public PositionSense(Body2d body)
-	{
-		this.body = body;
-	}
 
 	@Override
 	public SensorInput[] getInputs()
@@ -60,6 +60,7 @@ public class PositionSense implements BodyPart<Body2d>
 	@Override
 	public void sampleInputs()
 	{
+		position = body.getPosition();
 	}
 
 	@Override
@@ -70,8 +71,7 @@ public class PositionSense implements BodyPart<Body2d>
 	@Override
 	public void attachEvaluationState(Body2d body)
 	{
-		// TODO Auto-generated method stub
-
+		this.body = body.getBody();
 	}
 	
 	
@@ -92,7 +92,7 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new PositionSense(context);
+			return new PositionSense();
 		}
 
 		@Override

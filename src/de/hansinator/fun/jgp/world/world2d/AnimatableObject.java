@@ -5,7 +5,7 @@ import java.awt.Point;
 
 
 
-public abstract class AnimatableObject extends Point.Double
+public abstract class AnimatableObject
 {
 	public double dir;
 
@@ -13,9 +13,8 @@ public abstract class AnimatableObject extends Point.Double
 	
 	public volatile boolean selected = false;
 	
-	public AnimatableObject(World2d world, double x, double y, double dir)
+	public AnimatableObject(World2d world, double dir)
 	{
-		super(x, y);
 		this.dir = dir;
 		this.world = world;
 	}

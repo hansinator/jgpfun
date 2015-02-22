@@ -67,8 +67,6 @@ public class TestRadarSense extends JPanel
 		organism.setExecutionContext(world);
 
 		body = ((AntBody) organism.getIOUnits()[0]);
-		body.x = 400.0;
-		body.y = 300.0;
 		body.sampleInputs();
 		
 		for(IOUnit<Body2d> part : body.getParts())

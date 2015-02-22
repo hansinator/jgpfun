@@ -48,7 +48,7 @@ public class World2d implements World, ContactListener
 
 	private final int foodCount;
 
-	private final List<AnimatableObject> objects;
+	private final List<Body2d> bodies;
 
 	private org.jbox2d.dynamics.World world;
 
@@ -78,7 +78,7 @@ public class World2d implements World, ContactListener
 		rnd = Settings.newRandomSource();
 
 		food = new ArrayList<Body>(foodCount);
-		objects = new ArrayList<AnimatableObject>();
+		bodies = new ArrayList<Body2d>();
 		resetState();
 
 		this.worldWidth = worldWidth;
@@ -121,7 +121,7 @@ public class World2d implements World, ContactListener
 	@Override
 	public final void resetState()
 	{
-		objects.clear();
+		bodies.clear();
 
 		Vec2 gravity = new Vec2(0, 0);
 		world = new org.jbox2d.dynamics.World(gravity);
@@ -222,17 +222,19 @@ public class World2d implements World, ContactListener
 		// TODO probably create a selectable interface in the future, but for
 		// now coupling of world2d and other 2d objects is ok
 		// see if we hit an object
-		for (AnimatableObject o : objects)
-			if (Math.abs(o.x - clickPos.x) < 10.0 && Math.abs(o.y - clickPos.y) < 10.0)
+		for (Body2d b : bodies)
+		{
+			Vec2 p = b.getBody().getPosition();
+			if (Math.abs(p.x - clickPos.x) < 10.0 && Math.abs(p.y - clickPos.y) < 10.0)
 			{
 				// TODO add an object inspector view that shows info about the
 				// selected object
 				if (e.getClickCount() == 1)
-					o.selected = true;
-				else if ((e.getClickCount() == 2) && (o instanceof Body2d))
+					b.selected = true;
+				else if (e.getClickCount() == 2)
 				{
 					// show a gene viewer
-					Genome genome = generation.get(((Body2d) o).parent);
+					Genome genome = generation.get(b.parent);
 					if (genome != null)
 					{
 						ExecutionUnitGeneView view = genome.getRootGene().getView();
@@ -241,7 +243,8 @@ public class World2d implements World, ContactListener
 					}
 				}
 			} else if (e.getClickCount() == 1)
-				o.selected = false;
+				b.selected = false;
+		}
 	}
 
 	private final Vec2 screenPos = new Vec2();
@@ -250,42 +253,38 @@ public class World2d implements World, ContactListener
 	{
 		world.drawDebugData();
 
-		for (AnimatableObject o : objects)
+		// TODO find a better solution like a separate BodyView / ObjectView
+		// class
+		// draw fitness onto bodies
+		for (Body2d b : bodies)
 		{
-			// TODO find a better solution like a separate BodyView / ObjectView
-			// class
-			// draw fitness onto bodies
-			if (o instanceof Body2d)
-			{
-				Body2d b = (Body2d) o;
-				Genome genome = generation.get(b.parent);
-				draw.getViewportTranform().getWorldToScreen(b.getBody().getPosition(), screenPos);
+			Genome genome = generation.get(b.parent);
+			draw.getViewportTranform().getWorldToScreen(b.getBody().getPosition(), screenPos);
 
-				if (genome != null)
-				{
-					g.setColor(Color.green);
-					g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6),
-							Math.round(screenPos.y - 8));
-				}
-				
-				// FIXME hacky implementation here
-				if (b.selected)
-				{
-					g.setColor(Color.cyan);
-					g.drawOval(Math.round(screenPos.x), Math.round(screenPos.y), 5, 5);
-				}
+			if (genome != null)
+			{
+				g.setColor(Color.green);
+				g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6),
+						Math.round(screenPos.y - 8));
+			}
+			
+			// FIXME hacky implementation here
+			if (b.selected)
+			{
+				g.setColor(Color.cyan);
+				g.drawOval(Math.round(screenPos.x), Math.round(screenPos.y), 5, 5);
 			}
 		}
 	}
 
-	public synchronized void registerObject(AnimatableObject object)
+	public synchronized void registerObject(Body2d object)
 	{
-		objects.add(object);
+		bodies.add(object);
 	}
 
-	public synchronized void unregisterObject(AnimatableObject object)
+	public synchronized void unregisterObject(Body2d object)
 	{
-		objects.remove(object);
+		bodies.remove(object);
 	}
 
 	public int getWidth()
