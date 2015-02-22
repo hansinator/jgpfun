@@ -16,15 +16,15 @@ import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
+import de.hansinator.fun.jgp.world.world2d.AnimatableObject;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
+import de.hansinator.fun.jgp.world.world2d.Body2d.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.World2dObject;
-import de.hansinator.fun.jgp.world.world2d.World2dObject.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
-import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
 import de.hansinator.fun.jgp.world.world2d.senses.LinearVelocitySense;
+import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
+import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
 import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
@@ -48,8 +48,8 @@ public class FindingFoodScenario implements Scenario
 	@Override
 	public Genome randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(false);
-		bodyGene.addBodyPartGene(new RadarSense.Gene());
+		AntBody.Gene bodyGene = new AntBody.Gene();
+		bodyGene.addBodyPartGene(new ObjectLocator.Gene());
 		//bodyGene.addBodyPartGene(new RadarSense.Gene());
 		bodyGene.addBodyPartGene(new OrientationSense.Gene());
 		bodyGene.addBodyPartGene(new LinearVelocitySense.Gene());
@@ -92,7 +92,7 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public void onCollision(World2dObject a, Body b)
+		public void onCollision(AnimatableObject a, Body b)
 		{
 			if (b.getUserData() == World2d.FOOD_TAG)
 			{

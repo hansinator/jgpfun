@@ -1,11 +1,13 @@
 package de.hansinator.fun.jgp.world.world2d;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
@@ -28,6 +30,8 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 
 	@SuppressWarnings("unchecked")
 	protected BodyPart.DrawablePart<Body2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
+	
+	private final List<CollisionListener> collisionListeners = new ArrayList<CollisionListener>();
 
 	protected SensorInput[] inputs;
 
@@ -159,10 +163,30 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 		y = pos.y;
 	}
 
-	@Override
+	/**
+	 * Only animatable objects can cause collisions
+	 * 
+	 * @return The desired radius in pixels in which this object wants to experience collisions
+	 */
 	public int getCollisionRadius()
 	{
 		return bodyCollisionRadius;
+	}
+	
+	final synchronized public boolean addCollisionListener(CollisionListener listener)
+	{
+		return collisionListeners.add(listener);
+	}
+
+	final synchronized public boolean removeCollisionListener(CollisionListener listener)
+	{
+		return collisionListeners.remove(listener);
+	}
+
+	final void collision(Body object)
+	{
+		for(CollisionListener listener : collisionListeners)
+			listener.onCollision(this, object);
 	}
 	
 	public World2d getWorld()
@@ -175,5 +199,10 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	{
 		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
 			part.draw(g);
+	}
+	
+	public interface CollisionListener
+	{
+		public void onCollision(AnimatableObject a, Body object);
 	}
 }

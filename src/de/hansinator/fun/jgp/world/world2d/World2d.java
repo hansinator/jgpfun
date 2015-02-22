@@ -48,9 +48,7 @@ public class World2d implements World, ContactListener
 
 	private final int foodCount;
 
-	private final List<World2dObject> objects;
-
-	private final List<AnimatableObject> animatableObjects;
+	private final List<AnimatableObject> objects;
 
 	private org.jbox2d.dynamics.World world;
 
@@ -80,8 +78,7 @@ public class World2d implements World, ContactListener
 		rnd = Settings.newRandomSource();
 
 		food = new ArrayList<Body>(foodCount);
-		objects = new ArrayList<World2dObject>();
-		animatableObjects = new ArrayList<AnimatableObject>();
+		objects = new ArrayList<AnimatableObject>();
 		resetState();
 
 		this.worldWidth = worldWidth;
@@ -125,7 +122,6 @@ public class World2d implements World, ContactListener
 	public final void resetState()
 	{
 		objects.clear();
-		animatableObjects.clear();
 
 		Vec2 gravity = new Vec2(0, 0);
 		world = new org.jbox2d.dynamics.World(gravity);
@@ -188,7 +184,7 @@ public class World2d implements World, ContactListener
 		}
 	}
 
-	public Vec2 findNearestFood(Point.Double p)
+	public Vec2 findNearestFood(Vec2 p)
 	{
 		double minDist = 1000000;
 		double curDist;
@@ -226,7 +222,7 @@ public class World2d implements World, ContactListener
 		// TODO probably create a selectable interface in the future, but for
 		// now coupling of world2d and other 2d objects is ok
 		// see if we hit an object
-		for (World2dObject o : objects)
+		for (AnimatableObject o : objects)
 			if (Math.abs(o.x - clickPos.x) < 10.0 && Math.abs(o.y - clickPos.y) < 10.0)
 			{
 				// TODO add an object inspector view that shows info about the
@@ -254,10 +250,8 @@ public class World2d implements World, ContactListener
 	{
 		world.drawDebugData();
 
-		for (World2dObject o : objects)
+		for (AnimatableObject o : objects)
 		{
-			o.draw(g);
-
 			// TODO find a better solution like a separate BodyView / ObjectView
 			// class
 			// draw fitness onto bodies
@@ -284,18 +278,14 @@ public class World2d implements World, ContactListener
 		}
 	}
 
-	public synchronized void registerObject(World2dObject object)
+	public synchronized void registerObject(AnimatableObject object)
 	{
 		objects.add(object);
-		if (object instanceof AnimatableObject)
-			animatableObjects.add((AnimatableObject) object);
 	}
 
-	public synchronized void unregisterObject(World2dObject object)
+	public synchronized void unregisterObject(AnimatableObject object)
 	{
 		objects.remove(object);
-		if (object instanceof AnimatableObject)
-			animatableObjects.remove(object);
 	}
 
 	public int getWidth()
@@ -314,9 +304,9 @@ public class World2d implements World, ContactListener
 		Object o = contact.m_fixtureA.m_body.getUserData();
 
 		// execute collisions
-		if (o instanceof AnimatableObject)
+		if (o instanceof Body2d)
 		{
-			((AnimatableObject) o).collision(contact.m_fixtureB.m_body);
+			((Body2d) o).collision(contact.m_fixtureB.m_body);
 		}
 	}
 

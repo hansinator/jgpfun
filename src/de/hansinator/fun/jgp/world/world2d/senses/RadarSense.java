@@ -2,12 +2,10 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
@@ -18,7 +16,6 @@ import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
 /**
  * 

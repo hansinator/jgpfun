@@ -19,14 +19,9 @@ import de.hansinator.fun.jgp.world.world2d.senses.ObjectLocator;
  */
 public class AntBody extends Body2d
 {
-	protected final ObjectLocator locator;
-
 	public AntBody(ExecutionUnit<World2d> context, Shape shape)
 	{
 		super(context, 0.0, 0.0, 0.0, shape);
-
-		// init locator sense
-		locator = new ObjectLocator(this);
 	}
 
 	public static class Gene extends IOUnit.Gene<ExecutionUnit<World2d>>
@@ -34,8 +29,6 @@ public class AntBody extends Body2d
 		public static int locatorInputCount = new ObjectLocator.Gene().getInputCount();
 
 		private List<IOUnit.Gene<Body2d>> children = new ArrayList<IOUnit.Gene<Body2d>>();
-
-		boolean useInternalLocator;
 		
 		private FloatGene bodyWidth = new FloatGene(1.0f, 500);
 		
@@ -55,11 +48,6 @@ public class AntBody extends Body2d
 
 		int outputCount = 0;
 
-		public Gene(boolean useInternalLocator)
-		{
-			this.useInternalLocator = useInternalLocator;
-		}
-
 		@SuppressWarnings("rawtypes")
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
@@ -72,7 +60,7 @@ public class AntBody extends Body2d
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<ExecutionUnit<World2d>> replicate()
 		{
-			AntBody.Gene gene = new AntBody.Gene(useInternalLocator);
+			AntBody.Gene gene = new AntBody.Gene();
 
 			gene.inputCount = inputCount;
 			gene.outputCount = outputCount;
@@ -88,6 +76,7 @@ public class AntBody extends Body2d
 		@Override
 		public IOUnit<ExecutionUnit<World2d>> express(ExecutionUnit<World2d> context)
 		{
+			// create ant body shape
 			float w = (minWidth + (bodyWidth.getValue() * (maxWidth - minWidth))) / 2;
 			float h = (minHeight + (bodyHeight.getValue() * (maxHeight - minHeight))) / 2;
 			PolygonShape shape = new PolygonShape();
@@ -97,26 +86,25 @@ public class AntBody extends Body2d
 			vertices[2] = new Vec2(w, h); // right wing
 			shape.set(vertices, 3);
 
+			// create body
 			AntBody body = new AntBody(context, shape);
+			
+			// create parts
+			int i = 0;
 			@SuppressWarnings("unchecked")
-			IOUnit<Body2d>[] parts = new IOUnit[children.size() + (useInternalLocator ? 1 : 0)];
-			int i = useInternalLocator ? 1 : 0;
-
-			if (useInternalLocator)
-				parts[0] = body.locator;
-
+			IOUnit<Body2d>[] parts = new IOUnit[children.size()];
 			for (IOUnit.Gene<Body2d> gene : children)
 				parts[i++] = gene.express(body);
 
+			// attach parts and return finished body
 			body.setParts(parts);
-
 			return body;
 		}
 
 		@Override
 		public int getInputCount()
 		{
-			return inputCount + (useInternalLocator ? locatorInputCount : 0);
+			return inputCount;
 		}
 
 		@Override

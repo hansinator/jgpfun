@@ -49,7 +49,7 @@ public class TestRadarSense extends JPanel
 
 	public LGPGene randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.addBodyPartGene(new RadarSense.Gene());
 
 		LGPGene organismGene = LGPGene.randomGene(256);
