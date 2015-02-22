@@ -3,19 +3,10 @@
 package de.hansinator.fun.jgp.life.lgp;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
-import de.hansinator.fun.jgp.life.ActorOutput;
-import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;
 
 /**

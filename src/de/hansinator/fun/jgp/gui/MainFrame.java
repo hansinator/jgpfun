@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,9 +13,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import org.jbox2d.common.Vec2;
 
 import de.hansinator.fun.jgp.simulation.Simulator;
 

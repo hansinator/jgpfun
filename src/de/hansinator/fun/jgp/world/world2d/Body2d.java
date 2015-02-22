@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
@@ -19,7 +18,7 @@ import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 
-public abstract class Body2d extends AnimatableObject implements BodyPart<ExecutionUnit<World2d>>
+public abstract class Body2d implements BodyPart<ExecutionUnit<World2d>>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
@@ -42,15 +41,18 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	private org.jbox2d.dynamics.Body body;
 	
 	private Shape shape;
+	
+	protected World2d world;
+	
+	public volatile boolean selected = false;
 
 	public org.jbox2d.dynamics.Body getBody()
 	{
 		return body;
 	}
 
-	public Body2d(ExecutionUnit<World2d> parent, double dir, Shape shape)
+	public Body2d(ExecutionUnit<World2d> parent, Shape shape)
 	{
-		super(parent.getExecutionContext(), dir);
 		this.parent = parent;
 		this.shape = shape;
 	}
@@ -102,32 +104,33 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	public void attachEvaluationState(ExecutionUnit<World2d> context)
 	{
 		world = context.getExecutionContext();
-		
-		int x = rnd.nextInt(world.getWidth());
-		int y = rnd.nextInt(world.getHeight());
-		dir = rnd.nextDouble() * 2 * Math.PI;
 		world.registerObject(this);
-		
-	    // box2d body
-	    {
-	      FixtureDef fd = new FixtureDef();
-	      fd.shape = shape;
-	      fd.density = 1.0f;
-	      fd.friction = 0.9f;
 
-	      BodyDef bd = new BodyDef();
-	      bd.type = BodyType.DYNAMIC;
-	      bd.angularDamping = 12.0f;
-	      bd.linearDamping = 4.0f;
-	      bd.allowSleep = false;
-	      bd.position.set((float)x, (float)y);
-	      body = world.getWorld().createBody(bd);
-	      body.setUserData(this);
-	      body.createFixture(fd);
-	    }
-	    
-	    // attach parts after body initialization is done
-		for(IOUnit<Body2d> part : parts)
+		// box2d body
+		{
+			int x = rnd.nextInt(world.getWidth());
+			int y = rnd.nextInt(world.getHeight());
+			float dir = Math.round(rnd.nextDouble() * 2.0 * Math.PI);
+
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.density = 1.0f;
+			fd.friction = 0.9f;
+
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.angularDamping = 12.0f;
+			bd.linearDamping = 4.0f;
+			bd.allowSleep = false;
+			bd.position.set((float) x, (float) y);
+			bd.angle = dir;
+			body = world.getWorld().createBody(bd);
+			body.setUserData(this);
+			body.createFixture(fd);
+		}
+
+		// attach parts after body initialization is done
+		for (IOUnit<Body2d> part : parts)
 			part.attachEvaluationState(this);
 	}
 
@@ -155,8 +158,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	{
 		for (IOUnit<Body2d> p : parts)
 			p.applyOutputs();
-		
-		dir = body.getAngle();
 	}
 
 	/**
@@ -190,7 +191,7 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 		return world;
 	}
 	
-	@Override
+
 	public void draw(Graphics g)
 	{
 		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
@@ -199,6 +200,6 @@ public abstract class Body2d extends AnimatableObject implements BodyPart<Execut
 	
 	public interface CollisionListener
 	{
-		public void onCollision(AnimatableObject a, Body object);
+		public void onCollision(Body2d a, Body object);
 	}
 }

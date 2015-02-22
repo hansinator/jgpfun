@@ -6,7 +6,6 @@ import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.Gene;
 import de.hansinator.fun.jgp.genetics.ImmutableGene;
-import de.hansinator.fun.jgp.genetics.ValueGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.BooleanGene;
 import de.hansinator.fun.jgp.genetics.ValueGene.IntegerGene;
 import de.hansinator.fun.jgp.life.lgp.operations.Operation;

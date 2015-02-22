@@ -21,7 +21,7 @@ public class AntBody extends Body2d
 {
 	public AntBody(ExecutionUnit<World2d> context, Shape shape)
 	{
-		super(context, 0.0, shape);
+		super(context, shape);
 	}
 
 	public static class Gene extends IOUnit.Gene<ExecutionUnit<World2d>>

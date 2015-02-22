@@ -16,7 +16,6 @@ import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.AnimatableObject;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Body2d.CollisionListener;
@@ -92,7 +91,7 @@ public class FindingFoodScenario implements Scenario
 		}
 
 		@Override
-		public void onCollision(AnimatableObject a, Body b)
+		public void onCollision(Body2d a, Body b)
 		{
 			if (b.getUserData() == World2d.FOOD_TAG)
 			{

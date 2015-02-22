@@ -1,13 +1,11 @@
 package de.hansinator.fun.jgp.genetics;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import de.hansinator.fun.jgp.genetics.selection.Selectable;
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
-import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
