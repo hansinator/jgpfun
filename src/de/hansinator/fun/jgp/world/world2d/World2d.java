@@ -258,6 +258,8 @@ public class World2d implements World, ContactListener
 		// draw fitness onto bodies
 		for (Body2d b : bodies)
 		{
+			b.draw(g);
+			
 			Genome genome = generation.get(b.parent);
 			draw.getViewportTranform().getWorldToScreen(b.getBody().getPosition(), screenPos);
 

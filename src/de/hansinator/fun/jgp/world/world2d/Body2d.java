@@ -159,16 +159,6 @@ public abstract class Body2d implements BodyPart<ExecutionUnit<World2d>>
 		for (IOUnit<Body2d> p : parts)
 			p.applyOutputs();
 	}
-
-	/**
-	 * Only animatable objects can cause collisions
-	 * 
-	 * @return The desired radius in pixels in which this object wants to experience collisions
-	 */
-	public int getCollisionRadius()
-	{
-		return bodyCollisionRadius;
-	}
 	
 	final synchronized public boolean addCollisionListener(CollisionListener listener)
 	{

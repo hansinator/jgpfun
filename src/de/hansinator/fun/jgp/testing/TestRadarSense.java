@@ -79,6 +79,7 @@ public class TestRadarSense extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
+				body.getBody().
 				body.dir = sliderBody.getValue() * (Math.PI / 180.0);
 				sense.get();
 				repaint();
@@ -109,7 +110,7 @@ public class TestRadarSense extends JPanel
 		
 		body.draw(g);
 		g.setColor(Color.yellow);
-		g.drawString("BodyDir: " + String.format("%.2f", body.dir), 10, 15);
+		g.drawString("BodyDir: " + String.format("%.2f", body.getBody().getAngle()), 10, 15);
 		g.drawString("BeamDir: " + String.format("%.2f", sense.direction), 10, 25);
 	}
 	
