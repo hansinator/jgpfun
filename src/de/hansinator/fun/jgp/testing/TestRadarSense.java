@@ -16,22 +16,14 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
-import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
-import de.hansinator.fun.jgp.simulation.FindingFoodScenario.FoodFitnessEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.actors.TankMotor;
-import de.hansinator.fun.jgp.world.world2d.senses.OrientationSense;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
-import de.hansinator.fun.jgp.world.world2d.senses.SpeedSense;
-import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
 
 /**
  * 
@@ -55,7 +47,7 @@ public class TestRadarSense extends JPanel
 
 	public LGPGene randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene(false);
+		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.addBodyPartGene(new RadarSense.Gene());
 
 		LGPGene organismGene = LGPGene.randomGene(256);
@@ -73,8 +65,6 @@ public class TestRadarSense extends JPanel
 		organism.setExecutionContext(world);
 
 		body = ((AntBody) organism.getIOUnits()[0]);
-		body.x = 400.0;
-		body.y = 300.0;
 		body.sampleInputs();
 		
 		for(IOUnit<Body2d> part : body.getParts())
@@ -89,6 +79,7 @@ public class TestRadarSense extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
+				body.getBody().
 				body.dir = sliderBody.getValue() * (Math.PI / 180.0);
 				sense.get();
 				repaint();
@@ -117,15 +108,12 @@ public class TestRadarSense extends JPanel
 		g.setColor(Color.black);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
-		for (Food f : world.food)
-			f.draw(g);
-		
 		body.draw(g);
 		g.setColor(Color.yellow);
-		g.drawString("BodyDir: " + String.format("%.2f", body.dir), 10, 15);
+		g.drawString("BodyDir: " + String.format("%.2f", body.getBody().getAngle()), 10, 15);
 		g.drawString("BeamDir: " + String.format("%.2f", sense.direction), 10, 25);
 	}
-
+	
 	public static void main(String[] args) throws IOException
 	{
 		Point p = new Point(10,10);

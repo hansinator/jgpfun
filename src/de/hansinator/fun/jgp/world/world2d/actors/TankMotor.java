@@ -2,6 +2,8 @@ package de.hansinator.fun.jgp.world.world2d.actors;
 
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -16,6 +18,10 @@ public class TankMotor implements BodyPart<Body2d>
 
 	public static final double maxSpeed = Settings.getDouble("maxSpeed");
 	
+	private final Vec2 leftMotorPos;
+	
+	private final Vec2 rightMotorPos;
+	
 	//make this a world2dobject in the future
 	private final Body2d body;
 
@@ -23,8 +29,10 @@ public class TankMotor implements BodyPart<Body2d>
 	private double left, right;
 	
 	
-	public TankMotor(Body2d body) {
+	public TankMotor(Body2d body, Vec2 leftMotorPos, Vec2 rightMotorPos) {
 		this.body = body;
+		this.leftMotorPos = leftMotorPos;
+		this.rightMotorPos = rightMotorPos;
 	}
 
 	public final ActorOutput actorLeft = new ActorOutput()
@@ -69,20 +77,15 @@ public class TankMotor implements BodyPart<Body2d>
 	@Override
 	public void applyOutputs()
 	{
-		double speed;
-
-		// find the direction
-		body.dir += (right - left) * (maxSteerForce / 100.0);
-		body.dir -= 2 * Math.PI
-				* (body.dir < 0.0 ? Math.ceil(body.dir / (2 * Math.PI)) : (Math.floor(body.dir / (2 * Math.PI))));
-
-		// calculate speed
-		speed = (right + left) / 2.0;
-		body.lastSpeed = speed;
+		// impulse drive physics left
+		Vec2 f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-left * maxSteerForce * 7.0f)));
+		Vec2 p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(leftMotorPos));
+		body.getBody().applyLinearImpulse(f, p);
 		
-		// apply movement
-		body.x += Math.sin(body.dir) * maxSpeed * speed;
-		body.y -= Math.cos(body.dir) * maxSpeed * speed;
+		// impulse drive physics right
+		f = body.getBody().getWorldVector(new Vec2(0.0f, (float)(-right * maxSteerForce * 7.0f)));
+		p = body.getBody().getWorldPoint(body.getBody().getLocalCenter().add(rightMotorPos));
+		body.getBody().applyLinearImpulse(f, p);
 	}
 
 	@Override
@@ -92,7 +95,7 @@ public class TankMotor implements BodyPart<Body2d>
 	}
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
-	{
+	{	
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -109,7 +112,7 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new TankMotor(context);
+			return new TankMotor(context, new Vec2(-1.0f, 1.0f), new Vec2(1.0f, 1.0f));
 		}
 
 		@Override

@@ -2,8 +2,11 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
 import java.util.List;
+
+import org.jbox2d.callbacks.RayCastCallback;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Fixture;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -12,31 +15,33 @@ import de.hansinator.fun.jgp.simulation.Simulator;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
-import de.hansinator.fun.jgp.world.world2d.Food;
 import de.hansinator.fun.jgp.world.world2d.World2d;
-import de.hansinator.fun.jgp.world.world2d.World2dObject;
 
 /**
  * 
  * @author Hansinator
  */
-public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>
+public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePart<Body2d>, RayCastCallback
 {
 	private final static double sweepSpeedScaleFactor = Settings.getDouble("radarSweepSpeedScaleFactor");
-	
-	private final World2dObject origin;
+
+	private org.jbox2d.dynamics.Body origin;
 
 	private World2d world;
 
 	public double direction = 0.0;
 
-	public static final double beamLength = 200.0;
+	public static final double beamLength = 50.0;
 
-	public Point2D target = null;
-	
+	private Vec2 target = new Vec2();
+
+	private boolean hit = false;
+
 	public static Color beamColor = new Color(24, 24, 24);
-	
-	private double oldBeamX, oldBeamY;
+
+	private Vec2 beamPos = new Vec2();
+
+	private Vec2 oldBeamPos = new Vec2();
 
 	public final SensorInput senseDirection = new SensorInput() {
 
@@ -51,88 +56,89 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 	ActorOutput[] outputs = { this };
 
-	public RadarSense(World2dObject origin)
-	{
-		this.origin = origin;
-	}
-
-	public boolean pointInLine(double x1, double y1, double x2, double y2, Point2D p)
-	{
-		double x3, y3, m, b, y;
-
-		x3 = p.getX();
-		y3 = p.getY();
-		m = (y2 - y1) / (x2 - x1);
-		b = y1 - m * x1;
-		y = m * x3 + b;
-
-		// point is near (better, as a longer radar skips pixels at the outer
-		// end when moving)
-		return Math.abs(y - y3) < 3.0;
-
-		// real match
-		// return Math.round(y) == Math.round(y3);
-	}
-	
-	// see http://stackoverflow.com/questions/13300904/determine-whether-point-lies-inside-triangle
-	public boolean pointInTriangle(double x1, double y1, double x2, double y2, double x3, double y3, Point2D p)
-	{
-		double alpha = ((y2 - y3) * (p.getX() - x3) + (x3 - x2) * (p.getY() - y3)) /
-				(double)((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
-		double beta = ((y3 - y1) * (p.getX() - x3) + (x1 - x3) * (p.getY() - y3)) /
-				(double)((y2 - y3) * (x1 - x3) + (x3 - x2) * (x1 - y3));
-		double gamma = 1.0f - alpha - beta;
-
-		return ((alpha > 0.0) && (beta > 0.0) && (gamma > 0.0)) ||
-				((alpha == 1.0) && (beta == 0.0) && (gamma == 0.0)) ||
-				((alpha == 0.0) && (beta == 1.0) && (gamma == 0.0)) ||
-				((alpha == 0.0) && (beta == 0.0) && (gamma == 1.0));
-	}
-
 	@Override
 	public int get()
 	{
-		double x1, y1, x2, y2, rdir, bdir;
+		double rdir, bdir;
+		float angle = origin.getAngle();
+		Vec2 pos = origin.getPosition();
 
-		// line start
-		x1 = Math.floor(origin.x);
-		y1 = Math.floor(origin.y);
-
-		// line end
+		// compute new beam end position
 		rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-		bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
-		x2 = Math.floor(origin.x + beamLength * Math.sin(rdir + bdir));
-		y2 = Math.floor(origin.y - beamLength * Math.cos(rdir + bdir));
-		
-		for (Food f : world.food)
+		bdir = angle - ((double) Math.round(angle / (2 * Math.PI)) * 2 * Math.PI);
+		oldBeamPos.set(beamPos);
+		beamPos.set(Math.round(pos.x + beamLength * Math.sin(rdir + bdir)),
+				Math.round(pos.y - beamLength * Math.cos(rdir + bdir)));
+
+		// trace the beam path using bresenham's line algorithm and query each
+		// intermediate beam pos for any collisions
+		hit = false;
+		rayCastAlongLine(oldBeamPos, beamPos, 1.0f);
+
+		// if we hit something compute and return distance
+		if (hit)
 		{
-			boolean hit = false;
-			// see if this is a triangle or a line
-			if(!(oldBeamX == x2) && (oldBeamY == y2)) hit = pointInTriangle(x1, y1, x2, y2, oldBeamX, oldBeamY, f);
-			else hit = pointInLine(x1, y1, x2, y2, f)
-					// test if distance to point is within beamLength
-					&& (Math.sqrt(((x1 - f.x) * (x1 - f.x)) + ((y1 - f.y) * (y1 - f.y))) <= beamLength)
-					&& (Math.abs(x1 + 2.0 * Math.sin(rdir + bdir) - f.x) < Math.abs(x1 - f.x));
-			if(hit)
+			Vec2 o = origin.getPosition();
+			float curDist = (float) Math.sqrt(((target.x - o.x) * (target.x - o.x))
+					+ ((target.y - o.y) * (target.y - o.y)));
+			return Math.round(Math.round((Integer.MAX_VALUE / beamLength) * curDist));
+		}
+
+		return 0;
+	}
+
+	private final Vec2 testPoint = new Vec2();
+	private void rayCastAlongLine(final Vec2 start, final Vec2 end, final float interval)
+	{
+		float dx1 = 0.0f, dy1 = 0.0f, dx2 = 0.0f, dy2 = 0.0f;
+		
+		// compute delta
+		testPoint.set(end);
+		testPoint.subLocal(start);
+	
+		// choose proper step directions
+		dx1 = dx2 = Math.signum(testPoint.x) * interval;
+		dy1 = Math.signum(testPoint.y) * interval;
+
+		// compute loop values
+		int longest = Math.abs(Math.round(testPoint.x));
+		int shortest = Math.abs(Math.round(testPoint.y));
+		if (!(longest > shortest))
+		{
+			// swap values
+			int x = longest;
+			longest = shortest;
+			shortest = x;
+			
+			// choose proper step directions
+			dy2 = Math.signum(testPoint.y) * interval;
+			dx2 = 0.0f;
+		}
+
+		// finally "draw" the line
+		testPoint.set(start);
+		for (int i = 0, numerator = longest >> 1; i <= longest; i++)
+		{
+			synchronized (world) // FIXME hacky locking object
 			{
-				target = f;
-				oldBeamX = x2;
-				oldBeamY = y2;
-				return Integer.MAX_VALUE;
+				world.getWorld().raycast(this, origin.getPosition(), testPoint);
+			}
+			numerator += shortest;
+			if (!(numerator < longest))
+			{
+				numerator -= longest;
+				testPoint.addLocal(dx1, dy1);
+			} else
+			{
+				testPoint.addLocal(dx2, dy2);
 			}
 		}
-		target = null;
-		
-		oldBeamX = x2;
-		oldBeamY = y2;
-		
-		return 0;
 	}
 
 	@Override
 	public void set(int value)
 	{
-		direction += ((double)value / (double)Integer.MAX_VALUE) / sweepSpeedScaleFactor;
+		direction += ((double) value / (double) Integer.MAX_VALUE) / sweepSpeedScaleFactor;
 		direction -= 2 * Math.PI
 				* (direction < 0.0 ? Math.ceil(direction / (2 * Math.PI)) : (Math.floor(direction / (2 * Math.PI))));
 	}
@@ -159,25 +165,33 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	{
 	}
 
+	private final Vec2 o = new Vec2();
+	private final Vec2 t1 = new Vec2();
+	private final Vec2 t2 = new Vec2();
+
 	@Override
 	public void draw(Graphics g)
 	{
-		final int x_center = Math.round((float) origin.x);
-		final int y_center = Math.round((float) origin.y);
+		if (origin == null)
+			return;
 
-		if (target == null)
+		world.getDraw().getViewportTranform().getWorldToScreen(origin.getPosition(), o);
+		int x = Math.round(o.x);
+		int y = Math.round(o.y);
+
+		if (!hit)
 		{
+			world.getDraw().getViewportTranform().getWorldToScreen(beamPos, t1);
+			world.getDraw().getViewportTranform().getWorldToScreen(oldBeamPos, t2);
+
 			g.setColor(beamColor);
-			double rdir, bdir, x, y;
-			rdir = direction - ((double) Math.round(direction / (2 * Math.PI)) * 2 * Math.PI);
-			bdir = origin.dir - ((double) Math.round(origin.dir / (2 * Math.PI)) * 2 * Math.PI);
-			x = origin.x + RadarSense.beamLength * Math.sin(rdir + bdir);
-			y = origin.y - RadarSense.beamLength * Math.cos(rdir + bdir);
-			g.fillPolygon(new int[]{x_center, Math.round((float)x), Math.round((float)oldBeamX)}, new int[]{y_center, Math.round((float)y), Math.round((float)oldBeamY)} , 3);
-		} else if (target != null)
+			g.fillPolygon(new int[] { x, Math.round(t1.x), Math.round(t2.x) },
+					new int[] { y, Math.round(t1.y), Math.round(t2.y) }, 3);
+		} else
 		{
+			world.getDraw().getViewportTranform().getWorldToScreen(target, t1);
 			g.setColor(Color.blue);
-			g.drawLine(x_center, y_center, (int) Math.round(target.getX()), (int) Math.round(target.getY()));
+			g.drawLine(x, y, Math.round(t1.x), Math.round(t1.y));
 		}
 
 	}
@@ -186,6 +200,10 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	public void attachEvaluationState(Body2d context)
 	{
 		this.world = context.getWorld();
+		this.origin = context.getBody();
+
+		// init oldBeamPos
+		get();
 	}
 
 	public static class Gene extends IOUnit.Gene<Body2d>
@@ -206,7 +224,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new RadarSense(context);
+			return new RadarSense();
 		}
 
 		@Override
@@ -221,5 +239,15 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 			return 1;
 		}
 
+	}
+
+	@Override
+	public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction)
+	{
+		target.set(point);
+		hit = true;
+
+		// clip the ray to the closest hit
+		return 1;
 	}
 }

@@ -1,9 +1,15 @@
 package de.hansinator.fun.jgp.world.world2d;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Polygon;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -11,9 +17,8 @@ import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
-import de.hansinator.fun.jgp.world.BodyPart.DrawablePart;
 
-public abstract class Body2d extends AnimatableObject implements DrawablePart<ExecutionUnit<World2d>>
+public abstract class Body2d implements BodyPart<ExecutionUnit<World2d>>
 {
 	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
 
@@ -24,19 +29,32 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 
 	@SuppressWarnings("unchecked")
 	protected BodyPart.DrawablePart<Body2d>[] drawableParts = BodyPart.DrawablePart.emptyDrawablePartArray;
+	
+	private final List<CollisionListener> collisionListeners = new ArrayList<CollisionListener>();
 
 	protected SensorInput[] inputs;
 
 	protected ActorOutput[] outputs;
 
 	public final ExecutionUnit<World2d> parent;
+	
+	private org.jbox2d.dynamics.Body body;
+	
+	private Shape shape;
+	
+	protected World2d world;
+	
+	public volatile boolean selected = false;
 
-	public double lastSpeed = 0.0;
-
-	public Body2d(ExecutionUnit<World2d> parent, double x, double y, double dir)
+	public org.jbox2d.dynamics.Body getBody()
 	{
-		super(parent.getExecutionContext(), x, y, dir);
+		return body;
+	}
+
+	public Body2d(ExecutionUnit<World2d> parent, Shape shape)
+	{
 		this.parent = parent;
+		this.shape = shape;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,14 +104,34 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 	public void attachEvaluationState(ExecutionUnit<World2d> context)
 	{
 		world = context.getExecutionContext();
-		
-		for(IOUnit<Body2d> part : parts)
-			part.attachEvaluationState(this);
-		
-		x = rnd.nextInt(world.getWidth());
-		y = rnd.nextInt(world.getHeight());
-		dir = rnd.nextDouble() * 2 * Math.PI;
 		world.registerObject(this);
+
+		// box2d body
+		{
+			int x = rnd.nextInt(world.getWidth());
+			int y = rnd.nextInt(world.getHeight());
+			float dir = Math.round(rnd.nextDouble() * 2.0 * Math.PI);
+
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.density = 1.0f;
+			fd.friction = 0.9f;
+
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.angularDamping = 12.0f;
+			bd.linearDamping = 4.0f;
+			bd.allowSleep = false;
+			bd.position.set((float) x, (float) y);
+			bd.angle = dir;
+			body = world.getWorld().createBody(bd);
+			body.setUserData(this);
+			body.createFixture(fd);
+		}
+
+		// attach parts after body initialization is done
+		for (IOUnit<Body2d> part : parts)
+			part.attachEvaluationState(this);
 	}
 
 	@Override
@@ -121,40 +159,37 @@ public abstract class Body2d extends AnimatableObject implements DrawablePart<Ex
 		for (IOUnit<Body2d> p : parts)
 			p.applyOutputs();
 	}
-
-	@Override
-	public void draw(Graphics g)
+	
+	final synchronized public boolean addCollisionListener(CollisionListener listener)
 	{
-		final double sindir = Math.sin(dir);
-		final double cosdir = Math.cos(dir);
-		final double x_len_displace = 6.0 * sindir;
-		final double y_len_displace = 6.0 * cosdir;
-		final double x_width_displace = 4.0 * sindir;
-		final double y_width_displace = 4.0 * cosdir;
-		final double x_bottom = x - x_len_displace;
-		final double y_bottom = y + y_len_displace;
-
-		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
-			part.draw(g);
-
-		Polygon p = new Polygon();
-		p.addPoint(Math.round((float) (x + x_len_displace)), Math.round((float) (y - y_len_displace))); // top of triangle
-		p.addPoint(Math.round((float) (x_bottom + y_width_displace)), Math.round((float) (y_bottom + x_width_displace))); // right wing
-		p.addPoint(Math.round((float) (x_bottom - y_width_displace)), Math.round((float) (y_bottom - x_width_displace))); // left wing
-
-		g.setColor(selected ? Color.magenta : Color.red);
-		g.drawPolygon(p);
-		g.fillPolygon(p);
+		return collisionListeners.add(listener);
 	}
 
-	@Override
-	public int getCollisionRadius()
+	final synchronized public boolean removeCollisionListener(CollisionListener listener)
 	{
-		return bodyCollisionRadius;
+		return collisionListeners.remove(listener);
+	}
+
+	final void collision(Body object)
+	{
+		for(CollisionListener listener : collisionListeners)
+			listener.onCollision(this, object);
 	}
 	
 	public World2d getWorld()
 	{
 		return world;
+	}
+	
+
+	public void draw(Graphics g)
+	{
+		for (BodyPart.DrawablePart<Body2d> part : drawableParts)
+			part.draw(g);
+	}
+	
+	public interface CollisionListener
+	{
+		public void onCollision(Body2d a, Body object);
 	}
 }

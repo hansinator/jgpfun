@@ -2,6 +2,9 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.util.List;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -16,18 +19,15 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
 public class WallSense implements SensorInput, BodyPart<Body2d>
 {
 
-	private double worldWidth, worldHeight;
+	private float worldWidth, worldHeight, angle = 0.0f;
 
-	private final Body2d body;
+	private Body body;
+	
+	private Vec2 position;
 
 	SensorInput[] inputs = { this };
 
 	private int lastSenseVal = 0;
-
-	public WallSense(Body2d body)
-	{
-		this.body = body;
-	}
 
 	@Override
 	public int get()
@@ -50,25 +50,24 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void sampleInputs()
 	{
+		position = body.getPosition();
+		angle = body.getAngle();
 	}
 
 	@Override
 	public void applyOutputs()
 	{
 		// pickup wallsense in applyOutputs before coordinates are clipped
-		double dir = body.dir, temp = 0.0;
+		float temp = 0.0f;
 
-		// clip to 2*PI range
-		dir = dir - ((double) Math.round(dir / (2 * Math.PI)) * 2 * Math.PI);
-
-		if ((body.x < 0) || (body.x >= worldWidth))
+		if ((position.x <= 0) || (position.x >= worldWidth))
 		{
 			// TODO: fix abs stuff
-			temp = Math.min(Math.abs(2 * Math.PI - dir), Math.abs(Math.PI - dir));
-			if ((body.y < 0) || (body.y >= worldHeight))
-				temp = Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir)));
-		} else if ((body.y < 0) || (body.y >= worldHeight))
-			temp = Math.min(Math.abs(0.5 * Math.PI - dir), Math.abs(1.5 * Math.PI - dir));
+			temp = (float) Math.min(Math.abs(2 * Math.PI - angle), Math.abs(Math.PI - angle));
+			if ((position.y <= 0) || (position.y >= worldHeight))
+				temp = (float) Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle)));
+		} else if ((position.y <= 0) || (position.y >= worldHeight))
+			temp = (float) Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle));
 
 		lastSenseVal = (int) Math.round(temp * Simulator.intScaleFactor);
 	}
@@ -76,8 +75,9 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void attachEvaluationState(Body2d context)
 	{
-		this.worldWidth = Math.floor(context.getWorld().getWidth());
-		this.worldHeight = Math.floor(context.getWorld().getHeight());
+		this.worldWidth = context.getWorld().getWidth();
+		this.worldHeight = context.getWorld().getHeight();
+		this.body = context.getBody();
 	}
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
@@ -98,7 +98,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new WallSense(context);
+			return new WallSense();
 		}
 
 		@Override

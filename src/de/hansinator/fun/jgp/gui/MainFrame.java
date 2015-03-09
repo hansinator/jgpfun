@@ -1,7 +1,6 @@
 package de.hansinator.fun.jgp.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,7 +13,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import de.hansinator.fun.jgp.simulation.Simulator;
 
@@ -26,8 +24,6 @@ public class MainFrame extends JFrame implements WindowListener
 {
 
 	private WorldSimulationView simulationClientView;
-
-	private final JScrollPane centerPane;
 
 	public final JPanel sidePaneLeft, sidePaneRight;
 
@@ -41,7 +37,6 @@ public class MainFrame extends JFrame implements WindowListener
 		this.simulator = simulator;
 
 		// create all sub views
-		centerPane = new JScrollPane();
 		sidePaneLeft = new JPanel();
 		sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
 		bottomPane = new BottomPanel(simulator);
@@ -50,17 +45,13 @@ public class MainFrame extends JFrame implements WindowListener
 		simulationClientView = new WorldSimulationView(simulator.getSimulation());
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
-		// init centerPane
-		centerPane.setPreferredSize(new Dimension(800, 600));
-		centerPane.setViewportView(simulationClientView);
-
 		// add the menu bar
 		setJMenuBar(createMenuBar());
 
 		// setup and add all stuff to the content pane
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		contentPane.add(centerPane, BorderLayout.CENTER);
+		contentPane.add(simulationClientView, BorderLayout.CENTER);
 		contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
 		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
 		contentPane.add(bottomPane, BorderLayout.PAGE_END);
@@ -68,6 +59,8 @@ public class MainFrame extends JFrame implements WindowListener
 		// get ready for action
 		pack();
 		setVisible(true);
+		
+		
 	}
 
 	private JMenuBar createMenuBar()

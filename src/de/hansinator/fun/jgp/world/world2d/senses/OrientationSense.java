@@ -2,6 +2,8 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.util.List;
 
+import org.jbox2d.dynamics.Body;
+
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -13,18 +15,15 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 {
 	private final SensorInput[] inputs = { this };
 
-	private final Body2d body;
-
-	public OrientationSense(Body2d body2d)
-	{
-		body = body2d;
-	}
+	private Body body;
+	
+	private float angle;
 
 	@Override
 	public int get()
 	{
 		// could also be sin
-		return (int) (Math.cos(body.dir) * Simulator.intScaleFactor);
+		return (int) (Math.cos(angle) * Simulator.intScaleFactor);
 	}
 
 	@Override
@@ -42,6 +41,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void sampleInputs()
 	{
+		angle = body.getAngle();
 	}
 
 	@Override
@@ -52,6 +52,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public void attachEvaluationState(Body2d context)
 	{
+		this.body = context.getBody();
 	}
 
 	public static class Gene extends IOUnit.Gene<Body2d>
@@ -72,7 +73,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new OrientationSense(context);
+			return new OrientationSense();
 		}
 
 		@Override

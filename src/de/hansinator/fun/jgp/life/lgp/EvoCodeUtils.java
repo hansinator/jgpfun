@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hansinator.fun.jgp.life.lgp.operations.BranchOperation;
 import de.hansinator.fun.jgp.life.lgp.operations.NoSourceOperation;
 import de.hansinator.fun.jgp.life.lgp.operations.UnaryOperation;
 
@@ -14,12 +15,10 @@ import de.hansinator.fun.jgp.life.lgp.operations.UnaryOperation;
  * 
  * @author Hansinator
  */
-class EvoCodeUtils
-{
+class EvoCodeUtils {
 
 	private static final Object dummy = new Object();
 
-	
 	public static OpCode[] stripStructuralIntronCode(OpCode[] program, int inputRegisterCount, int outputRegisterCount)
 	{
 		Map<Integer, Object> effectiveRegisters = new HashMap<Integer, Object>();
@@ -51,26 +50,31 @@ class EvoCodeUtils
 				// fetch instruction
 				memVal = program[i];
 	
-				// TODO: implement branch stuff
-				// skip branches if the preceeding instruction was non-effective
-				/*
-				 * if ((instructionSet[opVal] == Instructions.OpBranchEq) ||
-				 * (instructionSet[opVal] == Instructions.OpBranchGt) ||
-				 * (instructionSet[opVal] == Instructions.OpBranchLt)) { if
-				 * (!markers[Math.Min(i + 1, markers.Length - 1)]) { //mark the
-				 * instruction as non-effective markers[i] = false; } else {
-				 * sourceRegister1 = (UInt32)memVal.src1 % registerCount; if
-				 * (!effectiveRegisters.Contains(sourceRegister1) && !immediate) {
-				 * effectiveRegisters.Add(sourceRegister1, new Object()); }
-				 * 
-				 * sourceRegister2 = memVal.src2 % registerCount; if
-				 * (!effectiveRegisters.Contains(sourceRegister2)) {
-				 * effectiveRegisters.Add(sourceRegister2, new Object()); }
-				 * 
-				 * markers[i] = true; }
-				 * 
-				 * continue; }
-				 */
+				// special branch treatment
+				if (memVal.operation instanceof BranchOperation)
+				{
+					// skip branches if the preceeding instruction (i.e. the one affected by the branch) was non-effective
+					// also skip branches that are the last instruction
+					if ((i == (program.length - 1)) || !markers[i+1])
+						markers[i] = false;
+					// else add only the sources to the effective registers
+					else
+					{
+						// add source operand 1
+						effectiveRegisters.put(memVal.src1.getValue(), dummy);
+
+						// add source operand 2, if it is no immediate operation
+						if (!memVal.immediate.getValue())
+							effectiveRegisters.put(memVal.src2.getValue(), dummy);
+
+						// mark the instruction as effective
+						markers[i] = true;
+					}
+
+					// skip trg register treatment
+					continue;
+				}
+				 
 	
 				// see if target register is in effective registers
 				if (effectiveRegisters.containsKey(memVal.trg.getValue()))
@@ -112,5 +116,4 @@ class EvoCodeUtils
 
 		return strippedProgram.toArray(new OpCode[strippedProgram.size()]);
 	}
-
 }

@@ -10,9 +10,14 @@
  */
 package de.hansinator.fun.jgp.gui;
 
+import java.awt.AWTError;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -26,6 +31,56 @@ import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateList
 public class WorldSimulationView extends javax.swing.JPanel
 {
 	private final WorldSimulation simulation;
+	
+	public final de.hansinator.fun.jgp.gui.DebugDrawJ2D draw;
+	
+	private final Object drawLock = new Object();
+	
+	private Graphics2D dbg = null;
+	  private Image dbImage = null;
+	  
+	  private int panelWidth;
+	  private int panelHeight;
+	  
+	
+	public Graphics2D getDBGraphics() {
+	    return dbg;
+	  }
+	
+	 private void updateSize(int argWidth, int argHeight) {
+		    panelWidth = argWidth;
+		    panelHeight = argHeight;
+		    draw.getViewportTranform().setExtents(argWidth / 2, argHeight / 2);
+		  }
+	
+	  public boolean render() {
+		    if (dbImage == null) {
+		      //log.debug("dbImage is null, creating a new one");
+		      if (panelWidth <= 0 || panelHeight <= 0) {
+		        return false;
+		      }
+		      dbImage = createImage(panelWidth, panelHeight);
+		      if (dbImage == null) {
+		        //log.error("dbImage is still null, ignoring render call");
+		        return false;
+		      }
+		      dbg = (Graphics2D) dbImage.getGraphics();
+		    }
+		    return true;
+		  }
+
+		  public void paintScreen() {
+		    try {
+		      Graphics g = this.getGraphics();
+		      if ((g != null) && dbImage != null) {
+		        g.drawImage(dbImage, 0, 0, null);
+		        Toolkit.getDefaultToolkit().sync();
+		        g.dispose();
+		      }
+		    } catch (AWTError e) {
+		      System.out.println("Graphics context error" + e);
+		    }
+		  }
 
 	/*
 	 * TODO: add setters for things to draw or make a worldmodel including all
@@ -35,7 +90,9 @@ public class WorldSimulationView extends javax.swing.JPanel
 	/** Creates new form MainView */
 	public WorldSimulationView(final WorldSimulation simulation)
 	{
+		draw = new de.hansinator.fun.jgp.gui.DebugDrawJ2D(this);
 		this.simulation = simulation;
+		simulation.world.setDraw(draw);
 		initComponents();
 		
 		simulation.addViewUpdateListener( new SimulationViewUpdateListener() {
@@ -43,7 +100,31 @@ public class WorldSimulationView extends javax.swing.JPanel
 			@Override
 			public void onViewUpdate()
 			{
-				repaint();
+				synchronized(drawLock)
+				{
+					if(render()) {
+						Graphics g = dbg;
+						dbg.setColor(Color.black);
+					    dbg.fillRect(0, 0, panelWidth, panelHeight);
+					    
+					    simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
+					    
+						if (simulation.getRPS() != 0)
+						{
+							g.setColor(Color.yellow);
+							g.drawString("RPS: " + simulation.getRPS(), 10, 15);
+						}
+	
+						int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
+						if (progress != 0)
+						{
+							g.setColor(Color.yellow);
+							g.drawString("" + progress + "%", 10, 30);
+						}
+
+				        paintScreen();
+				      }
+				}
 			}
 		});
 
@@ -54,7 +135,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 			public void mouseClicked(MouseEvent e)
 			{
 				simulation.world.clickEvent(e, simulation.getOrganismsByGenomeMap());
-				// fixme: only repaint if necessary
+				// FIXME only repaint if necessary
 				repaint();
 			}
 
@@ -79,6 +160,18 @@ public class WorldSimulationView extends javax.swing.JPanel
 			}
 
 		});
+		
+		  addComponentListener(new ComponentAdapter() {
+		      @Override
+		      public void componentResized(ComponentEvent e) {
+		        updateSize(getWidth(), getHeight());
+		        synchronized(drawLock)
+				{
+		        	dbImage = null;
+		        	render();
+				}
+		      }
+		    });
 	}
 
 	/**
@@ -104,23 +197,9 @@ public class WorldSimulationView extends javax.swing.JPanel
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-
-		g.setColor(Color.black);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-		simulation.world.draw(g, simulation.getOrganismsByGenomeMap());
-
-		if (simulation.getRPS() != 0)
+		synchronized(drawLock)
 		{
-			g.setColor(Color.yellow);
-			g.drawString("RPS: " + simulation.getRPS(), 10, 15);
-		}
-
-		int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
-		if (progress != 0)
-		{
-			g.setColor(Color.yellow);
-			g.drawString("" + progress + "%", 10, 30);
+			g.drawImage(dbImage, 0, 0, null);
 		}
 	}
 
