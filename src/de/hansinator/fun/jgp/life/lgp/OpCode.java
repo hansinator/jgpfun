@@ -15,42 +15,40 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
 
 public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 
-	private static final Random rnd = Settings.newRandomSource();
-
 	private final static int maxRegisterValDelta = 16;
 
 	private final static int maxConstantValDelta = 16384;
 
 	IntegerGene op = new IntegerGene(20) {
 		@Override
-		public void mutate() {
-			value = rnd.nextInt();
+		public void mutate(Random rng) {
+			value = rng.nextInt();
 		};
 	};
 
 	IntegerGene src1 = new IntegerGene(20) {
 		@Override
-		public void mutate() {
-			value += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+		public void mutate(Random rng) {
+			value += rng.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
 		};
 	};
 
 	IntegerGene src2 = new IntegerGene(20) {
 		@Override
-		public void mutate() {
+		public void mutate(Random rng) {
 			// if immediate, modify the constant value by random value
 			if (immediate.getValue())
-				value += rnd.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
+				value += rng.nextInt(maxConstantValDelta * 2) - maxConstantValDelta;
 			// else modify the src2 register number by a random value
 			else
-				value += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+				value += rng.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
 		};
 	};
 
 	IntegerGene trg = new IntegerGene(20) {
 		@Override
-		public void mutate() {
-			value += rnd.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
+		public void mutate(Random rng) {
+			value += rng.nextInt(maxRegisterValDelta * 2) - maxRegisterValDelta;
 		};
 	};
 
@@ -61,8 +59,8 @@ public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 
 	Operation operation;
 
-	public static OpCode randomOpCode(Random rnd) {
-		return new OpCode(rnd.nextInt(), rnd.nextInt(), rnd.nextInt(), rnd.nextInt(), rnd.nextBoolean());
+	public static OpCode randomOpCode(Random rng) {
+		return new OpCode(rng.nextInt(), rng.nextInt(), rng.nextInt(), rng.nextInt(), rng.nextBoolean());
 	}
 
 	private OpCode(int op, int src1, int src2, int trg, boolean immediate) {

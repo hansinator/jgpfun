@@ -32,8 +32,6 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  */
 public class LGPGene implements ExecutionUnit.Gene<World2d>
 {
-	private static final Random rnd = Settings.newRandomSource();
-	
 	// define chances for what mutation could happen in some sort of
 	// percentage
 	private static final int mutateIns = 2200, mutateRem = 1800, mutateRep = 2000;
@@ -58,9 +56,9 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	private final Mutation mutationInsert = new AbstractMutation(mutateIns) {
 		
 		@Override
-		public void mutate()
+		public void mutate(Random rng)
 		{
-			program.add(rnd.nextInt(program.size()), OpCode.randomOpCode(rnd));
+			program.add(rng.nextInt(program.size()), OpCode.randomOpCode(rng));
 		}
 	};
 	
@@ -68,9 +66,9 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	private final Mutation mutationRemove = new AbstractMutation(mutateRem) {
 		
 		@Override
-		public void mutate()
+		public void mutate(Random rng)
 		{
-			program.remove(rnd.nextInt(program.size()));
+			program.remove(rng.nextInt(program.size()));
 		}
 	};
 	
@@ -78,22 +76,22 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	private final Mutation mutationReplace = new AbstractMutation(mutateRep) {
 		
 		@Override
-		public void mutate()
+		public void mutate(Random rng)
 		{
-			program.set(rnd.nextInt(program.size()), OpCode.randomOpCode(rnd));
+			program.set(rng.nextInt(program.size()), OpCode.randomOpCode(rng));
 		}
 	};
 	
 	private final Mutation[] mutations = { mutationInsert, mutationRemove, mutationReplace };
 	
 
-	public static LGPGene randomGene(int maxLength)
+	public static LGPGene randomGene(Random rng, int maxLength)
 	{
-		int size = rnd.nextInt(maxLength - 200) + 201;
+		int size = rng.nextInt(maxLength - 200) + 201;
 		List<OpCode> program = new ArrayList<OpCode>(size);
 
 		for (int i = 0; i < size; i++)
-			program.add(OpCode.randomOpCode(rnd));
+			program.add(OpCode.randomOpCode(rng));
 
 		return new LGPGene(program, maxLength);
 	}

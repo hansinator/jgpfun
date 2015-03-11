@@ -1,5 +1,7 @@
 package de.hansinator.fun.jgp.genetics;
 
+import java.util.Random;
+
 import de.hansinator.fun.jgp.genetics.selection.Selectable;
 
 /**
@@ -16,7 +18,7 @@ public interface Mutation extends Selectable
 {
 	public static Mutation[] emptyMutationArray = { };
 	
-	void mutate();
+	void mutate(Random rng);
 	
 	void setMutationChance(int mutationChance);
 	

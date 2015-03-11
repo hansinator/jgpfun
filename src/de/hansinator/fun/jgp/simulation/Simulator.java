@@ -8,6 +8,16 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
+import org.uncommons.watchmaker.framework.CachingFitnessEvaluator;
+import org.uncommons.watchmaker.framework.EvolutionEngine;
+import org.uncommons.watchmaker.framework.EvolutionObserver;
+import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.FitnessEvaluator;
+import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
+import org.uncommons.watchmaker.framework.PopulationData;
+import org.uncommons.watchmaker.framework.TerminationCondition;
+import org.uncommons.watchmaker.framework.selection.TournamentSelection;
+import org.uncommons.watchmaker.framework.termination.UserAbort;
 
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
@@ -46,7 +56,7 @@ public class Simulator
 
 	private final Scenario scenario;
 
-	private final Random rnd;
+	private final Random rng;
 
 	public final StatisticsHistoryModel statisticsHistory = new StatisticsHistoryModel();
 
@@ -56,24 +66,23 @@ public class Simulator
 
 	public final XYSeries realGenomeSizeChartData = new XYSeries("real prg size");
 
-	private final Object runLock = new Object();
+	private final int popSize = Settings.getInt("popSize");
+	
+	private final int eliteCount = Settings.getInt("eliteCount");
+	
+	private final UserAbort abort = new UserAbort();
 
-	private final int popSize;
-
-	private int evaluationCount;
-
-	private volatile boolean running;
+	private EvolutionEngine engine;
 
 	public Simulator(Scenario scenario)
 	{
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
-		popSize = Settings.getInt("popSize");
 		currentGeneration = new Genome[popSize];
 		genealogyTree = new GenealogyTree();
 		selector = scenario.getSelectionStrategy();
 		crossover = scenario.getCrossoverOperator();
-		rnd = Settings.newRandomSource();
+		rng = Settings.newRandomSource();
 
 		fitnessChartData.setMaximumItemCount(500);
 		genomeSizeChartData.setMaximumItemCount(500);
@@ -91,6 +100,7 @@ public class Simulator
 	 */
 	synchronized public void start()
 	{
+		abort.reset();
 		new Thread(new Runnable()
 		{
 
@@ -107,62 +117,34 @@ public class Simulator
 		long now, evaluationsPerMinuteAverage = 0, evaluationsPerMinuteCount = 0;
 		long startTime = System.currentTimeMillis();
 		long lastStatsTime = startTime;
-		int lastEvaluationCount = 0, totalFitness;
+		int lastEvaluationCount = 0;
 
 		// setup simulation
 		simulation.initialize();
 		System.out.println("Start time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
+		
+        FitnessEvaluator<Genome> evaluator = new CachingFitnessEvaluator<Genome>(new PolygonImageEvaluator(targetImage));
+        EvolutionaryOperator<Genome> pipeline = probabilitiesPanel.createEvolutionPipeline(factory, canvasSize, rng);
+        org.uncommons.watchmaker.framework.SelectionStrategy<Genome> selection = new TournamentSelection(selectionPressureControl.getNumberGenerator());
+        
+        engine = new GenerationalEvolutionEngine<Genome>(scenario.getCandidateFactory(), pipeline, evaluator, selection, rng);
+        engine.addEvolutionObserver(new ConsoleEvoLog());
+        //engine.addEvolutionObserver(monitor);
 
 		// run simulation
-		running = true;
-		synchronized (runLock)
-		{
-			while (running)
-			{
-				// evaluate organisms
-				currentGeneration = simulation.evaluate(currentGeneration);
-				totalFitness = calculateTotalFitness(currentGeneration);
-				evaluationCount++;
+        engine.evolve(popSize, eliteCount, new TerminationCondition[]{ abort });
 
-				// update population statistics
-				printPopStats(totalFitness, evaluationCount);
-				fitnessChartData.add(evaluationCount, totalFitness);
-
-				// produce new generation
-				currentGeneration = newGeneration(currentGeneration, totalFitness);
-
-				// statistics
-				System.out.println("GEN: " + evaluationCount);
-				now = System.currentTimeMillis();
-				if ((now - lastStatsTime) >= 3000)
-				{
-					long evaluationsPerMinute = (evaluationCount - lastEvaluationCount)
-							* (60000 / (now - lastStatsTime));
-					evaluationsPerMinuteAverage += evaluationsPerMinute;
-					evaluationsPerMinuteCount++;
-
-					System.out.println("GPM: " + evaluationsPerMinute);
-					System.out.println("Runtime: "
-							+ PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, now)));
-					lastEvaluationCount = evaluationCount;
-					lastStatsTime = now;
-				}
-			}
-		}
-
-		// simulation statistics
+		// print statistics
 		System.out.println("\nEnd time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
 		System.out.println("Runtime: "
 				+ PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
-		System.out.println("Average GPM: "
-				+ ((evaluationsPerMinuteCount > 0) ? (evaluationsPerMinuteAverage / evaluationsPerMinuteCount) : 0));
 	}
 
 	public void stop()
 	{
-		running = false;
+		abort.abort();
 		simulation.stop();
 	}
 
@@ -214,8 +196,8 @@ public class Simulator
 			// mutate or crossover with a user defined chance
 			// if (rnd.nextDouble() > crossoverRate) {
 			// mutate genomes
-			child1.mutate(rnd.nextInt(maxMutations) + 1);
-			child2.mutate(rnd.nextInt(maxMutations) + 1);
+			child1.mutate(rng.nextInt(maxMutations) + 1);
+			child2.mutate(rng.nextInt(maxMutations) + 1);
 			/*
 			 * } else { //perform crossover crossover.cross(child1.program,
 			 * child2.program, rnd); }
@@ -281,4 +263,36 @@ public class Simulator
 		Simulator sim = new Simulator(new FindingFoodScenario());
 		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), sim).startSimulation();
 	}
+	
+	
+    static class ConsoleEvoLog implements EvolutionObserver<String>
+    {
+        public void populationUpdate(PopulationData<? extends String> data)
+        {
+        	// update population statistics
+			printPopStats(totalFitness, evaluationCount);
+			fitnessChartData.add(evaluationCount, totalFitness);
+
+			// statistics
+			System.out.println("GEN: " + evaluationCount);
+			now = System.currentTimeMillis();
+			if ((now - lastStatsTime) >= 3000)
+			{
+				long evaluationsPerMinute = (evaluationCount - lastEvaluationCount)
+						* (60000 / (now - lastStatsTime));
+				evaluationsPerMinuteAverage += evaluationsPerMinute;
+				evaluationsPerMinuteCount++;
+
+				System.out.println("GPM: " + evaluationsPerMinute);
+				System.out.println("Runtime: "
+						+ PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, now)));
+				lastEvaluationCount = evaluationCount;
+				lastStatsTime = now;
+			}
+			
+            System.out.printf("Generation %d: %s\n",
+                              data.getGenerationNumber(),
+                              data.getBestCandidate());
+        }
+    }
 }

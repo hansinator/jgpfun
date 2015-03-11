@@ -18,8 +18,6 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  */
 public class Genome implements Selectable
 {
-	private final Random rnd = Settings.newRandomSource();
-	
 	private final ExecutionUnit.Gene<World2d> rootGene;
 	
 	//XXX make this something like "addEvaluation" to add an evaluation with world parameter reference and datetime and stuff so a genome is multi-evaluatable
@@ -55,7 +53,7 @@ public class Genome implements Selectable
 		return new Genome(rootGene.replicate(), fitnessEvaluator.replicate(), mutationSelector);
 	}
 	
-	public void mutate(int mutationCount)
+	public void mutate(Random rng, int mutationCount)
 	{
 		// walk the gene tree and collect possible mutations in a list
 		List<Mutation> mutations = new ArrayList<Mutation>();
@@ -70,7 +68,7 @@ public class Genome implements Selectable
 				totalFitness += mutation.getMutationChance();
 			
 			// use our selector to select a mutation and execute it
-			mutationSelector.select(mutations.toArray(new Mutation[mutations.size()]), totalFitness).mutate();
+			mutationSelector.select(mutations.toArray(new Mutation[mutations.size()]), totalFitness).mutate(rng);
 		}
 	}
 	

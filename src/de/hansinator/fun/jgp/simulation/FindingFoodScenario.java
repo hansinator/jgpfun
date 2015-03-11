@@ -3,7 +3,10 @@
 
 package de.hansinator.fun.jgp.simulation;
 
+import java.util.Random;
+
 import org.jbox2d.dynamics.Body;
+import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
@@ -30,35 +33,27 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
  * 
  * @author Hansinator
  */
-public class FindingFoodScenario implements Scenario
+public class FindingFoodScenario implements Scenario<Genome>
 {
 	private final int progSize = Settings.getInt("progSize");
 	
 	private final int worldWidth = Settings.getInt("worldWidth");
 	
 	private final int worldHeight = Settings.getInt("worldHeight");
+	
+	private final AntFactory antFactory = new AntFactory(progSize);
 
 	@Override
 	public WorldSimulation getSimulation()
 	{
 		return new WorldSimulation(new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
 	}
+	
 
 	@Override
-	public Genome randomGenome()
+	public AbstractCandidateFactory<Genome> getCandidateFactory()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene();
-		bodyGene.addBodyPartGene(new ObjectLocator.Gene());
-		//bodyGene.addBodyPartGene(new RadarSense.Gene());
-		bodyGene.addBodyPartGene(new OrientationSense.Gene());
-		bodyGene.addBodyPartGene(new LinearVelocitySense.Gene());
-		bodyGene.addBodyPartGene(new WallSense.Gene());
-		bodyGene.addBodyPartGene(new TankMotor.Gene());
-		
-		LGPGene organismGene = LGPGene.randomGene(progSize);
-		organismGene.addIOGene(bodyGene);
-		
-		return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelector());
+		return antFactory;
 	}
 
 	@Override
@@ -74,7 +69,7 @@ public class FindingFoodScenario implements Scenario
 	}
 
 
-	public class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
+	static class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
 	{
 		private int fitness = 0;
 
@@ -110,5 +105,33 @@ public class FindingFoodScenario implements Scenario
 				if(u instanceof Body2d)
 					((Body2d)u).addCollisionListener(this);
 		}
+	}
+	
+	static class AntFactory extends AbstractCandidateFactory<Genome>
+	{	
+		private final int progSize;
+		
+		public AntFactory(int progSize)
+		{
+			this.progSize = progSize;
+		}
+		
+		@Override
+		public Genome generateRandomCandidate(Random rng)
+		{
+			AntBody.Gene bodyGene = new AntBody.Gene();
+			bodyGene.addBodyPartGene(new ObjectLocator.Gene());
+			//bodyGene.addBodyPartGene(new RadarSense.Gene());
+			bodyGene.addBodyPartGene(new OrientationSense.Gene());
+			bodyGene.addBodyPartGene(new LinearVelocitySense.Gene());
+			bodyGene.addBodyPartGene(new WallSense.Gene());
+			bodyGene.addBodyPartGene(new TankMotor.Gene());
+			
+			LGPGene organismGene = LGPGene.randomGene(rng, progSize);
+			organismGene.addIOGene(bodyGene);
+			
+			return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelector());
+		}
+		
 	}
 }
