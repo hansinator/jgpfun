@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.selection.Selectable;
+import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+
 import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
-import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
 /**
@@ -16,7 +16,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * @author hansinator
  *
  */
-public class Genome implements Selectable
+public class Genome
 {
 	private final ExecutionUnit.Gene<World2d> rootGene;
 	
@@ -35,12 +35,6 @@ public class Genome implements Selectable
 	public FitnessEvaluator getFitnessEvaluator()
 	{
 		return fitnessEvaluator;
-	}
-	
-	@Override
-	public int getSelectionChance()
-	{
-		return fitnessEvaluator.getFitness();
 	}
 	
 	public ExecutionUnit.Gene<World2d> getRootGene()
@@ -91,5 +85,48 @@ public class Genome implements Selectable
 		if(children != null)
 			for(Gene child : children)
 				collectMutations(child, mutations);
+	}
+	
+	public static class GenomeMutation implements EvolutionaryOperator<Genome>
+	{
+		private final int maxMutations;
+		
+		public GenomeMutation(int maxMutations)
+		{
+			this.maxMutations = maxMutations;
+		}
+		
+		@Override
+		public List<Genome> apply(List<Genome> selectedCandidates, Random rng)
+		{
+			List<Genome> mutatedCandidates = new ArrayList<Genome>(selectedCandidates.size());
+			
+			// clone each candidate and mutate and return the children
+			for (Genome parent : selectedCandidates)
+			{
+				Genome child = parent.replicate();
+				child.mutate(rng, rng.nextInt(maxMutations) + 1);
+				mutatedCandidates.add(child);
+			}
+			
+			return mutatedCandidates;
+		}	
+	}
+	
+	public static class GenomeEvaluator implements org.uncommons.watchmaker.framework.FitnessEvaluator<Genome>
+	{
+
+		@Override
+		public double getFitness(Genome candidate, List<? extends Genome> population)
+		{
+			return candidate.getFitnessEvaluator().getFitness();
+		}
+
+		@Override
+		public boolean isNatural()
+		{
+			return true;
+		}
+		
 	}
 }

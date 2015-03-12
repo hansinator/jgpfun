@@ -11,18 +11,15 @@ import org.joda.time.format.PeriodFormat;
 import org.uncommons.watchmaker.framework.CachingFitnessEvaluator;
 import org.uncommons.watchmaker.framework.EvolutionEngine;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
-import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.TerminationCondition;
-import org.uncommons.watchmaker.framework.selection.TournamentSelection;
 import org.uncommons.watchmaker.framework.termination.UserAbort;
 
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
-import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
+import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.gui.MainFrame;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.util.Settings;
@@ -37,24 +34,13 @@ public class Simulator
 
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
-	/*
-	 * The chance with which crossover happens, rest is mutation.
-	 */
-	public static final double crossoverRate = Settings.getDouble("crossoverRate");
-
-	public static final int maxMutations = Settings.getInt("maxMutations");
-
 	private final WorldSimulation simulation;
 
 	protected Genome[] currentGeneration;
 
-	private final SelectionStrategy selector;
-
-	private final CrossoverOperator crossover;
-
 	private final GenealogyTree genealogyTree;
 
-	private final Scenario scenario;
+	private final Scenario<Genome> scenario;
 
 	private final Random rng;
 
@@ -72,16 +58,14 @@ public class Simulator
 	
 	private final UserAbort abort = new UserAbort();
 
-	private EvolutionEngine engine;
+	private EvolutionEngine<Genome> engine;
 
-	public Simulator(Scenario scenario)
+	public Simulator(Scenario<Genome> scenario)
 	{
 		this.scenario = scenario;
 		simulation = scenario.getSimulation();
 		currentGeneration = new Genome[popSize];
 		genealogyTree = new GenealogyTree();
-		selector = scenario.getSelectionStrategy();
-		crossover = scenario.getCrossoverOperator();
 		rng = Settings.newRandomSource();
 
 		fitnessChartData.setMaximumItemCount(500);
@@ -124,11 +108,9 @@ public class Simulator
 		System.out.println("Start time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
 		
-        FitnessEvaluator<Genome> evaluator = new CachingFitnessEvaluator<Genome>(new PolygonImageEvaluator(targetImage));
-        EvolutionaryOperator<Genome> pipeline = probabilitiesPanel.createEvolutionPipeline(factory, canvasSize, rng);
-        org.uncommons.watchmaker.framework.SelectionStrategy<Genome> selection = new TournamentSelection(selectionPressureControl.getNumberGenerator());
-        
-        engine = new GenerationalEvolutionEngine<Genome>(scenario.getCandidateFactory(), pipeline, evaluator, selection, rng);
+		// setup engine
+        FitnessEvaluator<Genome> evaluator = new CachingFitnessEvaluator<Genome>(new GenomeEvaluator());
+        engine = new GenerationalEvolutionEngine<Genome>(scenario.getCandidateFactory(), scenario.createEvolutionPipeline(), evaluator, scenario.getSelectionStrategy(), rng);
         engine.addEvolutionObserver(new ConsoleEvoLog());
         //engine.addEvolutionObserver(monitor);
 
@@ -150,69 +132,19 @@ public class Simulator
 
 	public void restart()
 	{
-		simulation.stop();
+		stop();
 		reset();
 		start();
 	}
 
 	private void reset()
 	{
-		if (running)
-			stop();
-
-		// ensure that the main loop has ended before manipulating these
-		synchronized (runLock)
-		{
-			genealogyTree.clear();
-			fitnessChartData.clear();
-			genomeSizeChartData.clear();
-			realGenomeSizeChartData.clear();
-			statisticsHistory.clear();
-			evaluationCount = 0;
-
-			for (int i = 0; i < popSize; i++)
-			{
-				Genome g = scenario.randomGenome();
-				currentGeneration[i] = g;
-				genealogyTree.put(g);
-			}
-		}
-	}
-
-	private Genome[] newGeneration(Genome[] generation, int totalFitness)
-	{
-		Genome child1, child2, parent1, parent2;
-		Genome[] newAnts = new Genome[generation.length];
-
-		// create new genomes via cloning and mutation or crossover
-		for (int i = 0; i < (generation.length / 2); i++)
-		{
-			// select two source genomes and clone them
-			parent1 = selector.select(generation, totalFitness);
-			parent2 = selector.select(generation, totalFitness);
-			child1 = parent1.replicate();
-			child2 = parent2.replicate();
-
-			// mutate or crossover with a user defined chance
-			// if (rnd.nextDouble() > crossoverRate) {
-			// mutate genomes
-			child1.mutate(rng.nextInt(maxMutations) + 1);
-			child2.mutate(rng.nextInt(maxMutations) + 1);
-			/*
-			 * } else { //perform crossover crossover.cross(child1.program,
-			 * child2.program, rnd); }
-			 */
-
-			// create new ants from the modified genomes and save them
-			newAnts[i*2] = child1;
-			newAnts[i*2+1] = child2;
-
-			// add to genealogy tree
-			genealogyTree.put(parent1, child1);
-			genealogyTree.put(parent2, child2);
-		}
-
-		return newAnts;
+		engine = null;
+		genealogyTree.clear();
+		fitnessChartData.clear();
+		genomeSizeChartData.clear();
+		realGenomeSizeChartData.clear();
+		statisticsHistory.clear();
 	}
 
 	private int calculateTotalFitness(Genome[] generation)
@@ -248,11 +180,6 @@ public class Simulator
 	{
 		return simulation;
 	}
-	
-	public int getEvaluationCount()
-	{
-		return evaluationCount;
-	}
 
 	/**
 	 * @param args
@@ -265,9 +192,10 @@ public class Simulator
 	}
 	
 	
-    static class ConsoleEvoLog implements EvolutionObserver<String>
+    static class ConsoleEvoLog implements EvolutionObserver<Genome>
     {
-        public void populationUpdate(PopulationData<? extends String> data)
+    	@Override
+        public void populationUpdate(PopulationData<? extends Genome> data)
         {
         	// update population statistics
 			printPopStats(totalFitness, evaluationCount);

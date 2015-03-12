@@ -3,17 +3,24 @@
 
 package de.hansinator.fun.jgp.simulation;
 
+import java.awt.Dimension;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.jbox2d.dynamics.Body;
+import org.uncommons.maths.random.Probability;
+import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
+import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
+import org.uncommons.watchmaker.framework.selection.TournamentSelection;
 
 import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.Genome.GenomeMutation;
 import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.RouletteWheelSelector;
-import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
-import de.hansinator.fun.jgp.genetics.selection.TournamentSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -35,13 +42,17 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
  */
 public class FindingFoodScenario implements Scenario<Genome>
 {
-	private final int progSize = Settings.getInt("progSize");
+	private static final int progSize = Settings.getInt("progSize");
 	
-	private final int worldWidth = Settings.getInt("worldWidth");
+	private static final int worldWidth = Settings.getInt("worldWidth");
 	
-	private final int worldHeight = Settings.getInt("worldHeight");
+	private static final int worldHeight = Settings.getInt("worldHeight");
+	
+	private static final int maxMutations = Settings.getInt("maxMutations");
 	
 	private final AntFactory antFactory = new AntFactory(progSize);
+	
+	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(Probability.EVENS);
 
 	@Override
 	public WorldSimulation getSimulation()
@@ -57,17 +68,18 @@ public class FindingFoodScenario implements Scenario<Genome>
 	}
 
 	@Override
-	public CrossoverOperator getCrossoverOperator()
+	public SelectionStrategy<Object> getSelectionStrategy()
 	{
-		return new OffsetTwoPointCrossover(progSize / 8);
+		return selectionStrategy;
 	}
 
 	@Override
-	public SelectionStrategy getSelectionStrategy()
+	public EvolutionaryOperator<Genome> createEvolutionPipeline()
 	{
-		return new TournamentSelector(3);
+		List<EvolutionaryOperator<Genome>> operators = new LinkedList<EvolutionaryOperator<Genome>>();
+		operators.add(new GenomeMutation(maxMutations));
+		return new EvolutionPipeline<Genome>(operators);
 	}
-
 
 	static class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
 	{

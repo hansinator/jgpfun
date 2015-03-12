@@ -20,8 +20,6 @@ import de.hansinator.fun.jgp.world.BodyPart;
 
 public abstract class Body2d implements BodyPart<ExecutionUnit<World2d>>
 {
-	private static final int bodyCollisionRadius = Settings.getInt("bodyCollisionRadius");
-
 	protected static final Random rnd = Settings.newRandomSource();
 
 	@SuppressWarnings("unchecked")
