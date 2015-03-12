@@ -14,6 +14,8 @@ import java.io.Writer;
 import java.util.Properties;
 import java.util.Random;
 
+import org.uncommons.maths.random.MersenneTwisterRNG;
+
 /**
  * A convenience singleton container for properties. This is to be replaced by a
  * more complex mechanism as soon as this application can run multiple
@@ -33,7 +35,7 @@ public final class Settings
 	}
 	
 	public static Random newRandomSource() {
-		return new Random();
+		return new MersenneTwisterRNG();
 	}
 
 	public static String getString(String key)

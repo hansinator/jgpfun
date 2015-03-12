@@ -13,7 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
@@ -23,7 +23,7 @@ import de.hansinator.fun.jgp.simulation.WorldSimulation;
 public class ControlPanel extends JPanel
 {
 
-	public ControlPanel(final Simulator simulator)
+	public ControlPanel(final EvolutionaryProcess simulator)
 	{
 		JCheckBox speedSwitch = new JCheckBox("Fast mode", true);
 		speedSwitch.addActionListener(new ActionListener()

@@ -8,7 +8,7 @@ import org.jbox2d.dynamics.Body;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -29,7 +29,7 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float)(position.x * Simulator.intScaleFactor));
+			return Math.round((float)(position.x * EvolutionaryProcess.intScaleFactor));
 		}
 	};
 
@@ -39,7 +39,7 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public int get()
 		{
-			return Math.round((float)(position.y * Simulator.intScaleFactor));
+			return Math.round((float)(position.y * EvolutionaryProcess.intScaleFactor));
 		}
 	};
 

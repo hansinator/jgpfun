@@ -5,7 +5,7 @@ import java.util.List;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -23,7 +23,7 @@ public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 	@Override
 	public int get()
 	{
-		return (int) (body.getBody().getLinearVelocity().length() * Simulator.intScaleFactor);
+		return (int) (body.getBody().getLinearVelocity().length() * EvolutionaryProcess.intScaleFactor);
 	}
 
 	@Override

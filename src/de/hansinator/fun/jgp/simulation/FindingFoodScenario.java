@@ -52,7 +52,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private final AntFactory antFactory = new AntFactory(progSize);
 	
-	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(Probability.EVENS);
+	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(new Probability(0.8));
 
 	@Override
 	public WorldSimulation getSimulation()

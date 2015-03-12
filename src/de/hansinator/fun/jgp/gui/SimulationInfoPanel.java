@@ -8,7 +8,8 @@ import javax.swing.SpringLayout;
 import javax.swing.plaf.BorderUIResource;
 
 import util.SpringUtilities;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.gui.MainFrame.EvoStats;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
@@ -18,18 +19,21 @@ import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateList
  */
 public class SimulationInfoPanel extends JPanel
 {
-	private final Simulator simulator;
+	private final EvolutionaryProcess simulator;
 	
 	private final JLabel labelRPS;
 
 	private final JLabel labelProgress;
 
 	private final JLabel labelGeneration;
+	
+	private final EvoStats evoStats;
 
 	
-	public SimulationInfoPanel(final Simulator simulator)
+	public SimulationInfoPanel(final EvolutionaryProcess simulator, EvoStats evoStats)
 	{
 		this.simulator = simulator;
+		this.evoStats = evoStats;
 		
 		simulator.getSimulation().addViewUpdateListener( new SimulationViewUpdateListener() {
 			
@@ -73,6 +77,6 @@ public class SimulationInfoPanel extends JPanel
 	{
 		labelRPS.setText("" + simulator.getSimulation().getRPS());
 		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION);
-		labelGeneration.setText("" + (simulator.getEvaluationCount() + 1));
+		labelGeneration.setText("" + (evoStats.getGenerationNumber() + 1));
 	}
 }
