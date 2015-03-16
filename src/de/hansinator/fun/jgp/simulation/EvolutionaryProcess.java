@@ -1,35 +1,27 @@
 package de.hansinator.fun.jgp.simulation;
 
-import java.util.Random;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
-import org.uncommons.watchmaker.framework.CachingFitnessEvaluator;
 import org.uncommons.watchmaker.framework.EvolutionEngine;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
-import org.uncommons.watchmaker.framework.FitnessEvaluator;
-import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.TerminationCondition;
 import org.uncommons.watchmaker.framework.termination.UserAbort;
 
 import de.hansinator.fun.jgp.genetics.GenealogyTree;
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.util.Settings;
 
 public class EvolutionaryProcess
 {
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
 
-	private final WorldSimulation simulation;
+	private final WorldEvolutionEngine simulation;
 
 	private final GenealogyTree genealogyTree;
 
 	private final Scenario<Genome> scenario;
-
-	private final Random rng;
 
 	private final int popSize = Settings.getInt("popSize");
 	
@@ -45,9 +37,8 @@ public class EvolutionaryProcess
 	{
 		this.scenario = scenario;
 		this.observer = observer;
-		simulation = scenario.getSimulation();
+		simulation = scenario.createEvolutionEngine();
 		genealogyTree = new GenealogyTree();
-		rng = Settings.newRandomSource();
 	}
 
 	/**
@@ -77,13 +68,11 @@ public class EvolutionaryProcess
 		long startTime = System.currentTimeMillis();
 
 		// setup simulation
-		simulation.initialize();
 		System.out.println("Start time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
 		
 		// setup engine
-        FitnessEvaluator<Genome> evaluator = new CachingFitnessEvaluator<Genome>(new GenomeEvaluator());
-        engine = new GenerationalEvolutionEngine<Genome>(scenario.getCandidateFactory(), scenario.createEvolutionPipeline(), evaluator, scenario.getSelectionStrategy(), rng);
+        engine = scenario.createEvolutionEngine();
         engine.addEvolutionObserver(observer);
         //engine.addEvolutionObserver(monitor);
 
@@ -103,7 +92,7 @@ public class EvolutionaryProcess
 		simulation.stop();
 	}
 
-	public WorldSimulation getSimulation()
+	public WorldEvolutionEngine getSimulation()
 	{
 		return simulation;
 	}

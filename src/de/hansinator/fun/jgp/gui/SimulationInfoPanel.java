@@ -10,8 +10,8 @@ import javax.swing.plaf.BorderUIResource;
 import util.SpringUtilities;
 import de.hansinator.fun.jgp.gui.MainFrame.EvoStats;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
-import de.hansinator.fun.jgp.simulation.WorldSimulation;
-import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
+import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
+import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine.SimulationViewUpdateListener;
 
 /**
  * 
@@ -76,7 +76,7 @@ public class SimulationInfoPanel extends JPanel
 	private void updateInfo()
 	{
 		labelRPS.setText("" + simulator.getSimulation().getRPS());
-		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION);
+		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldEvolutionEngine.ROUNDS_PER_GENERATION);
 		labelGeneration.setText("" + (evoStats.getGenerationNumber() + 1));
 	}
 }

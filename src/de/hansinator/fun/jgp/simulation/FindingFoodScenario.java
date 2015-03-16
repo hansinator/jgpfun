@@ -3,7 +3,6 @@
 
 package de.hansinator.fun.jgp.simulation;
 
-import java.awt.Dimension;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -17,9 +16,8 @@ import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.selection.TournamentSelection;
 
 import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeMutation;
-import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
-import de.hansinator.fun.jgp.genetics.crossover.OffsetTwoPointCrossover;
 import de.hansinator.fun.jgp.genetics.selection.RouletteWheelSelector;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
@@ -55,9 +53,9 @@ public class FindingFoodScenario implements Scenario<Genome>
 	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(new Probability(0.8));
 
 	@Override
-	public WorldSimulation getSimulation()
+	public WorldEvolutionEngine createEvolutionEngine()
 	{
-		return new WorldSimulation(new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
+		return new WorldEvolutionEngine(getCandidateFactory(), createEvolutionPipeline(), new GenomeEvaluator() , getSelectionStrategy(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")), Settings.newRandomSource());
 	}
 	
 

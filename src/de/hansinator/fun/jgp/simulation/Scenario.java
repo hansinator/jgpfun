@@ -13,7 +13,7 @@ import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 public interface Scenario<T>
 {
 
-	public WorldSimulation getSimulation();
+	public WorldEvolutionEngine createEvolutionEngine();
 
 	public AbstractCandidateFactory<T> getCandidateFactory();
 

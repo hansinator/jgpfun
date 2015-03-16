@@ -3,12 +3,20 @@ package de.hansinator.fun.jgp.simulation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.uncommons.watchmaker.framework.AbstractEvolutionEngine;
+import org.uncommons.watchmaker.framework.CandidateFactory;
+import org.uncommons.watchmaker.framework.EvaluatedCandidate;
+import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.FitnessEvaluator;
+import org.uncommons.watchmaker.framework.SelectionStrategy;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -19,7 +27,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * 
  * @author hansinator
  */
-public class WorldSimulation
+public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 {
 
 	// todo: have world object automatically add themselves to a legend that can
@@ -44,8 +52,6 @@ public class WorldSimulation
 	
 	private volatile int currentRound;
 
-	private final Object runLock = new Object();
-
 	private final ThreadPoolExecutor pool;
 
 	public final World world;
@@ -56,104 +62,120 @@ public class WorldSimulation
 	
 	private final ConcurrentHashMap<ExecutionUnit<? extends World>, Genome> organismsByGenome = new ConcurrentHashMap<ExecutionUnit<? extends World>, Genome>();
 	
-	final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
+	private final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
 
-	// XXX distinguish only between generational and continuous simulation, not
-	// world and mona lisa; mona lisa needs to be implemented by a scenario only
-	public WorldSimulation(World world)
+	private final SelectionStrategy<? super Genome> selectionStrategy;
+
+	private final EvolutionaryOperator<Genome> evolutionScheme;
+
+	private final FitnessEvaluator<? super Genome> fitnessEvaluator;
+
+	
+	public WorldEvolutionEngine(CandidateFactory<Genome> candidateFactory, EvolutionaryOperator<Genome> evolutionScheme, FitnessEvaluator<? super Genome> fitnessEvaluator, SelectionStrategy<? super Genome> selectionStrategy, World world, Random rng)
 	{
+		super(candidateFactory, fitnessEvaluator, rng);
+		this.evolutionScheme = evolutionScheme;
+        this.fitnessEvaluator = fitnessEvaluator;
+		this.selectionStrategy = selectionStrategy;
 		this.world = world;
 		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
 		pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-	}
-
-	public void initialize()
-	{
-		synchronized (runLock)
-		{
-			world.resetState();
-			running = true;
-			paused = false;
-			rps = 0;
-		}
+		world.resetState();
+		running = true;
+		paused = false;
+		rps = 0;
+		super.setSingleThreaded(true);
 	}
 
 	/*
-	 * TODO re-think generation runtime stat calculation to be better suited for re-entrance
+	 * TODO improve runtime statistics collection (look at epochx approach)
 	 */
 	@SuppressWarnings({"unchecked" })
-	public Genome[] evaluate(Genome[] generation)
+	@Override
+	protected List<EvaluatedCandidate<Genome>> nextEvolutionStep(List<EvaluatedCandidate<Genome>> evaluatedPopulation, int eliteCount, Random rng)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[generation.length];
-		
-		// clear organism map for each new round
-		organismsByGenome.clear();
+		List<Genome> generation = new ArrayList<Genome>(evaluatedPopulation.size());
+        List<Genome> elite = new ArrayList<Genome>(eliteCount);
+		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[evaluatedPopulation.size()];
 
-		// synthesize organisms
-		for (int i = 0; i < generation.length; i++)
+        // select elite first
+        for(EvaluatedCandidate<Genome> candidate : evaluatedPopulation)
+            elite.add(candidate.getCandidate());
+        
+        // select and evolve the remaining candidates and add elite to obtain new generation
+        generation.addAll(selectionStrategy.select(evaluatedPopulation, fitnessEvaluator.isNatural(), evaluatedPopulation.size() - eliteCount, rng));
+        generation = evolutionScheme.apply(generation, rng);
+        generation.addAll(elite);
+      
+		// synthesize organisms for fitness evaluation
+        organismsByGenome.clear();
+		for (int i = 0; i < evaluatedPopulation.size(); i++)
 		{
-			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
-			organisms[i] = generation[i].getRootGene().express((World2d) world);
-			generation[i].getFitnessEvaluator().attach(organisms[i]);
+			Genome genome = generation.get(i);
 			
-			// record organism genome relationship
-			organismsByGenome.put(organisms[i], generation[i]);
+			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
+			organisms[i] = genome.getRootGene().express((World2d) world);
+			genome.getFitnessEvaluator().attach(organisms[i]);
+			
+			// record organism-genome relationship
+			organismsByGenome.put(organisms[i], genome);
 		}
 
-		synchronized (runLock)
+        // get rid of parents
+        evaluatedPopulation.clear();
+		
+		// evaluate organisms in a world
+		for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
 		{
-			for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
+			while (paused)
+				Thread.yield();
+
+			singleStep(organisms);
+
+			// calc stats and draw stuff
+			// TODO: try to decouple this from pure generation running
+			if (slowMode || (currentRound % roundsMod) == 0)
 			{
-				while (paused)
-					Thread.yield();
+				final long time = System.currentTimeMillis() - lastStatTime;
+				lastStatTime = System.currentTimeMillis();
+				this.rps = time > 0 ? (int) (((currentRound - lastStatRound) * 1000) / time) : 1;
+				lastStatRound = currentRound;
 
-				singleStep(organisms);
+				// update views
+				updateSimulationViews();
 
-				// calc stats and draw stuff
-				// TODO: try to decouple this from pure generation running
-				if (slowMode || (currentRound % roundsMod) == 0)
-				{
-					final long time = System.currentTimeMillis() - lastStatTime;
-					lastStatTime = System.currentTimeMillis();
-					this.rps = time > 0 ? (int) (((currentRound - lastStatRound) * 1000) / time) : 1;
-					lastStatRound = currentRound;
-
-					// update views
-					updateSimulationViews();
-
-					// slow down things artificially
-					if (slowMode && (time < (1000 / fpsMax)))
-						try
-						{
-							Thread.sleep((1000 / fpsMax) - time);
-						} catch (InterruptedException ex)
-						{
-							Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
-						}
-				}
+				// slow down things artificially
+				if (slowMode && (time < (1000 / fpsMax)))
+					try
+					{
+						Thread.sleep((1000 / fpsMax) - time);
+					} catch (InterruptedException ex)
+					{
+						Logger.getLogger(WorldEvolutionEngine.class.getName()).log(Level.SEVERE, null, ex);
+					}
 			}
 		}
 
-		// simulation statistics
+		// print simulation statistics
 		System.out.println("");
 		System.out.println("RPS: " + (ROUNDS_PER_GENERATION * 1000) / (System.currentTimeMillis() - start));
-
-		// prepare world for next generation
+		
+		// reset world
 		world.resetState();
-
-		return generation;
+		
+		// assign fitness scores
+		for (ExecutionUnit<? extends World> organism : organisms)
+		{
+			Genome genome = organismsByGenome.get(organism);
+            evaluatedPopulation.add(new EvaluatedCandidate<Genome>(genome, genome.getFitnessEvaluator().getFitness()));
+		}
+		
+		return evaluatedPopulation;
 	}
 
-	/**
-	 * Stop the current evaluation.
-	 */
-	public void stop()
-	{
-		running = false;
-	}
 
 	/**
 	 * Evaluate a single simulation round.
@@ -200,11 +222,19 @@ public class WorldSimulation
 			cb.await();
 		} catch (InterruptedException ex)
 		{
-			Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(WorldEvolutionEngine.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		// run world
 		world.animate();
+	}
+	
+	/**
+	 * Stop the current evaluation.
+	 */
+	public void stop()
+	{
+		running = false;
 	}
 
 	public boolean isSlowMode()
@@ -255,6 +285,12 @@ public class WorldSimulation
 	public int getRPS()
 	{
 		return rps;
+	}
+	
+	@Override
+	public void setSingleThreaded(boolean singleThreaded)
+	{
+		throw new UnsupportedOperationException("not possible");
 	}
 	
 	

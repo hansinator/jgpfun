@@ -195,7 +195,7 @@ public class MainFrame extends JFrame implements WindowListener
         public void populationUpdate(PopulationData<? extends Genome> data)
         {
     		generation = data.getGenerationNumber();
-    		
+
     		// population statistics
     		{
 	    		int avgProgSize = 0, avgRealProgSize = 0, totalFit = 0;

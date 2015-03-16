@@ -14,7 +14,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
-import de.hansinator.fun.jgp.simulation.WorldSimulation;
+import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
 
 /**
  * 
@@ -40,9 +40,9 @@ public class ControlPanel extends JPanel
 
 		});
 
-		final JSlider speedSlider = new JSlider(0, WorldSimulation.ROUNDS_PER_GENERATION);
-		speedSlider.setMajorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 2);
-		speedSlider.setMinorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 8);
+		final JSlider speedSlider = new JSlider(0, WorldEvolutionEngine.ROUNDS_PER_GENERATION);
+		speedSlider.setMajorTickSpacing(WorldEvolutionEngine.ROUNDS_PER_GENERATION / 2);
+		speedSlider.setMinorTickSpacing(WorldEvolutionEngine.ROUNDS_PER_GENERATION / 8);
 		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
 		speedSlider.setValue(simulator.getSimulation().getRoundsMod());
