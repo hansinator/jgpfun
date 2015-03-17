@@ -4,24 +4,14 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
-import org.uncommons.watchmaker.framework.EvolutionEngine;
-import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.TerminationCondition;
 import org.uncommons.watchmaker.framework.termination.UserAbort;
 
-import de.hansinator.fun.jgp.genetics.GenealogyTree;
-import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.util.Settings;
 
 public class EvolutionaryProcess
 {
 	public static final double intScaleFactor = Settings.getDouble("intScaleFactor");
-
-	private final WorldEvolutionEngine simulation;
-
-	private final GenealogyTree genealogyTree;
-
-	private final Scenario<Genome> scenario;
 
 	private final int popSize = Settings.getInt("popSize");
 	
@@ -29,16 +19,12 @@ public class EvolutionaryProcess
 	
 	private final UserAbort abort = new UserAbort();
 
-	private EvolutionEngine<Genome> engine;
-	
-	private EvolutionObserver<? super Genome> observer;
+	private WorldEvolutionEngine engine;
 
-	public EvolutionaryProcess(Scenario<Genome> scenario, EvolutionObserver<? super Genome> observer)
+	//TODO suppy either settings or popSize and eliteCount through here
+	public EvolutionaryProcess(WorldEvolutionEngine engine)
 	{
-		this.scenario = scenario;
-		this.observer = observer;
-		simulation = scenario.createEvolutionEngine();
-		genealogyTree = new GenealogyTree();
+		this.engine = engine;
 	}
 
 	/**
@@ -63,18 +49,12 @@ public class EvolutionaryProcess
 		}, "EvolutionThread" + this).start();
 	}
 
+	// TODO make this a callable and move printing into the caller 
 	private void run()
 	{
 		long startTime = System.currentTimeMillis();
-
-		// setup simulation
 		System.out.println("Start time: "
 				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
-		
-		// setup engine
-        engine = scenario.createEvolutionEngine();
-        engine.addEvolutionObserver(observer);
-        //engine.addEvolutionObserver(monitor);
 
 		// run simulation
         engine.evolve(popSize, eliteCount, new TerminationCondition[]{ abort });
@@ -89,11 +69,11 @@ public class EvolutionaryProcess
 	public void stop()
 	{
 		abort.abort();
-		simulation.stop();
+		engine.stop();
 	}
 
 	public WorldEvolutionEngine getSimulation()
 	{
-		return simulation;
+		return engine;
 	}
 }

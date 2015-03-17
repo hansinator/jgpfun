@@ -26,6 +26,7 @@ import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.Scenario;
+import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -46,14 +47,17 @@ public class MainFrame extends JFrame implements WindowListener
 	public final BottomPanel bottomPane;
 
 	private final EvolutionaryProcess evolutionaryProcess;
-	
-	private final EvoStats evoStats;
 
 	public MainFrame(int width, int height, Scenario<Genome> scenario)
 	{
 		super("BAH! Bonn!!1!11!!!");
-		this.evoStats = new EvoStats();
-		this.evolutionaryProcess = new EvolutionaryProcess(scenario, evoStats);
+		
+		// setup engine
+		WorldEvolutionEngine engine = scenario.createEvolutionEngine();
+		EvoStats evoStats = new EvoStats();
+		engine.addEvolutionObserver(evoStats);
+        //engine.addEvolutionObserver(monitor);
+		this.evolutionaryProcess = new EvolutionaryProcess(engine);
 
 		// create all sub views
 		sidePaneLeft = new JPanel();

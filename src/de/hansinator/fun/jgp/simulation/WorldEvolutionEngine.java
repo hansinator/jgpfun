@@ -115,10 +115,12 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 		for (int i = 0; i < evaluatedPopulation.size(); i++)
 		{
 			Genome genome = generation.get(i);
+			de.hansinator.fun.jgp.life.FitnessEvaluator evaluator = genome.getFitnessEvaluator();
 			
 			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
 			organisms[i] = genome.getRootGene().express((World2d) world);
-			genome.getFitnessEvaluator().attach(organisms[i]);
+			evaluator.attach(organisms[i]);
+			evaluator.setFitness(0);
 			
 			// record organism-genome relationship
 			organismsByGenome.put(organisms[i], genome);

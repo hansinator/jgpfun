@@ -84,6 +84,12 @@ public class FindingFoodScenario implements Scenario<Genome>
 		private int fitness = 0;
 
 		@Override
+		public void setFitness(int fitness)
+		{
+			this.fitness = fitness;
+		}
+
+		@Override
 		public int getFitness()
 		{
 			return fitness;
