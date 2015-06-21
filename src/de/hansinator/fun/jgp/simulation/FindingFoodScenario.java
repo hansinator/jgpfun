@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.jbox2d.dynamics.Body;
 import org.uncommons.maths.random.Probability;
+import org.uncommons.watchmaker.framework.EvaluationStrategy;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
@@ -53,9 +54,9 @@ public class FindingFoodScenario implements Scenario<Genome>
 	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(new Probability(0.8));
 
 	@Override
-	public WorldEvolutionEngine createEvolutionEngine()
+	public EvaluationStrategy<Genome> createEvaluationStrategy()
 	{
-		return new WorldEvolutionEngine(getCandidateFactory(), createEvolutionPipeline(), new GenomeEvaluator() , getSelectionStrategy(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")), Settings.newRandomSource());
+		return new WorldEvolutionEngine(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
 	}
 	
 

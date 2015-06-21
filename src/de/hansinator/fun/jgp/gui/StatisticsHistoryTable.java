@@ -50,20 +50,20 @@ public class StatisticsHistoryTable extends JTable
 			this.averageRealProgramSize = averageRealProgramSize;
 		}
 
-		private Number getValueAt(int columnIndex)
+		private String getValueAt(int columnIndex)
 		{
 			switch (columnIndex)
 			{
 				case 0:
-					return generation;
+					return "" + generation;
 				case 1:
-					return bestFitness;
+					return String.format("%.0f", bestFitness);
 				case 2:
-					return averageFitness;
+					return String.format("%.2f", averageFitness);
 				case 3:
-					return averageProgramSize;
+					return "" + averageProgramSize;
 				case 4:
-					return averageRealProgramSize;
+					return "" + averageRealProgramSize;
 				default:
 					throw new ArrayIndexOutOfBoundsException(columnIndex);
 			}
@@ -109,7 +109,7 @@ public class StatisticsHistoryTable extends JTable
 		@Override
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			return Integer.class;
+			return String.class;
 		}
 
 		@Override

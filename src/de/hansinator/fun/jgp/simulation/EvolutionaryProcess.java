@@ -4,6 +4,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.PeriodFormat;
+import org.uncommons.watchmaker.framework.EvolutionEngine;
 import org.uncommons.watchmaker.framework.TerminationCondition;
 import org.uncommons.watchmaker.framework.termination.UserAbort;
 
@@ -19,10 +20,10 @@ public class EvolutionaryProcess
 	
 	private final UserAbort abort = new UserAbort();
 
-	private WorldEvolutionEngine engine;
+	private EvolutionEngine<?> engine;
 
-	//TODO suppy either settings or popSize and eliteCount through here
-	public EvolutionaryProcess(WorldEvolutionEngine engine)
+	//TODO supply either settings or popSize and eliteCount through here
+	public EvolutionaryProcess(EvolutionEngine<?> engine)
 	{
 		this.engine = engine;
 	}
@@ -69,11 +70,5 @@ public class EvolutionaryProcess
 	public void stop()
 	{
 		abort.abort();
-		engine.stop();
-	}
-
-	public WorldEvolutionEngine getSimulation()
-	{
-		return engine;
 	}
 }

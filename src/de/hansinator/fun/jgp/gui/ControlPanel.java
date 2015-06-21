@@ -23,7 +23,7 @@ import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
 public class ControlPanel extends JPanel
 {
 
-	public ControlPanel(final EvolutionaryProcess simulator)
+	public ControlPanel(final WorldEvolutionEngine simulator)
 	{
 		JCheckBox speedSwitch = new JCheckBox("Fast mode", true);
 		speedSwitch.addActionListener(new ActionListener()
@@ -35,7 +35,7 @@ public class ControlPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				slowMode = !slowMode;
-				simulator.getSimulation().setSlowMode(slowMode);
+				simulator.setSlowMode(slowMode);
 			}
 
 		});
@@ -45,7 +45,7 @@ public class ControlPanel extends JPanel
 		speedSlider.setMinorTickSpacing(WorldEvolutionEngine.ROUNDS_PER_GENERATION / 8);
 		speedSlider.setPaintLabels(true);
 		speedSlider.setPaintTicks(true);
-		speedSlider.setValue(simulator.getSimulation().getRoundsMod());
+		speedSlider.setValue(simulator.getRoundsMod());
 		speedSlider.setMaximumSize(new Dimension(200, 40));
 		speedSlider.addChangeListener(new ChangeListener()
 		{
@@ -53,7 +53,7 @@ public class ControlPanel extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				simulator.getSimulation().setRoundsMod(speedSlider.getValue());
+				simulator.setRoundsMod(speedSlider.getValue());
 			}
 
 		});
@@ -71,7 +71,7 @@ public class ControlPanel extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				simulator.getSimulation().setFps(fpsSlider.getValue());
+				simulator.setFps(fpsSlider.getValue());
 			}
 
 		});
@@ -87,7 +87,7 @@ public class ControlPanel extends JPanel
 			{
 				paused = !paused;
 				pauseButton.setText(paused ? "Resume" : "Pause");
-				simulator.getSimulation().setPaused(paused);
+				simulator.setPaused(paused);
 			}
 
 		});

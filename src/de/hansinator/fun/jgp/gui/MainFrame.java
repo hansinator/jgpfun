@@ -18,13 +18,15 @@ import javax.swing.JPanel;
 import org.jfree.data.xy.XYSeries;
 import org.joda.time.format.PeriodFormat;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
+import org.uncommons.watchmaker.framework.EvolutionEngine;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
+import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.PopulationData;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
+import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.Scenario;
 import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
 import de.hansinator.fun.jgp.util.Settings;
@@ -47,13 +49,33 @@ public class MainFrame extends JFrame implements WindowListener
 	public final BottomPanel bottomPane;
 
 	private final EvolutionaryProcess evolutionaryProcess;
+	
+	private final WorldEvolutionEngine evaluationStrategy;
 
 	public MainFrame(int width, int height, Scenario<Genome> scenario)
 	{
 		super("BAH! Bonn!!1!11!!!");
+		// get EvaluationStrategy - this is our workhorse component for the moment.
+		// most computation happens during evaluation for our scenario, in contrast
+		// to the watchmaker examples where the evaluation is just a tiny fraction
+		// of the computational load. we need to save a reference to the strategy
+		// to pass it to the UI components for fine grained control over its
+		// execution (such as pausing, slow/fast mode, etc). in watchmaker examples
+		// it is sufficient to render the best candidate every once a while, because
+		// they compute new candidates more than once a second. here instead we'll
+		// need to render the evaluation process itself multiple times - it is
+		// not sufficient to show just the solution, but the process itself
+		// XXX because there is no API yet we need to cast this to a proper type
+		// TODO in the future the scenario should create the views for us, b/c it knows about types
+		evaluationStrategy = (WorldEvolutionEngine)scenario.createEvaluationStrategy();
 		
 		// setup engine
-		WorldEvolutionEngine engine = scenario.createEvolutionEngine();
+		EvolutionEngine<Genome> engine = new GenerationalEvolutionEngine<Genome>(
+				scenario.getCandidateFactory(), scenario.createEvolutionPipeline(),
+				evaluationStrategy,
+				scenario.getSelectionStrategy(),
+				Settings.newRandomSource()); 
+		
 		EvoStats evoStats = new EvoStats();
 		engine.addEvolutionObserver(evoStats);
         //engine.addEvolutionObserver(monitor);
@@ -62,10 +84,10 @@ public class MainFrame extends JFrame implements WindowListener
 		// create all sub views
 		sidePaneLeft = new JPanel();
 		sidePaneRight = new StatisticsHistoryPanel(evoStats.statisticsHistory);
-		bottomPane = new BottomPanel(evolutionaryProcess, evoStats);
+		bottomPane = new BottomPanel(evaluationStrategy, evoStats);
 		
 		// init simulation client view
-		simulationClientView = new WorldSimulationView(evolutionaryProcess.getSimulation());
+		simulationClientView = new WorldSimulationView(evaluationStrategy);
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
 		// add the menu bar
@@ -122,6 +144,7 @@ public class MainFrame extends JFrame implements WindowListener
 
 	public void stopSimulation()
 	{
+		evaluationStrategy.stop();
 		evolutionaryProcess.stop();
 	}
 

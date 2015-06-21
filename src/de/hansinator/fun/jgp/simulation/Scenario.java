@@ -1,5 +1,6 @@
 package de.hansinator.fun.jgp.simulation;
 
+import org.uncommons.watchmaker.framework.EvaluationStrategy;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
@@ -13,11 +14,11 @@ import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
 public interface Scenario<T>
 {
 
-	public WorldEvolutionEngine createEvolutionEngine();
+	EvaluationStrategy<T> createEvaluationStrategy();
 
-	public AbstractCandidateFactory<T> getCandidateFactory();
+	AbstractCandidateFactory<T> getCandidateFactory();
 
-	public SelectionStrategy<Object> getSelectionStrategy();
+	SelectionStrategy<Object> getSelectionStrategy();
 
-	public EvolutionaryOperator<Genome> createEvolutionPipeline();
+	EvolutionaryOperator<Genome> createEvolutionPipeline();
 }

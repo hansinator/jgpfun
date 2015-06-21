@@ -3,7 +3,6 @@ package de.hansinator.fun.jgp.simulation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -11,12 +10,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.uncommons.watchmaker.framework.AbstractEvolutionEngine;
-import org.uncommons.watchmaker.framework.CandidateFactory;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
-import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.EvaluationStrategy;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
-import org.uncommons.watchmaker.framework.SelectionStrategy;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
@@ -27,7 +23,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * 
  * @author hansinator
  */
-public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
+public final class WorldEvolutionEngine implements EvaluationStrategy<Genome>
 {
 
 	// todo: have world object automatically add themselves to a legend that can
@@ -54,29 +50,22 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 
 	private final ThreadPoolExecutor pool;
 
-	public final World world;
-
-	public static final int ROUNDS_PER_GENERATION = 4000;
+	public static final int ROUNDS_PER_GENERATION = 2000;
 	
 	private int rps;
+	
+	public final World world;
 	
 	private final ConcurrentHashMap<ExecutionUnit<? extends World>, Genome> organismsByGenome = new ConcurrentHashMap<ExecutionUnit<? extends World>, Genome>();
 	
 	private final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
 
-	private final SelectionStrategy<? super Genome> selectionStrategy;
-
-	private final EvolutionaryOperator<Genome> evolutionScheme;
-
 	private final FitnessEvaluator<? super Genome> fitnessEvaluator;
 
 	
-	public WorldEvolutionEngine(CandidateFactory<Genome> candidateFactory, EvolutionaryOperator<Genome> evolutionScheme, FitnessEvaluator<? super Genome> fitnessEvaluator, SelectionStrategy<? super Genome> selectionStrategy, World world, Random rng)
+	public WorldEvolutionEngine(FitnessEvaluator<? super Genome> fitnessEvaluator, World world)
 	{
-		super(candidateFactory, fitnessEvaluator, rng);
-		this.evolutionScheme = evolutionScheme;
         this.fitnessEvaluator = fitnessEvaluator;
-		this.selectionStrategy = selectionStrategy;
 		this.world = world;
 		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
 		pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
@@ -84,37 +73,25 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 		running = true;
 		paused = false;
 		rps = 0;
-		super.setSingleThreaded(true);
 	}
+
 
 	/*
 	 * TODO improve runtime statistics collection (look at epochx approach)
 	 */
 	@SuppressWarnings({"unchecked" })
-	@Override
-	protected List<EvaluatedCandidate<Genome>> nextEvolutionStep(List<EvaluatedCandidate<Genome>> evaluatedPopulation, int eliteCount, Random rng)
+	public List<EvaluatedCandidate<Genome>> evaluatePopulation(List<Genome> population)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		List<Genome> generation = new ArrayList<Genome>(evaluatedPopulation.size());
-        List<Genome> elite = new ArrayList<Genome>(eliteCount);
-		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[evaluatedPopulation.size()];
-
-        // select elite first
-        for(EvaluatedCandidate<Genome> candidate : evaluatedPopulation)
-            elite.add(candidate.getCandidate());
-        
-        // select and evolve the remaining candidates and add elite to obtain new generation
-        generation.addAll(selectionStrategy.select(evaluatedPopulation, fitnessEvaluator.isNatural(), evaluatedPopulation.size() - eliteCount, rng));
-        generation = evolutionScheme.apply(generation, rng);
-        generation.addAll(elite);
+		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[population.size()];
       
 		// synthesize organisms for fitness evaluation
         organismsByGenome.clear();
-		for (int i = 0; i < evaluatedPopulation.size(); i++)
+		for (int i = 0; i < population.size(); i++)
 		{
-			Genome genome = generation.get(i);
+			Genome genome = population.get(i);
 			de.hansinator.fun.jgp.life.FitnessEvaluator evaluator = genome.getFitnessEvaluator();
 			
 			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
@@ -125,9 +102,6 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 			// record organism-genome relationship
 			organismsByGenome.put(organisms[i], genome);
 		}
-
-        // get rid of parents
-        evaluatedPopulation.clear();
 		
 		// evaluate organisms in a world
 		for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
@@ -169,6 +143,7 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 		world.resetState();
 		
 		// assign fitness scores
+		List<EvaluatedCandidate<Genome>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<Genome>>(population.size());
 		for (ExecutionUnit<? extends World> organism : organisms)
 		{
 			Genome genome = organismsByGenome.get(organism);
@@ -289,12 +264,6 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 		return rps;
 	}
 	
-	@Override
-	public void setSingleThreaded(boolean singleThreaded)
-	{
-		throw new UnsupportedOperationException("not possible");
-	}
-	
 	
 	final synchronized public boolean addViewUpdateListener(SimulationViewUpdateListener listener)
 	{
@@ -320,5 +289,18 @@ public final class WorldEvolutionEngine extends AbstractEvolutionEngine<Genome>
 	public Map<ExecutionUnit<? extends World>, Genome> getOrganismsByGenomeMap()
 	{
 		return java.util.Collections.unmodifiableMap(organismsByGenome);
+	}
+
+	@Override
+	public boolean isNatural()
+	{
+		return fitnessEvaluator.isNatural();
+	}
+
+	@Override
+	public void setSingleThreaded(boolean singleThreaded)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

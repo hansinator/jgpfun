@@ -19,7 +19,7 @@ import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine.SimulationViewUpdat
  */
 public class SimulationInfoPanel extends JPanel
 {
-	private final EvolutionaryProcess simulator;
+	private final WorldEvolutionEngine simulator;
 	
 	private final JLabel labelRPS;
 
@@ -30,12 +30,12 @@ public class SimulationInfoPanel extends JPanel
 	private final EvoStats evoStats;
 
 	
-	public SimulationInfoPanel(final EvolutionaryProcess simulator, EvoStats evoStats)
+	public SimulationInfoPanel(final WorldEvolutionEngine simulator, EvoStats evoStats)
 	{
 		this.simulator = simulator;
 		this.evoStats = evoStats;
 		
-		simulator.getSimulation().addViewUpdateListener( new SimulationViewUpdateListener() {
+		simulator.addViewUpdateListener( new SimulationViewUpdateListener() {
 			
 			@Override
 			public void onViewUpdate()
@@ -75,8 +75,8 @@ public class SimulationInfoPanel extends JPanel
 
 	private void updateInfo()
 	{
-		labelRPS.setText("" + simulator.getSimulation().getRPS());
-		labelProgress.setText("" + (simulator.getSimulation().getCurrentRound() * 100) / WorldEvolutionEngine.ROUNDS_PER_GENERATION);
+		labelRPS.setText("" + simulator.getRPS());
+		labelProgress.setText("" + (simulator.getCurrentRound() * 100) / WorldEvolutionEngine.ROUNDS_PER_GENERATION);
 		labelGeneration.setText("" + (evoStats.getGenerationNumber() + 1));
 	}
 }
