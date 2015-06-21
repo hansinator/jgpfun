@@ -28,7 +28,7 @@ import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.Scenario;
-import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -47,14 +47,16 @@ public class MainFrame extends JFrame implements WindowListener
 	public final JPanel sidePaneLeft, sidePaneRight;
 
 	public final BottomPanel bottomPane;
-
-	private final EvolutionaryProcess evolutionaryProcess;
 	
-	private final WorldEvolutionEngine evaluationStrategy;
+	private final Scenario<Genome> scenario;
+	
+	private final WorldSimulation evaluationStrategy;
 
 	public MainFrame(int width, int height, Scenario<Genome> scenario)
 	{
 		super("BAH! Bonn!!1!11!!!");
+		this.scenario = scenario;
+		
 		// get EvaluationStrategy - this is our workhorse component for the moment.
 		// most computation happens during evaluation for our scenario, in contrast
 		// to the watchmaker examples where the evaluation is just a tiny fraction
@@ -67,19 +69,11 @@ public class MainFrame extends JFrame implements WindowListener
 		// not sufficient to show just the solution, but the process itself
 		// XXX because there is no API yet we need to cast this to a proper type
 		// TODO in the future the scenario should create the views for us, b/c it knows about types
-		evaluationStrategy = (WorldEvolutionEngine)scenario.createEvaluationStrategy();
-		
-		// setup engine
-		EvolutionEngine<Genome> engine = new GenerationalEvolutionEngine<Genome>(
-				scenario.getCandidateFactory(), scenario.createEvolutionPipeline(),
-				evaluationStrategy,
-				scenario.getSelectionStrategy(),
-				Settings.newRandomSource()); 
+		evaluationStrategy = (WorldSimulation)scenario.getEvaluationStrategy();
 		
 		EvoStats evoStats = new EvoStats();
-		engine.addEvolutionObserver(evoStats);
-        //engine.addEvolutionObserver(monitor);
-		this.evolutionaryProcess = new EvolutionaryProcess(engine);
+		scenario.getEngine().addEvolutionObserver(evoStats);
+        //scenario.getEngine().engine.addEvolutionObserver(monitor);
 
 		// create all sub views
 		sidePaneLeft = new JPanel();
@@ -139,13 +133,13 @@ public class MainFrame extends JFrame implements WindowListener
 		addWindowListener(this);
 		
 		// run simulator
-		evolutionaryProcess.start();
+		scenario.getEvolutionaryProcess().start();
 	}
 
 	public void stopSimulation()
 	{
 		evaluationStrategy.stop();
-		evolutionaryProcess.stop();
+		scenario.getEvolutionaryProcess().stop();
 	}
 
 	@Override

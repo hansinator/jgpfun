@@ -21,8 +21,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
-import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine.SimulationViewUpdateListener;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
+import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
 /**
  * 
@@ -30,7 +30,7 @@ import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine.SimulationViewUpdat
  */
 public class WorldSimulationView extends javax.swing.JPanel
 {
-	private final WorldEvolutionEngine simulation;
+	private final WorldSimulation simulation;
 	
 	public final de.hansinator.fun.jgp.gui.DebugDrawJ2D draw;
 	
@@ -88,7 +88,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 	 * and food
 	 */
 	/** Creates new form MainView */
-	public WorldSimulationView(final WorldEvolutionEngine simulation)
+	public WorldSimulationView(final WorldSimulation simulation)
 	{
 		draw = new de.hansinator.fun.jgp.gui.DebugDrawJ2D(this);
 		this.simulation = simulation;
@@ -115,7 +115,7 @@ public class WorldSimulationView extends javax.swing.JPanel
 							g.drawString("RPS: " + simulation.getRPS(), 10, 15);
 						}
 	
-						int progress = (simulation.getCurrentRound() * 100) / WorldEvolutionEngine.ROUNDS_PER_GENERATION;
+						int progress = (simulation.getCurrentRound() * 100) / WorldSimulation.ROUNDS_PER_GENERATION;
 						if (progress != 0)
 						{
 							g.setColor(Color.yellow);

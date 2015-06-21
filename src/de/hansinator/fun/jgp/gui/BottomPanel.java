@@ -17,7 +17,7 @@ import org.jfree.data.RangeType;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import de.hansinator.fun.jgp.gui.MainFrame.EvoStats;
-import de.hansinator.fun.jgp.simulation.WorldEvolutionEngine;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
  * 
@@ -28,7 +28,7 @@ public class BottomPanel extends JPanel
 
 	public final SimulationInfoPanel infoPanel;
 
-	public BottomPanel(WorldEvolutionEngine simulator, EvoStats evoStats)
+	public BottomPanel(WorldSimulation simulator, EvoStats evoStats)
 	{
 		infoPanel = new SimulationInfoPanel(simulator, evoStats);
 		

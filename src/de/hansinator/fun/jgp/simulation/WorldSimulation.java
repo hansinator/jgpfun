@@ -23,7 +23,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * 
  * @author hansinator
  */
-public final class WorldEvolutionEngine implements EvaluationStrategy<Genome>
+public final class WorldSimulation implements EvaluationStrategy<Genome>
 {
 
 	// todo: have world object automatically add themselves to a legend that can
@@ -63,7 +63,7 @@ public final class WorldEvolutionEngine implements EvaluationStrategy<Genome>
 	private final FitnessEvaluator<? super Genome> fitnessEvaluator;
 
 	
-	public WorldEvolutionEngine(FitnessEvaluator<? super Genome> fitnessEvaluator, World world)
+	public WorldSimulation(FitnessEvaluator<? super Genome> fitnessEvaluator, World world)
 	{
         this.fitnessEvaluator = fitnessEvaluator;
 		this.world = world;
@@ -130,7 +130,7 @@ public final class WorldEvolutionEngine implements EvaluationStrategy<Genome>
 						Thread.sleep((1000 / fpsMax) - time);
 					} catch (InterruptedException ex)
 					{
-						Logger.getLogger(WorldEvolutionEngine.class.getName()).log(Level.SEVERE, null, ex);
+						Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
 					}
 			}
 		}
@@ -199,7 +199,7 @@ public final class WorldEvolutionEngine implements EvaluationStrategy<Genome>
 			cb.await();
 		} catch (InterruptedException ex)
 		{
-			Logger.getLogger(WorldEvolutionEngine.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		// run world

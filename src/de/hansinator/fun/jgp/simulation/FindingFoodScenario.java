@@ -10,7 +10,9 @@ import java.util.Random;
 import org.jbox2d.dynamics.Body;
 import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.EvaluationStrategy;
+import org.uncommons.watchmaker.framework.EvolutionEngine;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
@@ -49,14 +51,55 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private static final int maxMutations = Settings.getInt("maxMutations");
 	
-	private final AntFactory antFactory = new AntFactory(progSize);
+	private final AntFactory antFactory;
 	
-	private final SelectionStrategy<Object> selectionStrategy = new TournamentSelection(new Probability(0.8));
+	private final SelectionStrategy<Object> selectionStrategy;
+	
+	private final EvaluationStrategy<Genome> evaluationStrategy;
+	
+	private final EvolutionEngine<Genome> engine;
+	
+	private final EvolutionaryProcess evolutionaryProcess;
+	
+	public FindingFoodScenario()
+	{
+		antFactory = new AntFactory(progSize);
+		selectionStrategy = new TournamentSelection(new Probability(0.8));
+		evaluationStrategy = new WorldSimulation(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
+		
+		// crate pipeline
+		List<EvolutionaryOperator<Genome>> operators = new LinkedList<EvolutionaryOperator<Genome>>();
+		operators.add(new GenomeMutation(maxMutations));
+		EvolutionaryOperator<Genome> evolutionPipeline = new EvolutionPipeline<Genome>(operators);
+		
+		// setup engine
+		engine = new GenerationalEvolutionEngine<Genome>(
+				antFactory,
+				evolutionPipeline,
+				evaluationStrategy,
+				selectionStrategy,
+				Settings.newRandomSource());
+		
+		// create a process
+		evolutionaryProcess = new EvolutionaryProcess(engine);
+	}
+	
+	@Override
+	public EvolutionEngine<Genome> getEngine()
+	{
+		return engine;
+	}
 
 	@Override
-	public EvaluationStrategy<Genome> createEvaluationStrategy()
+	public EvolutionaryProcess getEvolutionaryProcess()
 	{
-		return new WorldEvolutionEngine(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
+		return evolutionaryProcess;
+	}
+
+	@Override
+	public EvaluationStrategy<Genome> getEvaluationStrategy()
+	{
+		return evaluationStrategy;
 	}
 	
 
@@ -70,14 +113,6 @@ public class FindingFoodScenario implements Scenario<Genome>
 	public SelectionStrategy<Object> getSelectionStrategy()
 	{
 		return selectionStrategy;
-	}
-
-	@Override
-	public EvolutionaryOperator<Genome> createEvolutionPipeline()
-	{
-		List<EvolutionaryOperator<Genome>> operators = new LinkedList<EvolutionaryOperator<Genome>>();
-		operators.add(new GenomeMutation(maxMutations));
-		return new EvolutionPipeline<Genome>(operators);
 	}
 
 	static class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener

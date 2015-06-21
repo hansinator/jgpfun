@@ -22,7 +22,6 @@ public class EvolutionaryProcess
 
 	private EvolutionEngine<?> engine;
 
-	//TODO supply either settings or popSize and eliteCount through here
 	public EvolutionaryProcess(EvolutionEngine<?> engine)
 	{
 		this.engine = engine;
@@ -45,26 +44,20 @@ public class EvolutionaryProcess
 			@Override
 			public void run()
 			{
-				EvolutionaryProcess.this.run();
+				long startTime = System.currentTimeMillis();
+				System.out.println("Start time: "
+						+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
+
+				// run simulation
+		        engine.evolve(popSize, eliteCount, new TerminationCondition[]{ abort });
+
+				// print statistics
+				System.out.println("\nEnd time: "
+						+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
+				System.out.println("Runtime: "
+						+ PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
 			}
 		}, "EvolutionThread" + this).start();
-	}
-
-	// TODO make this a callable and move printing into the caller 
-	private void run()
-	{
-		long startTime = System.currentTimeMillis();
-		System.out.println("Start time: "
-				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(startTime));
-
-		// run simulation
-        engine.evolve(popSize, eliteCount, new TerminationCondition[]{ abort });
-
-		// print statistics
-		System.out.println("\nEnd time: "
-				+ DateTimeFormat.fullDateTime().withZone(DateTimeZone.getDefault()).print(new Instant()));
-		System.out.println("Runtime: "
-				+ PeriodFormat.getDefault().print(new org.joda.time.Period(startTime, System.currentTimeMillis())));
 	}
 
 	public void stop()
