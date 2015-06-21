@@ -16,6 +16,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jbox2d.dynamics.BodyType;
+
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
@@ -50,7 +52,7 @@ public class TestRadarSense extends JPanel
 		AntBody.Gene bodyGene = new AntBody.Gene();
 		bodyGene.addBodyPartGene(new RadarSense.Gene());
 
-		LGPGene organismGene = LGPGene.randomGene(256);
+		LGPGene organismGene = LGPGene.randomGene(Settings.newRandomSource(), 256);
 		organismGene.addIOGene(bodyGene);
 
 		return organismGene;
@@ -65,6 +67,7 @@ public class TestRadarSense extends JPanel
 		organism.setExecutionContext(world);
 
 		body = ((AntBody) organism.getIOUnits()[0]);
+		body.getBody().setType(BodyType.STATIC);
 		body.sampleInputs();
 		
 		for(IOUnit<Body2d> part : body.getParts())
@@ -79,8 +82,7 @@ public class TestRadarSense extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				body.getBody().
-				body.dir = sliderBody.getValue() * (Math.PI / 180.0);
+				body.getBody().setTransform(body.getBody().getPosition(), Math.round(sliderBody.getValue() * (Math.PI / 180.0)));
 				sense.get();
 				repaint();
 			}

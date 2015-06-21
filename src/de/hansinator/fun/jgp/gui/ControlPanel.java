@@ -13,7 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
@@ -23,7 +23,7 @@ import de.hansinator.fun.jgp.simulation.WorldSimulation;
 public class ControlPanel extends JPanel
 {
 
-	public ControlPanel(final Simulator simulator)
+	public ControlPanel(final WorldSimulation simulator)
 	{
 		JCheckBox speedSwitch = new JCheckBox("Fast mode", true);
 		speedSwitch.addActionListener(new ActionListener()
@@ -35,25 +35,7 @@ public class ControlPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				slowMode = !slowMode;
-				simulator.getSimulation().setSlowMode(slowMode);
-			}
-
-		});
-
-		final JSlider speedSlider = new JSlider(0, WorldSimulation.ROUNDS_PER_GENERATION);
-		speedSlider.setMajorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 2);
-		speedSlider.setMinorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 8);
-		speedSlider.setPaintLabels(true);
-		speedSlider.setPaintTicks(true);
-		speedSlider.setValue(simulator.getSimulation().getRoundsMod());
-		speedSlider.setMaximumSize(new Dimension(200, 40));
-		speedSlider.addChangeListener(new ChangeListener()
-		{
-
-			@Override
-			public void stateChanged(ChangeEvent e)
-			{
-				simulator.getSimulation().setRoundsMod(speedSlider.getValue());
+				simulator.setSlowMode(slowMode);
 			}
 
 		});
@@ -71,7 +53,7 @@ public class ControlPanel extends JPanel
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				simulator.getSimulation().setFps(fpsSlider.getValue());
+				simulator.setFps(fpsSlider.getValue());
 			}
 
 		});
@@ -87,7 +69,7 @@ public class ControlPanel extends JPanel
 			{
 				paused = !paused;
 				pauseButton.setText(paused ? "Resume" : "Pause");
-				simulator.getSimulation().setPaused(paused);
+				simulator.setPaused(paused);
 			}
 
 		});
@@ -95,12 +77,10 @@ public class ControlPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setAlignmentY(TOP_ALIGNMENT);
 		setAlignmentX(LEFT_ALIGNMENT);
-		setPreferredSize(new Dimension(200, 0));
-		// setMinimumSize(new Dimension(120, 0));
+		setPreferredSize(new Dimension(140, 0));
 		setBorder(BorderUIResource.getEtchedBorderUIResource());
 
 		add(speedSwitch);
-		add(speedSlider);
 		add(fpsSlider);
 		add(pauseButton);
 	}

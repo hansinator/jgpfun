@@ -21,6 +21,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JPanel;
+
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateListener;
 
@@ -28,7 +30,7 @@ import de.hansinator.fun.jgp.simulation.WorldSimulation.SimulationViewUpdateList
  * 
  * @author hansinator
  */
-public class WorldSimulationView extends javax.swing.JPanel
+public class WorldSimulationView extends JPanel
 {
 	private final WorldSimulation simulation;
 	

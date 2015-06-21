@@ -10,6 +10,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.uncommons.util.concurrent.ConfigurableThreadFactory;
+import org.uncommons.watchmaker.framework.EvaluatedCandidate;
+import org.uncommons.watchmaker.framework.EvaluationStrategy;
+import org.uncommons.watchmaker.framework.FitnessEvaluator;
+
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.world.World;
@@ -19,7 +24,7 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  * 
  * @author hansinator
  */
-public class WorldSimulation
+public final class WorldSimulation implements EvaluationStrategy<Genome>
 {
 
 	// todo: have world object automatically add themselves to a legend that can
@@ -44,116 +49,114 @@ public class WorldSimulation
 	
 	private volatile int currentRound;
 
-	private final Object runLock = new Object();
-
 	private final ThreadPoolExecutor pool;
 
-	public final World world;
-
-	public static final int ROUNDS_PER_GENERATION = 4000;
+	public static final int ROUNDS_PER_GENERATION = 2000;
 	
 	private int rps;
 	
+	public final World world;
+	
 	private final ConcurrentHashMap<ExecutionUnit<? extends World>, Genome> organismsByGenome = new ConcurrentHashMap<ExecutionUnit<? extends World>, Genome>();
 	
-	final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
+	private final List<SimulationViewUpdateListener> viewUpdateListeners = new ArrayList<SimulationViewUpdateListener>();
 
-	// XXX distinguish only between generational and continuous simulation, not
-	// world and mona lisa; mona lisa needs to be implemented by a scenario only
-	public WorldSimulation(World world)
+	private final FitnessEvaluator<? super Genome> fitnessEvaluator;
+
+	
+	public WorldSimulation(FitnessEvaluator<? super Genome> fitnessEvaluator, World world)
 	{
+        this.fitnessEvaluator = fitnessEvaluator;
 		this.world = world;
-		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
+		ConfigurableThreadFactory threadFactory = new ConfigurableThreadFactory("worker", Thread.NORM_PRIORITY, true);
+		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		pool.setThreadFactory(threadFactory);
+		pool.prestartAllCoreThreads();
 		pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		world.resetState();
+		running = true;
+		paused = false;
+		rps = 0;
 	}
 
-	public void initialize()
-	{
-		synchronized (runLock)
-		{
-			world.resetState();
-			running = true;
-			paused = false;
-			rps = 0;
-		}
-	}
 
 	/*
-	 * TODO re-think generation runtime stat calculation to be better suited for re-entrance
+	 * TODO improve runtime statistics collection (look at epochx approach)
 	 */
 	@SuppressWarnings({"unchecked" })
-	public Genome[] evaluate(Genome[] generation)
+	public List<EvaluatedCandidate<Genome>> evaluatePopulation(List<Genome> population)
 	{
 		long start = System.currentTimeMillis();
 		long lastStatTime = start;
 		int lastStatRound = 0;
-		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[generation.length];
-		
-		// clear organism map for each new round
-		organismsByGenome.clear();
-
-		// synthesize organisms
-		for (int i = 0; i < generation.length; i++)
+		ExecutionUnit<? extends World>[] organisms = new ExecutionUnit[population.size()];
+      
+		// synthesize organisms for fitness evaluation
+        organismsByGenome.clear();
+		for (int i = 0; i < population.size(); i++)
 		{
-			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
-			organisms[i] = generation[i].getRootGene().express((World2d) world);
-			generation[i].getFitnessEvaluator().attach(organisms[i]);
+			Genome genome = population.get(i);
+			de.hansinator.fun.jgp.life.FitnessEvaluator evaluator = genome.getFitnessEvaluator();
 			
-			// record organism genome relationship
-			organismsByGenome.put(organisms[i], generation[i]);
+			//TODO move these into a Genome.synthesise function so we don't need fitnessevaluator knowledge here
+			organisms[i] = genome.getRootGene().express((World2d) world);
+			evaluator.attach(organisms[i]);
+			evaluator.setFitness(0);
+			
+			// record organism-genome relationship
+			organismsByGenome.put(organisms[i], genome);
 		}
-
-		synchronized (runLock)
+		
+		// evaluate organisms in a world
+		for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
 		{
-			for (currentRound = 0; running && (currentRound < ROUNDS_PER_GENERATION); currentRound++)
+			while (paused)
+				Thread.yield();
+
+			singleStep(organisms);
+
+			// calc stats and draw stuff
+			// TODO: try to decouple this from pure generation running
+			if (slowMode || (currentRound % roundsMod) == 0)
 			{
-				while (paused)
-					Thread.yield();
+				final long time = System.currentTimeMillis() - lastStatTime;
+				lastStatTime = System.currentTimeMillis();
+				this.rps = time > 0 ? (int) (((currentRound - lastStatRound) * 1000) / time) : 1;
+				lastStatRound = currentRound;
 
-				singleStep(organisms);
+				// update views
+				updateSimulationViews();
 
-				// calc stats and draw stuff
-				// TODO: try to decouple this from pure generation running
-				if (slowMode || (currentRound % roundsMod) == 0)
-				{
-					final long time = System.currentTimeMillis() - lastStatTime;
-					lastStatTime = System.currentTimeMillis();
-					this.rps = time > 0 ? (int) (((currentRound - lastStatRound) * 1000) / time) : 1;
-					lastStatRound = currentRound;
-
-					// update views
-					updateSimulationViews();
-
-					// slow down things artificially
-					if (slowMode && (time < (1000 / fpsMax)))
-						try
-						{
-							Thread.sleep((1000 / fpsMax) - time);
-						} catch (InterruptedException ex)
-						{
-							Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
-						}
-				}
+				// slow down things artificially
+				if (slowMode && (time < (1000 / fpsMax)))
+					try
+					{
+						Thread.sleep((1000 / fpsMax) - time);
+					} catch (InterruptedException ex)
+					{
+						Logger.getLogger(WorldSimulation.class.getName()).log(Level.SEVERE, null, ex);
+					}
 			}
 		}
 
-		// simulation statistics
+		// print simulation statistics
 		System.out.println("");
 		System.out.println("RPS: " + (ROUNDS_PER_GENERATION * 1000) / (System.currentTimeMillis() - start));
-
-		// prepare world for next generation
+		
+		// reset world
 		world.resetState();
-
-		return generation;
+		
+		// assign fitness scores
+		List<EvaluatedCandidate<Genome>> evaluatedPopulation = new ArrayList<EvaluatedCandidate<Genome>>(population.size());
+		for (ExecutionUnit<? extends World> organism : organisms)
+		{
+			Genome genome = organismsByGenome.get(organism);
+            evaluatedPopulation.add(new EvaluatedCandidate<Genome>(genome, genome.getFitnessEvaluator().getFitness()));
+		}
+		
+		return evaluatedPopulation;
 	}
 
-	/**
-	 * Stop the current evaluation.
-	 */
-	public void stop()
-	{
-		running = false;
-	}
 
 	/**
 	 * Evaluate a single simulation round.
@@ -206,6 +209,14 @@ public class WorldSimulation
 		// run world
 		world.animate();
 	}
+	
+	/**
+	 * Stop the current evaluation.
+	 */
+	public void stop()
+	{
+		running = false;
+	}
 
 	public boolean isSlowMode()
 	{
@@ -215,16 +226,6 @@ public class WorldSimulation
 	public void setSlowMode(boolean slowMode)
 	{
 		this.slowMode = slowMode;
-	}
-
-	public int getRoundsMod()
-	{
-		return roundsMod;
-	}
-
-	public void setRoundsMod(int roundsMod)
-	{
-		this.roundsMod = roundsMod == 0 ? 1 : roundsMod;
 	}
 
 	public int getFps()
@@ -282,5 +283,18 @@ public class WorldSimulation
 	public Map<ExecutionUnit<? extends World>, Genome> getOrganismsByGenomeMap()
 	{
 		return java.util.Collections.unmodifiableMap(organismsByGenome);
+	}
+
+	@Override
+	public boolean isNatural()
+	{
+		return fitnessEvaluator.isNatural();
+	}
+
+	@Override
+	public void setSingleThreaded(boolean singleThreaded)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

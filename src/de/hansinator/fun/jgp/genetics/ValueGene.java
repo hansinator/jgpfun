@@ -38,21 +38,19 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 	}
 
 	public static class IntegerGene extends ValueGene<Integer> {
-		private static final Random rnd = Settings.newRandomSource();
 
 		public IntegerGene(int mutationChance) {
 			super(0, mutationChance);
 		}
 
 		@Override
-		public void mutate() {
-			value = rnd.nextInt();
+		public void mutate(Random rng) {
+			value = rng.nextInt();
 		}
 	}
 	
 	public static class FloatGene extends ValueGene<Float> {
-		private static final Random rnd = Settings.newRandomSource();
-
+		
 		public FloatGene(int mutationChance) {
 			super(0.0f, mutationChance);
 		}
@@ -62,21 +60,20 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 		}
 
 		@Override
-		public void mutate() {
-			value = rnd.nextFloat();
+		public void mutate(Random rng) {
+			value = rng.nextFloat();
 		}
 	}
 
 	public static class BooleanGene extends ValueGene<Boolean> {
-		private static final Random rnd = Settings.newRandomSource();
 
 		public BooleanGene(int mutationChance) {
 			super(false, mutationChance);
 		}
 
 		@Override
-		public void mutate() {
-			value = rnd.nextBoolean();
+		public void mutate(Random rng) {
+			value = rng.nextBoolean();
 		}
 	}
 }

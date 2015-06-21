@@ -16,7 +16,7 @@ import org.jfree.data.Range;
 import org.jfree.data.RangeType;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
  * 
@@ -27,15 +27,15 @@ public class BottomPanel extends JPanel
 
 	public final SimulationInfoPanel infoPanel;
 
-	public BottomPanel(Simulator simulator)
+	public BottomPanel(WorldSimulation simulator, EvoStats evoStats)
 	{
-		infoPanel = new SimulationInfoPanel(simulator);
+		infoPanel = new SimulationInfoPanel(simulator, evoStats);
 		
 		/*
 		 * Food chart
 		 */
 
-		XYSeriesCollection xyDataset = new XYSeriesCollection(simulator.fitnessChartData);
+		XYSeriesCollection xyDataset = new XYSeriesCollection(evoStats.fitnessChartData);
 		JFreeChart foodChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL,
 				false, false, false);
 		XYPlot xyPlot = foodChart.getXYPlot();
@@ -66,8 +66,8 @@ public class BottomPanel extends JPanel
 		 * Prog size chart
 		 */
 
-		xyDataset = new XYSeriesCollection(simulator.genomeSizeChartData);
-		xyDataset.addSeries(simulator.realGenomeSizeChartData);
+		xyDataset = new XYSeriesCollection(evoStats.genomeSizeChartData);
+		xyDataset.addSeries(evoStats.realGenomeSizeChartData);
 		JFreeChart progSizeChart = ChartFactory.createXYLineChart(null, null, null, xyDataset,
 				PlotOrientation.VERTICAL, false, false, false);
 		xyPlot = progSizeChart.getXYPlot();
@@ -102,7 +102,6 @@ public class BottomPanel extends JPanel
 		groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
 		groupPanel.setAlignmentY(TOP_ALIGNMENT);
 		groupPanel.setAlignmentX(LEFT_ALIGNMENT);
-		groupPanel.setPreferredSize(new Dimension(132, 200));
 		groupPanel.add(infoPanel);
 		groupPanel.add(new ControlPanel(simulator));
 

@@ -3,10 +3,12 @@ package de.hansinator.fun.jgp.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -14,7 +16,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.genetics.Genome;
+import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
+import de.hansinator.fun.jgp.simulation.Scenario;
+import de.hansinator.fun.jgp.util.Settings;
 
 /**
  * MainFrame is some sort of a view for a Simulator instance
@@ -22,27 +27,27 @@ import de.hansinator.fun.jgp.simulation.Simulator;
  */
 public class MainFrame extends JFrame implements WindowListener
 {
+	static
+	{
+		Settings.load(new File("default.properties"));
+	}
 
-	private WorldSimulationView simulationClientView;
+	private JPanel simulationClientView;
 
-	public final JPanel sidePaneLeft, sidePaneRight;
+	public final JPanel sidePaneRight;
+	
+	private final Scenario<Genome> scenario;
 
-	public final BottomPanel bottomPane;
-
-	private final Simulator simulator;
-
-	public MainFrame(int width, int height, Simulator simulator)
+	public MainFrame(int width, int height, Scenario<Genome> scenario)
 	{
 		super("BAH! Bonn!!1!11!!!");
-		this.simulator = simulator;
+		this.scenario = scenario;
+		
+        //scenario.getEngine().engine.addEvolutionObserver(monitor);
 
 		// create all sub views
-		sidePaneLeft = new JPanel();
-		sidePaneRight = new StatisticsHistoryPanel(simulator.statisticsHistory);
-		bottomPane = new BottomPanel(simulator);
-		
-		// init simulation client view
-		simulationClientView = new WorldSimulationView(simulator.getSimulation());
+		sidePaneRight = new StatisticsHistoryPanel(scenario.getEvoStats().statisticsHistory);
+		simulationClientView = scenario.getSimulationView();
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
 		// add the menu bar
@@ -52,15 +57,16 @@ public class MainFrame extends JFrame implements WindowListener
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(simulationClientView, BorderLayout.CENTER);
-		contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
 		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
-		contentPane.add(bottomPane, BorderLayout.PAGE_END);
-
+		
 		// get ready for action
+		addWindowListener(this);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
 		setVisible(true);
 		
-		
+		// debugging
+		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
 	}
 
 	private JMenuBar createMenuBar()
@@ -73,22 +79,24 @@ public class MainFrame extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				stopSimulation();
+				scenario.stop();
 			}
 
 		});
 
 		JMenu simulationMenu = new JMenu("Simulation");
-		simulationMenu.add(new JMenuItem("Reset")).addActionListener(new ActionListener()
+		// TODO implement proper scenario restart
+		/*simulationMenu.add(new JMenuItem("Restart")).addActionListener(new ActionListener()
 		{
 
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				simulator.restart();
+				scenario.stop();
+				startSimulation();
 			}
 
-		});
+		});*/
 		simulationMenu.add(new JMenuItem("Preferences"));
 		menuBar.add(simulationMenu);
 
@@ -96,21 +104,10 @@ public class MainFrame extends JFrame implements WindowListener
 	}
 
 	public void startSimulation()
-	{
-		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
-		
-		// TODO: to be put somewhere else
-		addWindowListener(this);
-		
-		// run simulator
-		simulator.start();
+	{	
+		scenario.start();
 	}
-
-	public void stopSimulation()
-	{
-		simulator.stop();
-	}
-
+	
 	@Override
 	public void windowOpened(WindowEvent e)
 	{
@@ -119,13 +116,12 @@ public class MainFrame extends JFrame implements WindowListener
 	@Override
 	public void windowClosing(WindowEvent e)
 	{
-		stopSimulation();
+		scenario.stop();
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e)
 	{
-		stopSimulation();
 	}
 
 	@Override
@@ -148,4 +144,14 @@ public class MainFrame extends JFrame implements WindowListener
 	{
 	}
 
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args)
+	{
+		Scenario<Genome> scenario = new FindingFoodScenario();
+		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), scenario);
+		scenario.start();
+	}
 }

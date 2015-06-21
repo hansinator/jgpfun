@@ -7,7 +7,7 @@ import org.jbox2d.dynamics.Body;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -23,7 +23,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 	public int get()
 	{
 		// could also be sin
-		return (int) (Math.cos(angle) * Simulator.intScaleFactor);
+		return (int) (Math.cos(angle) * EvolutionaryProcess.intScaleFactor);
 	}
 
 	@Override

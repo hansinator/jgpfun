@@ -36,34 +36,34 @@ public class StatisticsHistoryTable extends JTable
 
 		private final int generation;
 
-		private final int totalFood, averageFood;
+		private final double bestFitness, averageFitness;
 
 		private final int averageProgramSize, averageRealProgramSize;
 
-		private StatisticsHistoryEntry(int generation, int totalFood, int averageFood, int averageProgramSize,
+		private StatisticsHistoryEntry(int generation, double bestFitness, double averageFitness, int averageProgramSize,
 				int averageRealProgramSize)
 		{
 			this.generation = generation;
-			this.totalFood = totalFood;
-			this.averageFood = averageFood;
+			this.bestFitness = bestFitness;
+			this.averageFitness = averageFitness;
 			this.averageProgramSize = averageProgramSize;
 			this.averageRealProgramSize = averageRealProgramSize;
 		}
 
-		private int getValueAt(int columnIndex)
+		private String getValueAt(int columnIndex)
 		{
 			switch (columnIndex)
 			{
 				case 0:
-					return generation;
+					return "" + generation;
 				case 1:
-					return totalFood;
+					return String.format("%.0f", bestFitness);
 				case 2:
-					return averageFood;
+					return String.format("%.2f", averageFitness);
 				case 3:
-					return averageProgramSize;
+					return "" + averageProgramSize;
 				case 4:
-					return averageRealProgramSize;
+					return "" + averageRealProgramSize;
 				default:
 					throw new ArrayIndexOutOfBoundsException(columnIndex);
 			}
@@ -77,12 +77,12 @@ public class StatisticsHistoryTable extends JTable
 
 		private final ArrayList<StatisticsHistoryEntry> list = new ArrayList<StatisticsHistoryEntry>();
 
-		private String[] columnNames = { "Gen", "Food", "Avg Food", "Avg Prg", "Avg Real Prg" };
+		private String[] columnNames = { "Gen", "Best Fit", "Avg Fit", "Avg Prg", "Avg Real Prg" };
 
-		public void appendEntry(int generation, int totalFood, int averageFood, int averageProgramSize,
+		public void appendEntry(int generation, double bestFitness, double averageFitness, int averageProgramSize,
 				int averageRealProgramSize)
 		{
-			list.add(new StatisticsHistoryEntry(generation, totalFood, averageFood, averageProgramSize,
+			list.add(new StatisticsHistoryEntry(generation, bestFitness, averageFitness, averageProgramSize,
 					averageRealProgramSize));
 			fireTableRowsInserted(0, 1);
 		}
@@ -109,7 +109,7 @@ public class StatisticsHistoryTable extends JTable
 		@Override
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			return Integer.class;
+			return String.class;
 		}
 
 		@Override

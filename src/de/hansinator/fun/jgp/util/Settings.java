@@ -11,8 +11,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.security.SecureRandom;
 import java.util.Properties;
 import java.util.Random;
+
+import org.uncommons.maths.random.MersenneTwisterRNG;
+import org.uncommons.maths.random.SecureRandomSeedGenerator;
+import org.uncommons.maths.random.SeedException;
+import org.uncommons.maths.random.SeedGenerator;
+import org.uncommons.maths.random.XORShiftRNG;
 
 /**
  * A convenience singleton container for properties. This is to be replaced by a

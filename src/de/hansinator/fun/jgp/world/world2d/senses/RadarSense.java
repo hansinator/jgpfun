@@ -11,7 +11,7 @@ import org.jbox2d.dynamics.Fixture;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
@@ -48,7 +48,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 		@Override
 		public int get()
 		{
-			return (int) (direction * Simulator.intScaleFactor);
+			return (int) (direction * EvolutionaryProcess.intScaleFactor);
 		}
 	};
 

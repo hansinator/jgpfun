@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="/home/hansinator/code/jgpfun/lib/joda-time-2.0/joda-time-2.0.jar" sourcepath="/home/hansinator/code/artificial_intelligence/lib/joda-time-2.0/joda-time-2.0-sources.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jbox2d-library"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jbox2d-testbed"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/watchmaker-framework"/>
+	<classpathentry kind="lib" path="/watchmaker/lib/runtime/uncommons-maths-1.2.2.jar"/>
+	<classpathentry kind="lib" path="/watchmaker/framework/lib/runtime/google-collect-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

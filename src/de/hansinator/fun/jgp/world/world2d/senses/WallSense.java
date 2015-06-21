@@ -8,7 +8,7 @@ import org.jbox2d.dynamics.Body;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
-import de.hansinator.fun.jgp.simulation.Simulator;
+import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -69,7 +69,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		} else if ((position.y <= 0) || (position.y >= worldHeight))
 			temp = (float) Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle));
 
-		lastSenseVal = (int) Math.round(temp * Simulator.intScaleFactor);
+		lastSenseVal = (int) Math.round(temp * EvolutionaryProcess.intScaleFactor);
 	}
 
 	@Override
