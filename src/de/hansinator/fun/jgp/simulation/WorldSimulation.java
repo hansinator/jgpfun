@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.uncommons.util.concurrent.ConfigurableThreadFactory;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 import org.uncommons.watchmaker.framework.EvaluationStrategy;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
@@ -67,7 +68,10 @@ public final class WorldSimulation implements EvaluationStrategy<Genome>
 	{
         this.fitnessEvaluator = fitnessEvaluator;
 		this.world = world;
-		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1);
+		ConfigurableThreadFactory threadFactory = new ConfigurableThreadFactory("worker", Thread.NORM_PRIORITY, true);
+		pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		pool.setThreadFactory(threadFactory);
+		pool.prestartAllCoreThreads();
 		pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		world.resetState();
 		running = true;
@@ -222,16 +226,6 @@ public final class WorldSimulation implements EvaluationStrategy<Genome>
 	public void setSlowMode(boolean slowMode)
 	{
 		this.slowMode = slowMode;
-	}
-
-	public int getRoundsMod()
-	{
-		return roundsMod;
-	}
-
-	public void setRoundsMod(int roundsMod)
-	{
-		this.roundsMod = roundsMod == 0 ? 1 : roundsMod;
 	}
 
 	public int getFps()

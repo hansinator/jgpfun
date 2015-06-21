@@ -27,4 +27,8 @@ public interface Scenario<T>
 	SelectionStrategy<Object> getSelectionStrategy();
 	
 	EvolutionaryProcess getEvolutionaryProcess();
+
+	void stop();
+
+	void start();
 }

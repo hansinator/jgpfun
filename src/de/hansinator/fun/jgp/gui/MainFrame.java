@@ -3,6 +3,7 @@ package de.hansinator.fun.jgp.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -18,7 +19,6 @@ import javax.swing.JPanel;
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.Scenario;
-import de.hansinator.fun.jgp.simulation.WorldSimulation;
 import de.hansinator.fun.jgp.util.Settings;
 
 /**
@@ -37,27 +37,12 @@ public class MainFrame extends JFrame implements WindowListener
 	public final JPanel sidePaneRight;
 	
 	private final Scenario<Genome> scenario;
-	
-	private final WorldSimulation evaluationStrategy;
 
 	public MainFrame(int width, int height, Scenario<Genome> scenario)
 	{
 		super("BAH! Bonn!!1!11!!!");
 		this.scenario = scenario;
 		
-		// get EvaluationStrategy - this is our workhorse component for the moment.
-		// most computation happens during evaluation for our scenario, in contrast
-		// to the watchmaker examples where the evaluation is just a tiny fraction
-		// of the computational load. we need to save a reference to the strategy
-		// to pass it to the UI components for fine grained control over its
-		// execution (such as pausing, slow/fast mode, etc). in watchmaker examples
-		// it is sufficient to render the best candidate every once a while, because
-		// they compute new candidates more than once a second. here instead we'll
-		// need to render the evaluation process itself multiple times - it is
-		// not sufficient to show just the solution, but the process itself
-		// XXX because there is no API yet we need to cast this to a proper type
-		// TODO in the future the scenario should create the views for us, b/c it knows about types
-		evaluationStrategy = (WorldSimulation)scenario.getEvaluationStrategy();
         //scenario.getEngine().engine.addEvolutionObserver(monitor);
 
 		// create all sub views
@@ -73,12 +58,15 @@ public class MainFrame extends JFrame implements WindowListener
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(simulationClientView, BorderLayout.CENTER);
 		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
-
+		
 		// get ready for action
+		addWindowListener(this);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
 		setVisible(true);
 		
-		
+		// debugging
+		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
 	}
 
 	private JMenuBar createMenuBar()
@@ -91,13 +79,24 @@ public class MainFrame extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				stopSimulation();
+				scenario.stop();
 			}
 
 		});
 
 		JMenu simulationMenu = new JMenu("Simulation");
-		simulationMenu.add(new JMenuItem("Reset"));
+		// TODO implement proper scenario restart
+		/*simulationMenu.add(new JMenuItem("Restart")).addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				scenario.stop();
+				startSimulation();
+			}
+
+		});*/
 		simulationMenu.add(new JMenuItem("Preferences"));
 		menuBar.add(simulationMenu);
 
@@ -105,22 +104,10 @@ public class MainFrame extends JFrame implements WindowListener
 	}
 
 	public void startSimulation()
-	{
-		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
-		
-		// TODO: to be put somewhere else
-		addWindowListener(this);
-		
-		// run simulator
-		scenario.getEvolutionaryProcess().start();
+	{	
+		scenario.start();
 	}
-
-	public void stopSimulation()
-	{
-		evaluationStrategy.stop();
-		scenario.getEvolutionaryProcess().stop();
-	}
-
+	
 	@Override
 	public void windowOpened(WindowEvent e)
 	{
@@ -129,13 +116,12 @@ public class MainFrame extends JFrame implements WindowListener
 	@Override
 	public void windowClosing(WindowEvent e)
 	{
-		stopSimulation();
+		scenario.stop();
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e)
 	{
-		stopSimulation();
 	}
 
 	@Override
@@ -164,6 +150,8 @@ public class MainFrame extends JFrame implements WindowListener
 	 */
 	public static void main(String[] args)
 	{
-		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), new FindingFoodScenario()).startSimulation();
+		Scenario<Genome> scenario = new FindingFoodScenario();
+		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), scenario);
+		scenario.start();
 	}
 }

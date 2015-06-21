@@ -63,6 +63,16 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private final SelectionStrategy<Object> selectionStrategy;
 	
+	// this is our workhorse component for the moment.
+	// most computation happens during evaluation for our scenario, in contrast
+	// to the watchmaker examples where the evaluation is just a tiny fraction
+	// of the computational load. we need to save a reference to the strategy
+	// to pass it to the UI components for fine grained control over its
+	// execution (such as pausing, slow/fast mode, etc). in watchmaker examples
+	// it is sufficient to render the best candidate every once a while, because
+	// they compute new candidates more than once a second. here instead we'll
+	// need to render the evaluation process itself multiple times - it is
+	// not sufficient to show just the solution, but the process itself
 	private final WorldSimulation evaluationStrategy;
 	
 	private final EvolutionEngine<Genome> engine;
@@ -145,6 +155,19 @@ public class FindingFoodScenario implements Scenario<Genome>
 	public SelectionStrategy<Object> getSelectionStrategy()
 	{
 		return selectionStrategy;
+	}
+	
+	@Override
+	public void start()
+	{
+		evolutionaryProcess.start();
+	}
+	
+	@Override
+	public void stop()
+	{
+		evaluationStrategy.stop();
+		evolutionaryProcess.stop();	
 	}
 
 	static class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
