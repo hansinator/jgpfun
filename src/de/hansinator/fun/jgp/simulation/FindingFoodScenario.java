@@ -3,9 +3,12 @@
 
 package de.hansinator.fun.jgp.simulation;
 
+import java.awt.BorderLayout;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.JPanel;
 
 import org.jbox2d.dynamics.Body;
 import org.uncommons.maths.random.Probability;
@@ -18,10 +21,15 @@ import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.selection.TournamentSelection;
 
+import com.sun.org.apache.regexp.internal.recompile;
+
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeMutation;
 import de.hansinator.fun.jgp.genetics.selection.RouletteWheelSelector;
+import de.hansinator.fun.jgp.gui.BottomPanel;
+import de.hansinator.fun.jgp.gui.EvoStats;
+import de.hansinator.fun.jgp.gui.WorldSimulationView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
@@ -55,11 +63,15 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private final SelectionStrategy<Object> selectionStrategy;
 	
-	private final EvaluationStrategy<Genome> evaluationStrategy;
+	private final WorldSimulation evaluationStrategy;
 	
 	private final EvolutionEngine<Genome> engine;
 	
 	private final EvolutionaryProcess evolutionaryProcess;
+	
+	private final EvoStats evoStats = new EvoStats();
+	
+	private JPanel simulationView;
 	
 	public FindingFoodScenario()
 	{
@@ -79,9 +91,29 @@ public class FindingFoodScenario implements Scenario<Genome>
 				evaluationStrategy,
 				selectionStrategy,
 				Settings.newRandomSource());
+		engine.addEvolutionObserver(evoStats);
 		
 		// create a process
 		evolutionaryProcess = new EvolutionaryProcess(engine);
+	}
+	
+	public JPanel getSimulationView()
+	{
+		if(simulationView == null)
+		{
+			simulationView = new JPanel();
+			simulationView.setLayout(new BorderLayout());
+			simulationView.add(new WorldSimulationView(evaluationStrategy), BorderLayout.CENTER);
+			simulationView.add(new BottomPanel(evaluationStrategy, evoStats), BorderLayout.PAGE_END);
+		}
+		
+		return simulationView;
+	}
+	
+	@Override
+	public EvoStats getEvoStats()
+	{
+		return evoStats;
 	}
 	
 	@Override

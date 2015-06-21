@@ -40,24 +40,6 @@ public class ControlPanel extends JPanel
 
 		});
 
-		final JSlider speedSlider = new JSlider(0, WorldSimulation.ROUNDS_PER_GENERATION);
-		speedSlider.setMajorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 2);
-		speedSlider.setMinorTickSpacing(WorldSimulation.ROUNDS_PER_GENERATION / 8);
-		speedSlider.setPaintLabels(true);
-		speedSlider.setPaintTicks(true);
-		speedSlider.setValue(simulator.getRoundsMod());
-		speedSlider.setMaximumSize(new Dimension(200, 40));
-		speedSlider.addChangeListener(new ChangeListener()
-		{
-
-			@Override
-			public void stateChanged(ChangeEvent e)
-			{
-				simulator.setRoundsMod(speedSlider.getValue());
-			}
-
-		});
-
 		final JSlider fpsSlider = new JSlider(0, 100);
 		fpsSlider.setMajorTickSpacing(50);
 		fpsSlider.setMinorTickSpacing(25);
@@ -95,12 +77,10 @@ public class ControlPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setAlignmentY(TOP_ALIGNMENT);
 		setAlignmentX(LEFT_ALIGNMENT);
-		setPreferredSize(new Dimension(200, 0));
-		// setMinimumSize(new Dimension(120, 0));
+		setPreferredSize(new Dimension(140, 0));
 		setBorder(BorderUIResource.getEtchedBorderUIResource());
 
 		add(speedSwitch);
-		add(speedSlider);
 		add(fpsSlider);
 		add(pauseButton);
 	}

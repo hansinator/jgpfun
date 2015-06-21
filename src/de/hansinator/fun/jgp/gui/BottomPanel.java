@@ -16,7 +16,6 @@ import org.jfree.data.Range;
 import org.jfree.data.RangeType;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import de.hansinator.fun.jgp.gui.MainFrame.EvoStats;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
 
 /**
@@ -103,7 +102,6 @@ public class BottomPanel extends JPanel
 		groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
 		groupPanel.setAlignmentY(TOP_ALIGNMENT);
 		groupPanel.setAlignmentX(LEFT_ALIGNMENT);
-		groupPanel.setPreferredSize(new Dimension(132, 200));
 		groupPanel.add(infoPanel);
 		groupPanel.add(new ControlPanel(simulator));
 

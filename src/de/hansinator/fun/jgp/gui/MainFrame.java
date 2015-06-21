@@ -15,17 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import org.jfree.data.xy.XYSeries;
-import org.joda.time.format.PeriodFormat;
-import org.uncommons.watchmaker.framework.EvaluatedCandidate;
-import org.uncommons.watchmaker.framework.EvolutionEngine;
-import org.uncommons.watchmaker.framework.EvolutionObserver;
-import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
-import org.uncommons.watchmaker.framework.PopulationData;
-
 import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.gui.StatisticsHistoryTable.StatisticsHistoryModel;
-import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
 import de.hansinator.fun.jgp.simulation.FindingFoodScenario;
 import de.hansinator.fun.jgp.simulation.Scenario;
 import de.hansinator.fun.jgp.simulation.WorldSimulation;
@@ -42,11 +32,9 @@ public class MainFrame extends JFrame implements WindowListener
 		Settings.load(new File("default.properties"));
 	}
 
-	private WorldSimulationView simulationClientView;
+	private JPanel simulationClientView;
 
-	public final JPanel sidePaneLeft, sidePaneRight;
-
-	public final BottomPanel bottomPane;
+	public final JPanel sidePaneRight;
 	
 	private final Scenario<Genome> scenario;
 	
@@ -70,18 +58,11 @@ public class MainFrame extends JFrame implements WindowListener
 		// XXX because there is no API yet we need to cast this to a proper type
 		// TODO in the future the scenario should create the views for us, b/c it knows about types
 		evaluationStrategy = (WorldSimulation)scenario.getEvaluationStrategy();
-		
-		EvoStats evoStats = new EvoStats();
-		scenario.getEngine().addEvolutionObserver(evoStats);
         //scenario.getEngine().engine.addEvolutionObserver(monitor);
 
 		// create all sub views
-		sidePaneLeft = new JPanel();
-		sidePaneRight = new StatisticsHistoryPanel(evoStats.statisticsHistory);
-		bottomPane = new BottomPanel(evaluationStrategy, evoStats);
-		
-		// init simulation client view
-		simulationClientView = new WorldSimulationView(evaluationStrategy);
+		sidePaneRight = new StatisticsHistoryPanel(scenario.getEvoStats().statisticsHistory);
+		simulationClientView = scenario.getSimulationView();
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
 		// add the menu bar
@@ -91,9 +72,7 @@ public class MainFrame extends JFrame implements WindowListener
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(simulationClientView, BorderLayout.CENTER);
-		contentPane.add(sidePaneLeft, BorderLayout.LINE_START);
 		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
-		contentPane.add(bottomPane, BorderLayout.PAGE_END);
 
 		// get ready for action
 		pack();
@@ -179,93 +158,6 @@ public class MainFrame extends JFrame implements WindowListener
 	{
 	}
 
-	static class EvoStats implements EvolutionObserver<Genome>
-    {
-    	public final StatisticsHistoryModel statisticsHistory = new StatisticsHistoryModel();
-
-    	public final XYSeries fitnessChartData = new XYSeries("fitness");
-
-    	public final XYSeries genomeSizeChartData = new XYSeries("prg size");
-
-    	public final XYSeries realGenomeSizeChartData = new XYSeries("real prg size");
-    	
-    	private int lastEvaluationCount = 0, generation = 0;
-    	
-    	long lastStatsTime, evaluationsPerMinuteAverage = 0, evaluationsPerMinuteCount = 0;
-    	
-    	public EvoStats()
-		{
-    		fitnessChartData.setMaximumItemCount(500);
-    		genomeSizeChartData.setMaximumItemCount(500);
-    		realGenomeSizeChartData.setMaximumItemCount(500);
-    		//XXX this is a crude solution
-    		lastStatsTime = System.currentTimeMillis();
-		}
-
-    	public void reset()
-    	{
-    		fitnessChartData.clear();
-    		genomeSizeChartData.clear();
-    		realGenomeSizeChartData.clear();
-    		statisticsHistory.clear();
-    		//XXX this is a crude solution
-    		lastStatsTime = System.currentTimeMillis();
-    	}
-    	
-    	@Override
-        public void populationUpdate(PopulationData<? extends Genome> data)
-        {
-    		generation = data.getGenerationNumber();
-
-    		// population statistics
-    		{
-	    		int avgProgSize = 0, avgRealProgSize = 0, totalFit = 0;
-	    		int popSize = data.getPopulationSize();
-	
-	    		for (EvaluatedCandidate<? extends Genome> e : data.getEvaluatedPopulation())
-	    		{
-	    			Genome g = e.getCandidate();
-	    			avgProgSize += g.getRootGene().getSize();
-	    			avgRealProgSize += g.getRootGene().getExonSize();
-	    			totalFit += g.getFitnessEvaluator().getFitness();
-	    		}
-	    		avgProgSize /= popSize;
-	    		avgRealProgSize /= popSize;
-	    		
-	    		
-	    		statisticsHistory.appendEntry(generation, data.getBestCandidateFitness(), data.getMeanFitness(), avgProgSize, avgRealProgSize);
-	    		genomeSizeChartData.add(generation, avgProgSize);
-	    		realGenomeSizeChartData.add(generation, avgRealProgSize);
-				fitnessChartData.add(generation, data.getMeanFitness());
-				System.out.println("GEN: " + generation);
-    		}
-
-    		// performance statistics
-    		{
-    			long now;
-    			
-				now = System.currentTimeMillis();
-				if ((now - lastStatsTime) >= 3000)
-				{
-					long evaluationsPerMinute = (generation - lastEvaluationCount)
-							* (60000 / (now - lastStatsTime));
-					evaluationsPerMinuteAverage += evaluationsPerMinute;
-					evaluationsPerMinuteCount++;
-	
-					System.out.println("GPM: " + evaluationsPerMinute);
-					System.out.println("Runtime: " + PeriodFormat.getDefault().print(new org.joda.time.Period(data.getElapsedTime())));
-					lastEvaluationCount = generation;
-					lastStatsTime = now;
-				}
-    		}
-        }
-    	
-    	public int getGenerationNumber()
-    	{
-    		return generation;
-    	}
-    }
-	
 	/**
 	 * @param args
 	 *            the command line arguments

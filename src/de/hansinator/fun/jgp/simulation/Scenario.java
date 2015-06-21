@@ -1,19 +1,23 @@
 package de.hansinator.fun.jgp.simulation;
 
+import javax.swing.JPanel;
+
 import org.uncommons.watchmaker.framework.EvaluationStrategy;
 import org.uncommons.watchmaker.framework.EvolutionEngine;
-import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 
-import de.hansinator.fun.jgp.genetics.Genome;
-import de.hansinator.fun.jgp.genetics.crossover.CrossoverOperator;
+import de.hansinator.fun.jgp.gui.EvoStats;
 
 /*
  * maybe create a line following scenario
  */
 public interface Scenario<T>
 {
+	JPanel getSimulationView();
+	
+	EvoStats getEvoStats();
+	
 	EvolutionEngine<T> getEngine();
 
 	EvaluationStrategy<T> getEvaluationStrategy();
