@@ -34,13 +34,13 @@ public class AntBody extends Body2d
 		
 		private FloatGene bodyHeight = new FloatGene(1.0f, 500);
 		
-		private static float maxWidth = 4.0f;
+		private static float maxWidth = 1.0f;
 		
-		private static float maxHeight = 4.0f;
+		private static float maxHeight = 1.0f;
 		
-		private static float minWidth = 2.5f;
+		private static float minWidth = 0.625f;
 		
-		private static float minHeight = 2.5f;
+		private static float minHeight = 0.625f;
 		
 		Mutation[] mutations = {bodyWidth, bodyHeight };
 

@@ -70,7 +70,7 @@ public class World2d implements World, ContactListener
 	{
 		this.draw = draw;
 		world.setDebugDraw(draw);
-		setCamera(new Vec2(worldWidth / 2, worldHeight / 2), -2);
+		setCamera(new Vec2(worldWidth / 2, worldHeight / 2), -4);
 	}
 
 	public World2d(int worldWidth, int worldHeight, int foodCount)

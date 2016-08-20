@@ -156,8 +156,6 @@ public class DebugDrawJ2D extends DebugDraw {
 
   private Graphics2D getGraphics() {
 	  Graphics2D g = panel.getDBGraphics();
-	  if(g == null)
-		  System.out.println("bla");
     return g;
   }
 
