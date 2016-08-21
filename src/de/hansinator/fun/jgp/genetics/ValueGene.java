@@ -64,6 +64,22 @@ public abstract class ValueGene<V> extends MutableGene<V, Object> {
 			value = rng.nextFloat();
 		}
 	}
+	
+	public static class DoubleGene extends ValueGene<Double> {
+		
+		public DoubleGene(int mutationChance) {
+			super(0.0, mutationChance);
+		}
+		
+		public DoubleGene(double value, int mutationChance) {
+			super(value, mutationChance);
+		}
+
+		@Override
+		public void mutate(Random rng) {
+			value = rng.nextDouble();
+		}
+	}
 
 	public static class BooleanGene extends ValueGene<Boolean> {
 
