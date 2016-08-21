@@ -130,9 +130,9 @@ public class World2d implements World, ContactListener
 		groundBody = world.createBody(bodyDef);
 
 		world.setAllowSleep(true);
-		// world.setSubStepping(true);
+		//world.setSubStepping(true);
 		world.setContinuousPhysics(true);
-		// world.setDestructionListener(destructionListener);
+		//world.setDestructionListener(destructionListener);
 		world.setContactListener(this);
 		world.setDebugDraw(draw);
 
@@ -166,7 +166,7 @@ public class World2d implements World, ContactListener
 		// create food
 		{
 			CircleShape circle = new CircleShape();
-			circle.m_radius = 1.6f;
+			circle.m_radius = 1.0f;
 			FixtureDef fd = new FixtureDef();
 			fd.shape = circle;
 			fd.isSensor = true;
@@ -266,8 +266,8 @@ public class World2d implements World, ContactListener
 			if (genome != null)
 			{
 				g.setColor(Color.green);
-				g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 6),
-						Math.round(screenPos.y - 8));
+				g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 4),
+						Math.round(screenPos.y - 6));
 			}
 			
 			// FIXME hacky implementation here

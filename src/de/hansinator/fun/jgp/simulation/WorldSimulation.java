@@ -51,7 +51,7 @@ public final class WorldSimulation implements EvaluationStrategy<Genome>
 
 	private final ThreadPoolExecutor pool;
 
-	public static final int ROUNDS_PER_GENERATION = 2000;
+	public static final int ROUNDS_PER_GENERATION = 1500;
 	
 	private int rps;
 	

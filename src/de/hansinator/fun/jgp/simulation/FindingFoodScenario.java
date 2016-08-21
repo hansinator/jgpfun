@@ -59,6 +59,8 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private static final int maxMutations = Settings.getInt("maxMutations");
 	
+	private static final double tournamentSelectionProbability = Settings.getDouble("tournamentSelectionProbability");
+	
 	private final AntFactory antFactory;
 	
 	private final SelectionStrategy<Object> selectionStrategy;
@@ -86,7 +88,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 	public FindingFoodScenario()
 	{
 		antFactory = new AntFactory(progSize);
-		selectionStrategy = new TournamentSelection(new Probability(0.8));
+		selectionStrategy = new TournamentSelection(new Probability(tournamentSelectionProbability));
 		evaluationStrategy = new WorldSimulation(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
 		
 		// crate pipeline
