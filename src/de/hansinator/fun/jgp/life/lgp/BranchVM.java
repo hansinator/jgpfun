@@ -24,7 +24,7 @@ public class BranchVM<E extends World> extends LGPMachine<E>
 
 		// write input registers
 		for (SensorInput in : inputs)
-			regs[reg++] = in.get();
+			regs[reg++] = (int)Math.round(in.get());
 
 		while (pc < program.length)
 		{

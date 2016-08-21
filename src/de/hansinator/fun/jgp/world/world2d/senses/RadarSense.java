@@ -46,9 +46,9 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	public final SensorInput senseDirection = new SensorInput() {
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return (int) (direction * EvolutionaryProcess.intScaleFactor);
+			return direction * EvolutionaryProcess.intScaleFactor;
 		}
 	};
 
@@ -57,7 +57,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 	ActorOutput[] outputs = { this };
 
 	@Override
-	public int get()
+	public double get()
 	{
 		double rdir, bdir;
 		float angle = origin.getAngle();
@@ -81,10 +81,10 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 			Vec2 o = origin.getPosition();
 			float curDist = (float) Math.sqrt(((target.x - o.x) * (target.x - o.x))
 					+ ((target.y - o.y) * (target.y - o.y)));
-			return Math.round(Math.round((Integer.MAX_VALUE / beamLength) * curDist));
+			return Math.round((Integer.MAX_VALUE / beamLength) * curDist);
 		}
 
-		return 0;
+		return 0.0;
 	}
 
 	private final Vec2 testPoint = new Vec2();

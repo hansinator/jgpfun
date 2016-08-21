@@ -35,7 +35,8 @@ public class BottomPanel extends JPanel
 		 * Food chart
 		 */
 
-		XYSeriesCollection xyDataset = new XYSeriesCollection(evoStats.fitnessChartData);
+		XYSeriesCollection xyDataset = new XYSeriesCollection(evoStats.avgFitnessChartData);
+		xyDataset.addSeries(evoStats.bestFitnessChartData);
 		JFreeChart foodChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL,
 				false, false, false);
 		XYPlot xyPlot = foodChart.getXYPlot();
@@ -51,8 +52,8 @@ public class BottomPanel extends JPanel
 
 		axis = (NumberAxis) xyPlot.getDomainAxis();
 		axis.setRangeType(RangeType.POSITIVE);
-		axis.setDefaultAutoRange(new Range(0.0, 500.0));
-		axis.setAutoRangeMinimumSize(500.0);
+		axis.setDefaultAutoRange(new Range(0.0, 1000.0));
+		axis.setAutoRangeMinimumSize(1000.0);
 		axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		axis.setLowerMargin(0.0);
 		axis.setUpperMargin(0.0);
@@ -83,8 +84,8 @@ public class BottomPanel extends JPanel
 
 		axis = (NumberAxis) xyPlot.getDomainAxis();
 		axis.setRangeType(RangeType.POSITIVE);
-		axis.setDefaultAutoRange(new Range(0.0, 500.0));
-		axis.setAutoRangeMinimumSize(500.0);
+		axis.setDefaultAutoRange(new Range(0.0, 1000.0));
+		axis.setAutoRangeMinimumSize(1000.0);
 		axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		axis.setLowerMargin(0.0);
 		axis.setUpperMargin(0.0);

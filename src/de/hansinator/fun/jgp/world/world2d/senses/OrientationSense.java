@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.jbox2d.dynamics.Body;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.DoubleGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -13,17 +15,24 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 public class OrientationSense implements SensorInput, BodyPart<Body2d>
 {
+	private final double orientationScaleFactor;
+	
 	private final SensorInput[] inputs = { this };
 
 	private Body body;
 	
 	private float angle;
+	
+	public OrientationSense(double orientationScaleFactor)
+	{
+		this.orientationScaleFactor = orientationScaleFactor;
+	}
 
 	@Override
-	public int get()
+	public double get()
 	{
 		// could also be sin
-		return (int) (Math.cos(angle) * EvolutionaryProcess.intScaleFactor);
+		return Math.cos(angle) * orientationScaleFactor;
 	}
 
 	@Override
@@ -57,6 +66,10 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
+		private DoubleGene orientationScaleFactor = new DoubleGene(1.0, 500);
+		
+		Mutation[] mutations = { orientationScaleFactor };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -73,7 +86,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new OrientationSense();
+			return new OrientationSense(orientationScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor);
 		}
 
 		@Override
@@ -88,5 +101,10 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 			return 0;
 		}
 
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }

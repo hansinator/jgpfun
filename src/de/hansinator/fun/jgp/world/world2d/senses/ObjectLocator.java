@@ -7,6 +7,9 @@ import java.util.List;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.DoubleGene;
+import de.hansinator.fun.jgp.genetics.ValueGene.FloatGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -34,14 +37,17 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	private double objDist;
 	
 	private static Color beamColor = new Color(32, 32, 32);
+	
+	private final double senseDirScaleFactor, distScaleFactor;
+
 
 	public final SensorInput senseDirX = new SensorInput()
 	{
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return (int) (((target.x - origin.x) / objDist) * EvolutionaryProcess.intScaleFactor);
+			return ((target.x - origin.x) / objDist) * senseDirScaleFactor;
 		}
 
 	};
@@ -50,9 +56,9 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	{
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return (int) (((target.y - origin.y) / objDist) * EvolutionaryProcess.intScaleFactor);
+			return ((target.y - origin.y) / objDist) * senseDirScaleFactor;
 		}
 
 	};
@@ -61,14 +67,21 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	{
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return (int) (objDist * EvolutionaryProcess.intScaleFactor);
+			return objDist * distScaleFactor;
 		}
 
 	};
 
 	SensorInput[] inputs = { senseDirX, senseDirY, senseDist };
+	
+	
+	public ObjectLocator(double senseDirScaleFactor, double distScaleFactor)
+	{
+		this.senseDirScaleFactor = senseDirScaleFactor;
+		this.distScaleFactor = distScaleFactor;
+	}
 
 	@Override
 	public SensorInput[] getInputs()
@@ -121,6 +134,12 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
+		private DoubleGene senseDirScaleFactor = new DoubleGene(1.0, 500);
+		
+		private DoubleGene distScaleFactor = new DoubleGene(1.0, 500);
+		
+		Mutation[] mutations = { senseDirScaleFactor, distScaleFactor };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -137,7 +156,7 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new ObjectLocator();
+			return new ObjectLocator(senseDirScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor, distScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor);
 		}
 
 		@Override
@@ -152,5 +171,10 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 			return 0;
 		}
 
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }

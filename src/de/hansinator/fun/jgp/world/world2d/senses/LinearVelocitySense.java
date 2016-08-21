@@ -2,6 +2,8 @@ package de.hansinator.fun.jgp.world.world2d.senses;
 
 import java.util.List;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.DoubleGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -11,19 +13,22 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
 
 public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 {
+	private final double linearVelocityScaleFactor;
+	
 	private final SensorInput[] inputs = { this };
 
 	private final Body2d body;
 
-	public LinearVelocitySense(Body2d body2d)
+	public LinearVelocitySense(Body2d body2d, double linearVelocityScaleFactor)
 	{
-		body = body2d;
+		this.body = body2d;
+		this.linearVelocityScaleFactor = linearVelocityScaleFactor;
 	}
 
 	@Override
-	public int get()
+	public double get()
 	{
-		return (int) (body.getBody().getLinearVelocity().length() * EvolutionaryProcess.intScaleFactor);
+		return body.getBody().getLinearVelocity().length() * linearVelocityScaleFactor;
 	}
 
 	@Override
@@ -55,6 +60,10 @@ public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
+		private DoubleGene linearVelocityScaleFactor = new DoubleGene(1.0, 500);
+		
+		Mutation[] mutations = { linearVelocityScaleFactor };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -71,7 +80,7 @@ public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new LinearVelocitySense(context);
+			return new LinearVelocitySense(context, linearVelocityScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor);
 		}
 
 		@Override
@@ -85,6 +94,11 @@ public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 		{
 			return 0;
 		}
-
+		
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }

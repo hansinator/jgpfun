@@ -13,7 +13,9 @@ public class EvoStats implements EvolutionObserver<Genome>
 {
 	public final StatisticsHistoryModel statisticsHistory = new StatisticsHistoryModel();
 
-	public final XYSeries fitnessChartData = new XYSeries("fitness");
+	public final XYSeries avgFitnessChartData = new XYSeries("avg fitness");
+	
+	public final XYSeries bestFitnessChartData = new XYSeries("best fitness");
 
 	public final XYSeries genomeSizeChartData = new XYSeries("prg size");
 
@@ -25,16 +27,18 @@ public class EvoStats implements EvolutionObserver<Genome>
 	
 	public EvoStats()
 	{
-		fitnessChartData.setMaximumItemCount(500);
-		genomeSizeChartData.setMaximumItemCount(500);
-		realGenomeSizeChartData.setMaximumItemCount(500);
+		avgFitnessChartData.setMaximumItemCount(1000);
+		bestFitnessChartData.setMaximumItemCount(1000);
+		genomeSizeChartData.setMaximumItemCount(1000);
+		realGenomeSizeChartData.setMaximumItemCount(1000);
 		//XXX this is a crude solution
 		lastStatsTime = System.currentTimeMillis();
 	}
 
 	public void reset()
 	{
-		fitnessChartData.clear();
+		avgFitnessChartData.clear();
+		bestFitnessChartData.clear();
 		genomeSizeChartData.clear();
 		realGenomeSizeChartData.clear();
 		statisticsHistory.clear();
@@ -66,7 +70,8 @@ public class EvoStats implements EvolutionObserver<Genome>
     		statisticsHistory.appendEntry(generation, data.getBestCandidateFitness(), data.getMeanFitness(), avgProgSize, avgRealProgSize);
     		genomeSizeChartData.add(generation, avgProgSize);
     		realGenomeSizeChartData.add(generation, avgRealProgSize);
-			fitnessChartData.add(generation, data.getMeanFitness());
+			avgFitnessChartData.add(generation, data.getMeanFitness());
+			bestFitnessChartData.add(generation, data.getBestCandidateFitness());
 			System.out.println("GEN: " + generation);
 		}
 

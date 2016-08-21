@@ -5,6 +5,8 @@ import java.util.List;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.DoubleGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -18,7 +20,8 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
  */
 public class WallSense implements SensorInput, BodyPart<Body2d>
 {
-
+	private final double wallSenseScaleFactor;
+	
 	private float worldWidth, worldHeight, angle = 0.0f;
 
 	private Body body;
@@ -27,10 +30,15 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 
 	SensorInput[] inputs = { this };
 
-	private int lastSenseVal = 0;
+	private double lastSenseVal = 0;
+	
+	public WallSense(double wallSenseScaleFactor)
+	{
+		this.wallSenseScaleFactor = wallSenseScaleFactor;
+	}
 
 	@Override
-	public int get()
+	public double get()
 	{
 		return lastSenseVal;
 	}
@@ -69,7 +77,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		} else if ((position.y <= 0) || (position.y >= worldHeight))
 			temp = (float) Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle));
 
-		lastSenseVal = (int) Math.round(temp * EvolutionaryProcess.intScaleFactor);
+		lastSenseVal = temp * wallSenseScaleFactor;
 	}
 
 	@Override
@@ -82,6 +90,10 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
+		private DoubleGene wallSenseScaleFactor = new DoubleGene(1.0, 500);
+		
+		Mutation[] mutations = { wallSenseScaleFactor };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -98,7 +110,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new WallSense();
+			return new WallSense(wallSenseScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor);
 		}
 
 		@Override
@@ -113,5 +125,10 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 			return 0;
 		}
 
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }

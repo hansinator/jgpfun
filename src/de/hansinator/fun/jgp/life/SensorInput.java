@@ -9,5 +9,5 @@ public interface SensorInput {
 
 	public static final SensorInput[] emptySensorInputArray = {};
 
-	public int get();
+	public double get();
 }

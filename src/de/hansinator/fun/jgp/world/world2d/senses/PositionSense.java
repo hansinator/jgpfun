@@ -5,6 +5,8 @@ import java.util.List;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.DoubleGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -18,7 +20,8 @@ import de.hansinator.fun.jgp.world.world2d.Body2d;
  */
 public class PositionSense implements BodyPart<Body2d>
 {
-
+	private final double positionScaleFactor;
+	
 	private Body body;
 	
 	private Vec2 position;
@@ -27,9 +30,9 @@ public class PositionSense implements BodyPart<Body2d>
 	{
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return Math.round((float)(position.x * EvolutionaryProcess.intScaleFactor));
+			return position.x * positionScaleFactor;
 		}
 	};
 
@@ -37,13 +40,18 @@ public class PositionSense implements BodyPart<Body2d>
 	{
 
 		@Override
-		public int get()
+		public double get()
 		{
-			return Math.round((float)(position.y * EvolutionaryProcess.intScaleFactor));
+			return position.y * positionScaleFactor;
 		}
 	};
 
 	SensorInput[] inputs = { senseX, senseY };
+	
+	public PositionSense(double positionScaleFactor)
+	{
+		this.positionScaleFactor = positionScaleFactor;
+	}
 
 	@Override
 	public SensorInput[] getInputs()
@@ -77,6 +85,10 @@ public class PositionSense implements BodyPart<Body2d>
 	
 	public class Gene extends IOUnit.Gene<Body2d>
 	{
+		private DoubleGene positionScaleFactor = new DoubleGene(1.0, 500);
+		
+		Mutation[] mutations = { positionScaleFactor };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -92,7 +104,7 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new PositionSense();
+			return new PositionSense(positionScaleFactor.getValue() * EvolutionaryProcess.intScaleFactor);
 		}
 
 		@Override
@@ -107,5 +119,10 @@ public class PositionSense implements BodyPart<Body2d>
 			return 0;
 		}
 
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }
