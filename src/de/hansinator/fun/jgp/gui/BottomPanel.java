@@ -42,8 +42,8 @@ public class BottomPanel extends JPanel
 
 		NumberAxis axis = (NumberAxis) xyPlot.getRangeAxis();
 		axis.setRangeType(RangeType.POSITIVE);
-		axis.setDefaultAutoRange(new Range(0.0, 250.0));
-		axis.setAutoRangeMinimumSize(250.0);
+		axis.setDefaultAutoRange(new Range(0.0, 50.0));
+		axis.setAutoRangeMinimumSize(5.0);
 		axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		axis.setLowerMargin(0.0);
 		axis.setUpperMargin(0.0);

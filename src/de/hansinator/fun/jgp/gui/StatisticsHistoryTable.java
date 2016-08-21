@@ -57,9 +57,9 @@ public class StatisticsHistoryTable extends JTable
 				case 0:
 					return "" + generation;
 				case 1:
-					return String.format("%.0f", bestFitness);
+					return String.format("%.1f", bestFitness);
 				case 2:
-					return String.format("%.2f", averageFitness);
+					return String.format("%.1f", averageFitness);
 				case 3:
 					return "" + averageProgramSize;
 				case 4:

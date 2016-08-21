@@ -174,7 +174,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 
 	static class FoodFitnessEvaluator implements FitnessEvaluator, CollisionListener
 	{
-		private int fitness = 0;
+		private double fitness = 0.0;
 
 		@Override
 		public void setFitness(int fitness)
@@ -183,7 +183,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 		}
 
 		@Override
-		public int getFitness()
+		public double getFitness()
 		{
 			return fitness;
 		}
@@ -197,12 +197,18 @@ public class FindingFoodScenario implements Scenario<Genome>
 		@Override
 		public void onCollision(Body2d a, Body b)
 		{
-			if (b.getUserData() == World2d.FOOD_TAG)
+			Object userData = b.getUserData();
+			if (userData == World2d.FOOD_TAG)
 			{
-				fitness++;
+				fitness += 1.0;
 				
 				// set food to eaten to prevent further eating
 				b.setUserData(World2d.EATEN_TAG);
+			}
+			else if (userData == World2d.WALL_TAG)
+			{
+				if(fitness >= 0.1)
+					fitness -= 0.1;
 			}
 		}
 

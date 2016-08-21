@@ -3,7 +3,7 @@ package de.hansinator.fun.jgp.life;
 
 public interface FitnessEvaluator
 {
-	int getFitness();
+	double getFitness();
 	
 	void setFitness(int fitness);
 

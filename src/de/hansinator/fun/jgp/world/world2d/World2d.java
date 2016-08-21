@@ -34,6 +34,8 @@ import de.hansinator.fun.jgp.world.World;
 public class World2d implements World, ContactListener
 {
 
+	public final static Object WALL_TAG = new Object();
+	
 	public final static Object FOOD_TAG = new Object();
 
 	public final static Object EATEN_TAG = new Object();
@@ -126,16 +128,13 @@ public class World2d implements World, ContactListener
 		Vec2 gravity = new Vec2(0, 0);
 		world = new org.jbox2d.dynamics.World(gravity);
 
-		BodyDef bodyDef = new BodyDef();
-		groundBody = world.createBody(bodyDef);
-
 		world.setAllowSleep(true);
 		//world.setSubStepping(true);
 		world.setContinuousPhysics(true);
 		//world.setDestructionListener(destructionListener);
 		world.setContactListener(this);
 		world.setDebugDraw(draw);
-
+		
 		{
 			final float k_restitution = 0.4f;
 
@@ -145,6 +144,10 @@ public class World2d implements World, ContactListener
 			sd.shape = shape;
 			sd.density = 0.0f;
 			sd.restitution = k_restitution;
+			
+			BodyDef bodyDef = new BodyDef();
+			groundBody = world.createBody(bodyDef);
+			groundBody.setUserData(WALL_TAG);
 
 			// left wall
 			shape.set(new Vec2(worldWidth, 0), new Vec2(worldWidth, worldHeight - 1));
@@ -194,9 +197,6 @@ public class World2d implements World, ContactListener
 			Vec2 f = food.get(i).getPosition();
 			curDist = Math.sqrt(((p.x - f.x) * (p.x - f.x)) + ((p.y - f.y) * (p.y - f.y)));
 
-			// limit visible range to 200
-			// if (curDist > 200)
-			// continue;
 			if (curDist < minDist)
 			{
 				minDist = curDist;
@@ -266,7 +266,7 @@ public class World2d implements World, ContactListener
 			if (genome != null)
 			{
 				g.setColor(Color.green);
-				g.drawString("" + genome.getFitnessEvaluator().getFitness(), Math.round(screenPos.x + 4),
+				g.drawString(String.format("%.1f", genome.getFitnessEvaluator().getFitness()), Math.round(screenPos.x + 4),
 						Math.round(screenPos.y - 6));
 			}
 			
@@ -302,12 +302,18 @@ public class World2d implements World, ContactListener
 	@Override
 	public void beginContact(Contact contact)
 	{
-		Object o = contact.m_fixtureA.m_body.getUserData();
+		Object a = contact.m_fixtureA.m_body.getUserData();
+		Object b = contact.m_fixtureB.m_body.getUserData();
 
 		// execute collisions
-		if (o instanceof Body2d)
+		if (a instanceof Body2d)
 		{
-			((Body2d) o).collision(contact.m_fixtureB.m_body);
+			((Body2d) a).collision(contact.m_fixtureB.m_body);
+		}
+		
+		if (b instanceof Body2d)
+		{
+			((Body2d) b).collision(contact.m_fixtureA.m_body);
 		}
 	}
 
