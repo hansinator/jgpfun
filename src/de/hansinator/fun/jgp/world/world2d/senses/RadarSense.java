@@ -31,7 +31,7 @@ public class RadarSense implements SensorInput, ActorOutput, BodyPart.DrawablePa
 
 	public double direction = 0.0;
 
-	public static final double beamLength = 50.0;
+	public static final double beamLength = Settings.getDouble("radarBeamLength");
 
 	private Vec2 target = new Vec2();
 

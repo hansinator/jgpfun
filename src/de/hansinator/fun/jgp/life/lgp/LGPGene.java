@@ -33,9 +33,10 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
  */
 public class LGPGene implements ExecutionUnit.Gene<World2d>
 {
-	// define chances for what mutation could happen in some sort of
-	// percentage
-	private static final int mutateIns = 2200, mutateRem = 1800, mutateRep = 2000;
+	// chances for what mutation could happen in some sort of fitness
+	private static final int mutateIns = Settings.getInt("LGPGeneMutateIns");
+	private static final int mutateRem = Settings.getInt("LGPGeneMutateRem");
+	private static final int mutateRep = Settings.getInt("LGPGeneMutateRep");
 	
 	static final int registerCount = Settings.getInt("registerCount");
 

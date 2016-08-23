@@ -15,9 +15,9 @@ import de.hansinator.fun.jgp.world.world2d.World2d;
 
 public class OpCode extends ImmutableGene<OpCode, LGPMachine<World2d>> {
 
-	private final static int maxRegisterValDelta = 16;
-
-	private final static int maxConstantValDelta = 16384;
+	private final static int maxRegisterValDelta = Settings.getInt("maxRegisterValDelta");
+	
+	private final static int maxConstantValDelta = Settings.getInt("maxConstantValDelta");
 
 	IntegerGene op = new IntegerGene(20) {
 		@Override

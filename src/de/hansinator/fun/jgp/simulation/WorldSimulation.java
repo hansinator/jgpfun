@@ -17,6 +17,7 @@ import org.uncommons.watchmaker.framework.FitnessEvaluator;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
+import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.World;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
@@ -51,7 +52,7 @@ public final class WorldSimulation implements EvaluationStrategy<Genome>
 
 	private final ThreadPoolExecutor pool;
 
-	public static final int ROUNDS_PER_GENERATION = 1500;
+	public static final int ROUNDS_PER_GENERATION = Settings.getInt("roundsPerGeneration");
 	
 	private int rps;
 	
