@@ -114,7 +114,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 			simulationView = new JPanel();
 			simulationView.setLayout(new BorderLayout());
 			simulationView.add(new WorldSimulationView(evaluationStrategy), BorderLayout.CENTER);
-			simulationView.add(new BottomPanel(evaluationStrategy, evoStats), BorderLayout.PAGE_END);
+			simulationView.add(new BottomPanel(evaluationStrategy, evoStats), BorderLayout.SOUTH);
 		}
 		
 		return simulationView;

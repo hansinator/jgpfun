@@ -56,7 +56,7 @@ public class MainFrame extends JFrame implements WindowListener
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(simulationClientView, BorderLayout.CENTER);
-		contentPane.add(sidePaneRight, BorderLayout.LINE_END);
+		contentPane.add(sidePaneRight, BorderLayout.EAST);
 		
 		// get ready for action
 		addWindowListener(this);

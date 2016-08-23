@@ -20,6 +20,7 @@ import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
+import de.hansinator.fun.jgp.life.lgp.operations.UnaryOperation;
 import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 
@@ -230,21 +231,23 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	}
 	
 	
+	// XXX differentiate between body and genome view; add body view that shows angle etc and inputs and outputs
+	// XXX add a treeview for io gene children
 	private class View extends JDialog implements ExecutionUnitGeneView
 	{
 		public View()
 		{	
 			int i = 0;
 			
-			// make a tabke model for the program
-			String[] columns = new String[]{"loc", "op", "src1", "src2", "trg", "immediate"};
+			// make a table model for the program
+			String[] columns = new String[]{"loc", "op", "src1", "src2", "immediate", "trg"};
 			DefaultTableModel tableModel = new DefaultTableModel(0, columns.length);
 			tableModel.setColumnIdentifiers(columns);
 			if(strippedProgram != null)
-				for(OpCode o : strippedProgram )
-					tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.trg.getValue().toString(), o.immediate.getValue().toString() });
+				for(OpCode o : strippedProgram)
+					tableModel.addRow(new String[] { "" + i++ , LGPMachine.ops[o.op.getValue()].getClass().getSimpleName(), o.src1.getValue().toString(), o.src2.getValue().toString(), o.immediate.getValue() ? "X" : "" , o.trg.getValue().toString()});
 			
-			// create table 
+			// create table
 			JTable programTable = new JTable(tableModel);
 			programTable.setFillsViewportHeight(true);
 			programTable.setColumnSelectionAllowed(false);
@@ -252,7 +255,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 			
 			// add table to view
 			JScrollPane scrollPane = new JScrollPane(programTable);
-			scrollPane.setPreferredSize(new Dimension(800, 600));
+			scrollPane.setPreferredSize(new Dimension(600, 800));
 			Container contentPane = getContentPane();
 			contentPane.add(scrollPane);
 			
