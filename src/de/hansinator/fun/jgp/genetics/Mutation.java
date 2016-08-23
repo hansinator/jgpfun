@@ -2,8 +2,6 @@ package de.hansinator.fun.jgp.genetics;
 
 import java.util.Random;
 
-import de.hansinator.fun.jgp.genetics.selection.Selectable;
-
 /**
  * This describes a mutation that has a possibility to happen and can
  * be applied. Mutations are "offered" by Gene-instances and may be

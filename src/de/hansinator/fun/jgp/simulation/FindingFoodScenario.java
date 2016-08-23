@@ -19,14 +19,12 @@ import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
+import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.selection.TournamentSelection;
-
-import com.sun.org.apache.regexp.internal.recompile;
 
 import de.hansinator.fun.jgp.genetics.Genome;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeMutation;
-import de.hansinator.fun.jgp.genetics.selection.RouletteWheelSelector;
 import de.hansinator.fun.jgp.gui.BottomPanel;
 import de.hansinator.fun.jgp.gui.EvoStats;
 import de.hansinator.fun.jgp.gui.WorldSimulationView;
@@ -91,7 +89,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 		selectionStrategy = new TournamentSelection(new Probability(tournamentSelectionProbability));
 		evaluationStrategy = new WorldSimulation(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
 		
-		// crate pipeline
+		// create pipeline
 		List<EvolutionaryOperator<Genome>> operators = new LinkedList<EvolutionaryOperator<Genome>>();
 		operators.add(new GenomeMutation(maxMutations));
 		EvolutionaryOperator<Genome> evolutionPipeline = new EvolutionPipeline<Genome>(operators);
@@ -245,7 +243,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 			LGPGene organismGene = LGPGene.randomGene(rng, progSize);
 			organismGene.addIOGene(bodyGene);
 			
-			return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelector());
+			return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelection());
 		}
 		
 	}

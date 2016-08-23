@@ -1,4 +1,4 @@
-package de.hansinator.fun.jgp.genetics.selection;
+package de.hansinator.fun.jgp.genetics;
 
 public interface Selectable
 {

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import org.uncommons.watchmaker.framework.SelectionStrategy;
 
-import de.hansinator.fun.jgp.genetics.selection.SelectionStrategy;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.world.world2d.World2d;
@@ -23,9 +24,9 @@ public class Genome
 	//XXX make this something like "addEvaluation" to add an evaluation with world parameter reference and datetime and stuff so a genome is multi-evaluatable
 	private final FitnessEvaluator fitnessEvaluator;
 	
-	private final SelectionStrategy mutationSelector;
+	private final SelectionStrategy<Object> mutationSelector;
 	
-	public Genome(ExecutionUnit.Gene<World2d> rootGene, FitnessEvaluator fitnessEvaluator, SelectionStrategy mutationSelector)
+	public Genome(ExecutionUnit.Gene<World2d> rootGene, FitnessEvaluator fitnessEvaluator, SelectionStrategy<Object> mutationSelector)
 	{
 		this.rootGene = rootGene;
 		this.fitnessEvaluator = fitnessEvaluator;
@@ -53,17 +54,15 @@ public class Genome
 		List<Mutation> mutations = new ArrayList<Mutation>();
 		collectMutations(rootGene, mutations);
 
-		// select given amount of mutations
-		for(int i = 0; i < mutationCount; i++)
-		{
-			// always sum up chances anew because they might change during runs
-			int totalFitness = 0;
-			for (Mutation mutation : mutations)
-				totalFitness += mutation.getMutationChance();
-			
-			// use our selector to select a mutation and execute it
-			mutationSelector.select(mutations.toArray(new Mutation[mutations.size()]), totalFitness).mutate(rng);
-		}
+		// prepare mutations as EvaluatedCandidate list to perform selection
+		List<EvaluatedCandidate<Mutation>> ec = new ArrayList<EvaluatedCandidate<Mutation>>(mutations.size());
+		for (Mutation mutation : mutations)
+			ec.add(new EvaluatedCandidate<Mutation>(mutation, mutation.getSelectionChance())); 
+		
+		// select given amount of mutations and execute them
+		mutations = mutationSelector.select(ec, true, mutationCount, rng);
+		for(Mutation mutation : mutations)
+			mutation.mutate(rng);
 	}
 	
 	/**
