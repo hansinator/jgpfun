@@ -22,7 +22,6 @@ import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.World2d;
 import de.hansinator.fun.jgp.world.world2d.senses.RadarSense;
@@ -37,7 +36,7 @@ public class TestRadarSense extends JPanel
 
 	private final ExecutionUnit<World2d> organism;
 	
-	private final AntBody body;
+	private final Body2d body;
 	
 	private RadarSense sense;
 
@@ -49,7 +48,7 @@ public class TestRadarSense extends JPanel
 
 	public LGPGene randomGenome()
 	{
-		AntBody.Gene bodyGene = new AntBody.Gene();
+		Body2d.Gene bodyGene = new Body2d.Gene();
 		bodyGene.addBodyPartGene(new RadarSense.Gene());
 
 		LGPGene organismGene = LGPGene.randomGene(Settings.newRandomSource(), 256);
@@ -66,7 +65,7 @@ public class TestRadarSense extends JPanel
 		organism = randomGenome().express(world);
 		organism.setExecutionContext(world);
 
-		body = ((AntBody) organism.getIOUnits()[0]);
+		body = ((Body2d) organism.getIOUnits()[0]);
 		body.getBody().setType(BodyType.STATIC);
 		body.sampleInputs();
 		

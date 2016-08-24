@@ -33,7 +33,6 @@ import de.hansinator.fun.jgp.life.FitnessEvaluator;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.lgp.LGPGene;
 import de.hansinator.fun.jgp.util.Settings;
-import de.hansinator.fun.jgp.world.world2d.AntBody;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 import de.hansinator.fun.jgp.world.world2d.Body2d.CollisionListener;
 import de.hansinator.fun.jgp.world.world2d.World2d;
@@ -234,7 +233,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 		@Override
 		public Genome generateRandomCandidate(Random rng)
 		{
-			AntBody.Gene bodyGene = new AntBody.Gene();
+			Body2d.Gene bodyGene = new Body2d.Gene();
 			bodyGene.addBodyPartGene(new ObjectLocator.Gene());
 			//bodyGene.addBodyPartGene(new RadarSense.Gene());
 			bodyGene.addBodyPartGene(new OrientationSense.Gene());

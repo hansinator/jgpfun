@@ -152,11 +152,11 @@ public class World2d implements World, ContactListener
 			groundBody.setUserData(WALL_TAG);
 
 			// left wall
-			shape.set(new Vec2(worldWidth, 0), new Vec2(worldWidth, worldHeight - 1));
+			shape.set(new Vec2(worldWidth, 0.0f), new Vec2(worldWidth, worldHeight - 1));
 			groundBody.createFixture(sd);
 
 			// right wall
-			shape.set(new Vec2(1.0f, 0), new Vec2(1.0f, worldHeight - 1));
+			shape.set(new Vec2(1.0f, 0.0f), new Vec2(1.0f, worldHeight - 1));
 			groundBody.createFixture(sd);
 
 			// top wall
@@ -267,7 +267,7 @@ public class World2d implements World, ContactListener
 
 			if (genome != null)
 			{
-				g.setColor(Color.green);
+				g.setColor(b.color);
 				g.drawString(String.format("%.1f", genome.getFitnessEvaluator().getFitness()), Math.round(screenPos.x + 4),
 						Math.round(screenPos.y - 6));
 			}

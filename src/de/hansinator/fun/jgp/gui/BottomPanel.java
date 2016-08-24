@@ -36,6 +36,7 @@ public class BottomPanel extends JPanel
 		 */
 
 		XYSeriesCollection xyDataset = new XYSeriesCollection(evoStats.avgFitnessChartData);
+		xyDataset.addSeries(evoStats.bestFitnesslowPassChartData);
 		xyDataset.addSeries(evoStats.bestFitnessChartData);
 		JFreeChart foodChart = ChartFactory.createXYLineChart(null, null, null, xyDataset, PlotOrientation.VERTICAL,
 				false, false, false);

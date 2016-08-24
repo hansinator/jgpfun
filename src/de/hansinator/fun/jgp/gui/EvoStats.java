@@ -16,6 +16,8 @@ public class EvoStats implements EvolutionObserver<Genome>
 	public final XYSeries avgFitnessChartData = new XYSeries("avg fitness");
 	
 	public final XYSeries bestFitnessChartData = new XYSeries("best fitness");
+	
+	public final XYSeries bestFitnesslowPassChartData = new XYSeries("best fitness low pass");
 
 	public final XYSeries genomeSizeChartData = new XYSeries("prg size");
 
@@ -25,10 +27,22 @@ public class EvoStats implements EvolutionObserver<Genome>
 	
 	long lastStatsTime, evaluationsPerMinuteAverage = 0, evaluationsPerMinuteCount = 0;
 	
+	private static final int rollingAverageWndSize = 24;
+	
+	private double rollingAverageSum;
+	
+	private double[] rollingAverageValues = new double[rollingAverageWndSize];
+	
+	private int rollingAverageCount, rollingAverageIndex;
+	
 	public EvoStats()
 	{
+		rollingAverageSum = 0.0;
+		rollingAverageCount = 0;
+		rollingAverageIndex = 0;
 		avgFitnessChartData.setMaximumItemCount(1000);
 		bestFitnessChartData.setMaximumItemCount(1000);
+		bestFitnesslowPassChartData.setMaximumItemCount(1000);
 		genomeSizeChartData.setMaximumItemCount(1000);
 		realGenomeSizeChartData.setMaximumItemCount(1000);
 		//XXX this is a crude solution
@@ -37,8 +51,12 @@ public class EvoStats implements EvolutionObserver<Genome>
 
 	public void reset()
 	{
+		rollingAverageSum = 0.0;
+		rollingAverageCount = 0;
+		rollingAverageIndex = 0;
 		avgFitnessChartData.clear();
 		bestFitnessChartData.clear();
+		bestFitnesslowPassChartData.clear();
 		genomeSizeChartData.clear();
 		realGenomeSizeChartData.clear();
 		statisticsHistory.clear();
@@ -66,12 +84,24 @@ public class EvoStats implements EvolutionObserver<Genome>
     		avgProgSize /= popSize;
     		avgRealProgSize /= popSize;
     		
+    		double bestCandidateFitness = data.getBestCandidateFitness();
     		
-    		statisticsHistory.appendEntry(generation, data.getBestCandidateFitness(), data.getMeanFitness(), avgProgSize, avgRealProgSize);
+    		// do rolling average
+    		rollingAverageSum += bestCandidateFitness;
+    		if(rollingAverageCount < rollingAverageWndSize)
+    			rollingAverageCount++;
+    		else
+    			rollingAverageSum -= rollingAverageValues[rollingAverageIndex];
+    		rollingAverageValues[rollingAverageIndex++] = bestCandidateFitness;
+    		rollingAverageIndex %= rollingAverageWndSize;
+    		
+    		
+    		statisticsHistory.appendEntry(generation, bestCandidateFitness, data.getMeanFitness(), avgProgSize, avgRealProgSize);
     		genomeSizeChartData.add(generation, avgProgSize);
     		realGenomeSizeChartData.add(generation, avgRealProgSize);
 			avgFitnessChartData.add(generation, data.getMeanFitness());
-			bestFitnessChartData.add(generation, data.getBestCandidateFitness());
+			bestFitnessChartData.add(generation, bestCandidateFitness);
+			bestFitnesslowPassChartData.add(generation, rollingAverageSum / rollingAverageCount);
 			System.out.println("GEN: " + generation);
 		}
 
