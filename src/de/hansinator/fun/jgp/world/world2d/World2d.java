@@ -39,6 +39,8 @@ public class World2d implements World, ContactListener
 	public final static Object FOOD_TAG = new Object();
 
 	public final static Object EATEN_TAG = new Object();
+	
+	private final static float foodRadius = (float)Settings.getDouble("foodRadius");
 
 	private final Random rnd;
 
@@ -169,7 +171,7 @@ public class World2d implements World, ContactListener
 		// create food
 		{
 			CircleShape circle = new CircleShape();
-			circle.m_radius = 1.0f;
+			circle.m_radius = foodRadius;
 			FixtureDef fd = new FixtureDef();
 			fd.shape = circle;
 			fd.isSensor = true;
@@ -225,7 +227,7 @@ public class World2d implements World, ContactListener
 		for (Body2d b : bodies)
 		{
 			Vec2 p = b.getBody().getPosition();
-			if (Math.abs(p.x - clickPos.x) < 10.0 && Math.abs(p.y - clickPos.y) < 10.0)
+			if (Math.abs(p.x - clickPos.x) < 5.0 && Math.abs(p.y - clickPos.y) < 5.0)
 			{
 				// TODO add an object inspector view that shows info about the
 				// selected object

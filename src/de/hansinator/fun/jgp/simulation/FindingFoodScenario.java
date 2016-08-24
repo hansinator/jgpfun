@@ -59,6 +59,8 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	private static final double tournamentSelectionProbability = Settings.getDouble("tournamentSelectionProbability");
 	
+	private static final double wallTouchPenalty = Settings.getDouble("wallTouchPenalty");
+	
 	private final AntFactory antFactory;
 	
 	private final SelectionStrategy<Object> selectionStrategy;
@@ -205,8 +207,8 @@ public class FindingFoodScenario implements Scenario<Genome>
 			}
 			else if (userData == World2d.WALL_TAG)
 			{
-				if(fitness >= 0.1)
-					fitness -= 0.1;
+				if(fitness >= wallTouchPenalty)
+					fitness -= wallTouchPenalty;
 			}
 		}
 
