@@ -74,7 +74,9 @@ public class LinearVelocitySense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new LinearVelocitySense.Gene();
+			LinearVelocitySense.Gene gene = new LinearVelocitySense.Gene();
+			gene.linearVelocityScaleFactor.setValue(linearVelocityScaleFactor.getValue());
+			return gene;
 		}
 
 		@Override

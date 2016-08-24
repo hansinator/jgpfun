@@ -150,7 +150,10 @@ public class ObjectLocator implements BodyPart.DrawablePart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new ObjectLocator.Gene();
+			ObjectLocator.Gene gene = new ObjectLocator.Gene();
+			gene.senseDirScaleFactor.setValue(senseDirScaleFactor.getValue());
+			gene.distScaleFactor.setValue(distScaleFactor.getValue());
+			return gene;
 		}
 
 		@Override

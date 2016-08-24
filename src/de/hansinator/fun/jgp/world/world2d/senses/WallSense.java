@@ -104,7 +104,9 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new WallSense.Gene();
+			WallSense.Gene gene = new WallSense.Gene();
+			gene.wallSenseScaleFactor.setValue(wallSenseScaleFactor.getValue());
+			return gene;
 		}
 
 		@Override

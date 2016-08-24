@@ -98,7 +98,9 @@ public class PositionSense implements BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new PositionSense.Gene();
+			PositionSense.Gene gene = new PositionSense.Gene();
+			gene.positionScaleFactor.setValue(positionScaleFactor.getValue());
+			return gene;
 		}
 
 		@Override

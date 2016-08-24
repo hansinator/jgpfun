@@ -80,7 +80,9 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new OrientationSense.Gene();
+			OrientationSense.Gene gene = new OrientationSense.Gene();
+			gene.orientationScaleFactor.setValue(orientationScaleFactor.getValue());
+			return gene;
 		}
 
 		@Override
