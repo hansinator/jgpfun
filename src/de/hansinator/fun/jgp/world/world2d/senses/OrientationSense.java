@@ -10,6 +10,7 @@ import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
+import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -66,7 +67,7 @@ public class OrientationSense implements SensorInput, BodyPart<Body2d>
 
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
-		private DoubleGene orientationScaleFactor = new DoubleGene(1.0, 500);
+		private DoubleGene orientationScaleFactor = new DoubleGene(1.0, Settings.getInt("orientationScaleFactorMutChance"));
 		
 		Mutation[] mutations = { orientationScaleFactor };
 		

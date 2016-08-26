@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.jbox2d.common.Vec2;
 
+import de.hansinator.fun.jgp.genetics.Mutation;
+import de.hansinator.fun.jgp.genetics.ValueGene.FloatGene;
 import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
@@ -93,6 +95,18 @@ public class TankMotor implements BodyPart<Body2d>
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{	
+		private static float leftMotorPosX = (float)Settings.getDouble("leftMotorPosX");
+		
+		private static float leftMotorPosY = (float)Settings.getDouble("leftMotorPosY");
+		
+		private static float rightMotorPosX = (float)Settings.getDouble("rightMotorPosX");
+		
+		private static float rightMotorPosY = (float)Settings.getDouble("rightMotorPosY");
+		
+		private FloatGene motorSpacing = new FloatGene(1.0f, Settings.getInt("motorSpacingMutChance")); 
+		
+		Mutation[] mutations = { motorSpacing };
+		
 		@Override
 		public List<de.hansinator.fun.jgp.genetics.Gene> getChildren()
 		{
@@ -103,13 +117,15 @@ public class TankMotor implements BodyPart<Body2d>
 		@Override
 		public de.hansinator.fun.jgp.life.IOUnit.Gene<Body2d> replicate()
 		{
-			return new TankMotor.Gene();
+			TankMotor.Gene gene = new TankMotor.Gene();
+			gene.motorSpacing.setValue(motorSpacing.getValue());
+			return gene;
 		}
 
 		@Override
 		public IOUnit<Body2d> express(Body2d context)
 		{
-			return new TankMotor(context, new Vec2(-0.31f, 0.5f), new Vec2(0.31f, 0.5f));
+			return new TankMotor(context, new Vec2(leftMotorPosX * motorSpacing.getValue(), leftMotorPosY), new Vec2(rightMotorPosX * motorSpacing.getValue(), rightMotorPosY));
 		}
 
 		@Override
@@ -124,5 +140,10 @@ public class TankMotor implements BodyPart<Body2d>
 			return 2;
 		}
 
+		@Override
+		public Mutation[] getMutations()
+		{
+			return mutations;
+		}
 	}
 }

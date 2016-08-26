@@ -27,6 +27,7 @@ import de.hansinator.fun.jgp.genetics.Genome.GenomeEvaluator;
 import de.hansinator.fun.jgp.genetics.Genome.GenomeMutation;
 import de.hansinator.fun.jgp.gui.BottomPanel;
 import de.hansinator.fun.jgp.gui.EvoStats;
+import de.hansinator.fun.jgp.gui.StatisticsHistoryPanel;
 import de.hansinator.fun.jgp.gui.WorldSimulationView;
 import de.hansinator.fun.jgp.life.ExecutionUnit;
 import de.hansinator.fun.jgp.life.FitnessEvaluator;
@@ -116,15 +117,10 @@ public class FindingFoodScenario implements Scenario<Genome>
 			simulationView.setLayout(new BorderLayout());
 			simulationView.add(new WorldSimulationView(evaluationStrategy), BorderLayout.CENTER);
 			simulationView.add(new BottomPanel(evaluationStrategy, evoStats), BorderLayout.SOUTH);
+			simulationView.add(new StatisticsHistoryPanel(evoStats.statisticsHistory), BorderLayout.EAST);
 		}
 		
 		return simulationView;
-	}
-	
-	@Override
-	public EvoStats getEvoStats()
-	{
-		return evoStats;
 	}
 	
 	@Override

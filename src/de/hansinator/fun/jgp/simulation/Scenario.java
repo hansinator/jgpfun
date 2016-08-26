@@ -16,8 +16,6 @@ public interface Scenario<T>
 {
 	JPanel getSimulationView();
 	
-	EvoStats getEvoStats();
-	
 	EvolutionEngine<T> getEngine();
 
 	EvaluationStrategy<T> getEvaluationStrategy();

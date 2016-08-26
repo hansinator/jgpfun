@@ -11,6 +11,7 @@ import de.hansinator.fun.jgp.life.ActorOutput;
 import de.hansinator.fun.jgp.life.IOUnit;
 import de.hansinator.fun.jgp.life.SensorInput;
 import de.hansinator.fun.jgp.simulation.EvolutionaryProcess;
+import de.hansinator.fun.jgp.util.Settings;
 import de.hansinator.fun.jgp.world.BodyPart;
 import de.hansinator.fun.jgp.world.world2d.Body2d;
 
@@ -22,7 +23,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 {
 	private final double wallSenseScaleFactor;
 	
-	private float worldWidth, worldHeight, angle = 0.0f;
+	private float worldWidth, worldHeight;
 
 	private Body body;
 	
@@ -59,23 +60,16 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	public void sampleInputs()
 	{
 		position = body.getPosition();
-		angle = body.getAngle();
 	}
 
+	// pickup wallsense in applyOutputs before coordinates are clipped
 	@Override
 	public void applyOutputs()
 	{
-		// pickup wallsense in applyOutputs before coordinates are clipped
-		float temp = 0.0f;
+		float temp = 1.0f;
 
-		if ((position.x <= 0) || (position.x >= worldWidth))
-		{
-			// TODO: fix abs stuff
-			temp = (float) Math.min(Math.abs(2 * Math.PI - angle), Math.abs(Math.PI - angle));
-			if ((position.y <= 0) || (position.y >= worldHeight))
-				temp = (float) Math.min(temp, Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle)));
-		} else if ((position.y <= 0) || (position.y >= worldHeight))
-			temp = (float) Math.min(Math.abs(0.5 * Math.PI - angle), Math.abs(1.5 * Math.PI - angle));
+		if ((position.x <= 0) || (position.x >= worldWidth) || (position.y <= 0) || (position.y >= worldHeight))
+			temp = -100.0f;
 
 		lastSenseVal = temp * wallSenseScaleFactor;
 	}
@@ -90,7 +84,7 @@ public class WallSense implements SensorInput, BodyPart<Body2d>
 	
 	public static class Gene extends IOUnit.Gene<Body2d>
 	{
-		private DoubleGene wallSenseScaleFactor = new DoubleGene(1.0, 500);
+		private DoubleGene wallSenseScaleFactor = new DoubleGene(1.0, Settings.getInt("wallSenseScaleFactorMutChance"));
 		
 		Mutation[] mutations = { wallSenseScaleFactor };
 		

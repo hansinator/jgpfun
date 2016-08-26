@@ -32,8 +32,6 @@ public class MainFrame extends JFrame implements WindowListener
 	}
 
 	private JPanel simulationClientView;
-
-	public final JPanel sidePaneRight;
 	
 	private final Scenario<Genome> scenario;
 
@@ -45,7 +43,6 @@ public class MainFrame extends JFrame implements WindowListener
         //scenario.getEngine().engine.addEvolutionObserver(monitor);
 
 		// create all sub views
-		sidePaneRight = new StatisticsHistoryPanel(scenario.getEvoStats().statisticsHistory);
 		simulationClientView = scenario.getSimulationView();
 		simulationClientView.setPreferredSize(new Dimension(width, height));
 
@@ -56,7 +53,6 @@ public class MainFrame extends JFrame implements WindowListener
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(simulationClientView, BorderLayout.CENTER);
-		contentPane.add(sidePaneRight, BorderLayout.EAST);
 		
 		// get ready for action
 		addWindowListener(this);
