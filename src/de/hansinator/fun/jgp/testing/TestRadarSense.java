@@ -51,7 +51,7 @@ public class TestRadarSense extends JPanel
 		Body2d.Gene bodyGene = new Body2d.Gene();
 		bodyGene.addBodyPartGene(new RadarSense.Gene());
 
-		LGPGene organismGene = LGPGene.randomGene(Settings.newRandomSource(), 256);
+		LGPGene organismGene = LGPGene.randomGene(Settings.newRandomSource(), 256, 200);
 		organismGene.addIOGene(bodyGene);
 
 		return organismGene;

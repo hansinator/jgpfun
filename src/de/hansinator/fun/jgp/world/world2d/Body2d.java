@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
@@ -203,23 +204,23 @@ public class Body2d implements BodyPart<ExecutionUnit<World2d>>
 	
 	public static class Gene extends IOUnit.Gene<ExecutionUnit<World2d>>
 	{
-		public static int locatorInputCount = new ObjectLocator.Gene().getInputCount();
-
 		private List<IOUnit.Gene<Body2d>> children = new ArrayList<IOUnit.Gene<Body2d>>();
 		
-		private FloatGene bodyWidth = new FloatGene(1.0f, 500);
+		private FloatGene bodyWidth = new FloatGene(1.0f, Settings.getInt("bodyWidthMutChance"));
 		
-		private FloatGene bodyHeight = new FloatGene(1.0f, 500);
+		private FloatGene bodyHeight = new FloatGene(1.0f, Settings.getInt("bodyHeightMutChance"));
 		
-		private FloatGene color = new FloatGene(1.0f, 500);
+		private FloatGene color = new FloatGene(Settings.getInt("colorMutChance"));
 		
-		private static float maxWidth = 1.0f;
+		private static float maxBodyWidth = (float)Settings.getDouble("maxBodyWidth");
 		
-		private static float maxHeight = 1.0f;
+		private static float maxBodyHeight = (float)Settings.getDouble("maxBodyHeight");
 		
-		private static float minWidth = 0.625f;
+		private static float minBodyWidth = (float)Settings.getDouble("minBodyWidth");
 		
-		private static float minHeight = 0.625f;
+		private static float minBodyHeight = (float)Settings.getDouble("minBodyHeight");
+		
+		private static int bodyType = Settings.getInt("bodyType");
 		
 		Mutation[] mutations = { bodyWidth, bodyHeight, color };
 
@@ -257,14 +258,27 @@ public class Body2d implements BodyPart<ExecutionUnit<World2d>>
 		public IOUnit<ExecutionUnit<World2d>> express(ExecutionUnit<World2d> context)
 		{
 			// create ant body shape
-			float w = (minWidth + (bodyWidth.getValue() * (maxWidth - minWidth))) / 2;
-			float h = (minHeight + (bodyHeight.getValue() * (maxHeight - minHeight))) / 2;
-			PolygonShape shape = new PolygonShape();
-			Vec2 vertices[] = new Vec2[3];
-			vertices[0] = new Vec2(0.0f, -h); // top of triangle
-			vertices[1] = new Vec2(-w, h); // left wing
-			vertices[2] = new Vec2(w, h); // right wing
-			shape.set(vertices, 3);
+			float w = (minBodyWidth + (bodyWidth.getValue() * (maxBodyWidth - minBodyWidth))) / 2;
+			float h = (minBodyHeight + (bodyHeight.getValue() * (maxBodyHeight - minBodyHeight))) / 2;
+			
+			Shape shape;
+			
+			if(bodyType == 0)
+			{
+				PolygonShape ps = new PolygonShape();
+				Vec2 vertices[] = new Vec2[3];
+				vertices[0] = new Vec2(0.0f, -h); // top of triangle
+				vertices[1] = new Vec2(-w, h); // left wing
+				vertices[2] = new Vec2(w, h); // right wing
+				ps.set(vertices, 3);
+				shape = ps;
+			}
+			else
+			{
+				CircleShape cs = new CircleShape();
+				cs.m_radius = w;
+				shape = cs;
+			}
 
 			// create body
 			Body2d body = new Body2d(context, shape, color.getValue());

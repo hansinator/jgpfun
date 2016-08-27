@@ -49,8 +49,6 @@ import de.hansinator.fun.jgp.world.world2d.senses.WallSense;
  */
 public class FindingFoodScenario implements Scenario<Genome>
 {
-	private static final int progSize = Settings.getInt("progSize");
-	
 	private static final int worldWidth = Settings.getInt("worldWidth");
 	
 	private static final int worldHeight = Settings.getInt("worldHeight");
@@ -87,7 +85,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	public FindingFoodScenario()
 	{
-		antFactory = new AntFactory(progSize);
+		antFactory = new AntFactory();
 		selectionStrategy = new TournamentSelection(new Probability(tournamentSelectionProbability));
 		evaluationStrategy = new WorldSimulation(new GenomeEvaluator(), new World2d(worldWidth, worldHeight, Settings.getInt("foodCount")));
 		
@@ -219,12 +217,9 @@ public class FindingFoodScenario implements Scenario<Genome>
 	
 	static class AntFactory extends AbstractCandidateFactory<Genome>
 	{	
-		private final int progSize;
+		private static final int maxProgSize= Settings.getInt("maxProgSize");
 		
-		public AntFactory(int progSize)
-		{
-			this.progSize = progSize;
-		}
+		private static final int minProgSize= Settings.getInt("minProgSize");
 		
 		@Override
 		public Genome generateRandomCandidate(Random rng)
@@ -237,7 +232,7 @@ public class FindingFoodScenario implements Scenario<Genome>
 			bodyGene.addBodyPartGene(new WallSense.Gene());
 			bodyGene.addBodyPartGene(new TankMotor.Gene());
 			
-			LGPGene organismGene = LGPGene.randomGene(rng, progSize);
+			LGPGene organismGene = LGPGene.randomGene(rng, maxProgSize, minProgSize);
 			organismGene.addIOGene(bodyGene);
 			
 			return new Genome(organismGene, new FoodFitnessEvaluator(), new RouletteWheelSelection());

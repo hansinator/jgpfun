@@ -44,7 +44,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	
 	private OpCode[] strippedProgram = null;
 
-	private final int maxLength;
+	private final int maxLength, minLength;
 	
 	private final List<IOUnit.Gene<ExecutionUnit<World2d>>> ioGenes = new ArrayList<IOUnit.Gene<ExecutionUnit<World2d>>>();
 	
@@ -87,22 +87,23 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 	private final Mutation[] mutations = { mutationInsert, mutationRemove, mutationReplace };
 	
 
-	public static LGPGene randomGene(Random rng, int maxLength)
+	public static LGPGene randomGene(Random rng, int maxLength, int minLength)
 	{
-		int size = rng.nextInt(maxLength - 200) + 201;
+		int size = rng.nextInt(maxLength - minLength) + minLength;
 		List<OpCode> program = new ArrayList<OpCode>(size);
 
 		for (int i = 0; i < size; i++)
 			program.add(OpCode.randomOpCode(rng));
 
-		return new LGPGene(program, maxLength);
+		return new LGPGene(program, maxLength, minLength);
 	}
 
 
-	private LGPGene(List<OpCode> program, int maxLength)
+	private LGPGene(List<OpCode> program, int maxLength, int minLength)
 	{
 		this.program = program;
 		this.maxLength = maxLength;
+		this.minLength = minLength;
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		for (OpCode oc : program)
 			p.add(oc.replicate());
 
-		LGPGene lg = new LGPGene(p, maxLength);
+		LGPGene lg = new LGPGene(p, maxLength, minLength);
 		
 		lg.inputCount = inputCount;
 		lg.outputCount = outputCount;
@@ -203,8 +204,8 @@ public class LGPGene implements ExecutionUnit.Gene<World2d>
 		// so adjust insert mutation chance accordingly
 		mutationInsert.setMutationChance((program.size() >= maxLength)?0:mutateIns);
 		
-		// if we have only 4 opcodes left, don't delete more
-		if (program.size() < 5)
+		// if we have only minLength opcodes left, don't delete more
+		if (program.size() <= minLength)
 		{
 			mutationRemove.setMutationChance(0);
 			

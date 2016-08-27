@@ -34,13 +34,9 @@ public final class WorldSimulation implements EvaluationStrategy<Genome>
 	// "simple" stuff (bodiss, sesses) and more custom stuff.. a bit like the
 	// clonk menu?!
 
-	// (it is questionable if this must be included in propertiers... it's fine
-	// if it's hardcoded for a while or two!)
 	private int fpsMax = 70;
 
-	// (it is questionable if this must be included in propertiers... it's fine
-	// if it's hardcoded for a while or two!)
-	private int roundsMod = 800;
+	private int roundsMod = ROUNDS_PER_GENERATION / 3;
 
 	private volatile boolean running = true;
 

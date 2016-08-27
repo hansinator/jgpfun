@@ -59,9 +59,6 @@ public class MainFrame extends JFrame implements WindowListener
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
 		setVisible(true);
-		
-		// debugging
-		System.out.println("Simulation client view size: " + simulationClientView.getWidth() + "x" + simulationClientView.getHeight());
 	}
 
 	private JMenuBar createMenuBar()
@@ -146,7 +143,7 @@ public class MainFrame extends JFrame implements WindowListener
 	public static void main(String[] args)
 	{
 		Scenario<Genome> scenario = new FindingFoodScenario();
-		new MainFrame(Settings.getInt("worldWidth"), Settings.getInt("worldHeight"), scenario);
+		new MainFrame(800, 600, scenario);
 		scenario.start();
 	}
 }
